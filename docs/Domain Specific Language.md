@@ -1,3 +1,4 @@
+# Table of Contents
 - [YAML-Specific DSL](#yaml-specific-dsl)
   * [Workflow](#workflow)
   * [Stage](#stage)
