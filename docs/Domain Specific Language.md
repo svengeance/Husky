@@ -44,9 +44,9 @@ You might use several jobs to perform an installation of an application. A serie
 * (UI) Thank User, Open Readme, Start Program
 
 ### Task
-The final tier of a workflow. A task represents a specific action that Husky can perform.  
-Tasks can be custom code by the user, or pre-defined tasks that Husky is trained to perform.   
-Tasks do execute in parallel, as they are typically linear in nature and usually dependent upon each other.
+The final tier of a workflow. A task represents a specific action that Husky can perform.
+Tasks can be custom code by the user, or pre-defined tasks that Husky is trained to execute.   
+Tasks do not execute in parallel, as they are typically linear in nature and usually dependent upon each other.
 
 ## C#-Specific DSL 
 *Note: The following is still in the discovery phase and subject to change between now and the v1 public release*
