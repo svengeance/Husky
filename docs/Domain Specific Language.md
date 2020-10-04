@@ -27,9 +27,9 @@ to install itself.
 A workflow operates on an optional three-tier structure, described in the following sections. Please note that each tier has a semantic meaning in accordance to its place in the hierarchy, and that only the final tier ([tasks](#task)) may execute installation steps. A workflow must contain one or more of the following:
 
 ### Stage
-The first tier of a workflow, a stage usually represents a complete installation of a single application comprised of a series of [jobs](#job). Unlike traditional CI/CD pipelines where stages are isolated from each other, Husky will operate on a user's machine, without the privilege of blowing away and instancing a clean slate per stage (at least not without severe disgruntlement from the user). 
+The first tier of a workflow, a stage usually represents a complete installation of a feature comprised of a series of [jobs](#job). Unlike traditional CI/CD pipelines where stages are isolated from each other, Husky will operate on a user's machine, without the privilege of blowing away and instancing a clean slate per stage (at least not without severe disgruntlement from the user). 
 
-A multi-stage workflow for a Husky installation would be preferable when installing a series of _related_ applications, each with an independent install flow. For example, if you were to install a game and a chat application, and you wanted to bundle those within the same installer, you would use a multi-stage workflow.
+A multi-stage workflow for a Husky installation would be preferable when installing a series of optional and _related_ features, each with an independent install flow. For example, if you were to install a game and a chat application, and you wanted to bundle those within the same installer, you could use a multi-stage workflow. 
 
 Stages can demand (require) that a client machine meets certain criteria. It is often preferable to have a client install dependencies first, however Husky is capable of fetching a variety of whitelisted dependencies. 
 
