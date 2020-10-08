@@ -7,6 +7,7 @@ namespace HuskyApp.Installer
         static void Main(string[] args)
         {
             HelloWorldGenerated.HelloWorld.SayHello();
+            Console.Write("Hi!");
         }
     }
 }
