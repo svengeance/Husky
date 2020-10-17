@@ -10,7 +10,7 @@
   jobs: # A single job can exist without an explicitly declared stage
       show-splash:
           steps:
-              - name: Display Unix Splash Screen
+              show-unix-splash:
                 platforms:
                   - Linux
                   - OSX
@@ -22,7 +22,7 @@
                     echo Welcome to Husky-App! &&
                     read -n 1 -r -s -p $'Press any key to continue installation...\n'              
 
-              - name: Display Windows Splash Screen
+              show-windows-splash:
                 platforms:
                   - Windows
                 task: Scripting.ExecuteInlineScript
@@ -34,25 +34,23 @@
                 
       extract-husky-app:
           steps:
-              - name: Extract App Files
+              extract-files:
                 task: Resources.ExtractBundledResource
                 with:
                   resources: dist/program/**/* # standard file globbing pattern
                   targetDirectory: $variables.installDir
                   clean: true # Clean the destination directory 
 
-      create-shortcut:
+      create-launch-file:
           steps:
-              - name: Create Launch Shortcut
+              create-launch-script:
                 task: Scripting.CreateScriptFile # Create a platform-independent script file (.sh on linux, .bat on windows)
                 with:
                   directory: $variables.installDir
                   fileName: launch
                   script: dotnet Huskyapp.dll
-                output: # assign output variables FROM the step into inter-job variables
-                  app-launch-file: createdFileName
 
-              - name: Create Desktop Shortcut
+              create-shortcut:
                 task: Utilities.CreateShortcut # Create a platform-independent shortcut 
                 with:
-                  target: $jobs.create-shortcut.variables.app-launch-file # Variables are scoped at the job level
+                  target: $variables.create-launch-file.create-launch-script.createdFileName # Retrieve variable from prior step

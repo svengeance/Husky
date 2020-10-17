@@ -1,12 +1,7 @@
 ﻿using System;
 
-namespace HuskyApp
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine(@"........................................
+Console.WriteLine(@"
+........................................
 ........==................==............
 .......=..==.............=.=............
 .......=...==...........=...=...........
@@ -35,7 +30,4 @@ namespace HuskyApp
 Welcome to Husky!
 ");
 
-            Console.ReadKey();
-        }
-    }
-}
+Console.ReadKey();

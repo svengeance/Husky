@@ -18,6 +18,8 @@ namespace Husky.Generator
     {
         public void Execute(GeneratorExecutionContext context)
         {
+            return;
+
             var source = new StringBuilder();
             try
             {

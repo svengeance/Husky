@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuskyApp", "HuskyApp\HuskyA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D57AA5BC-E699-4A4D-9EF4-6A96FA71328D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Husky.Generator.Tests", "Husky.Generator.Tests\Husky.Generator.Tests.csproj", "{558496F9-FF37-4715-AB23-5C87BABB39DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Generator.Tests", "Husky.Generator.Tests\Husky.Generator.Tests.csproj", "{558496F9-FF37-4715-AB23-5C87BABB39DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Tasks", "Husky.Tasks\Husky.Tasks.csproj", "{E1A5F449-FB16-4FB7-B2A6-2C43F3BDFF75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{558496F9-FF37-4715-AB23-5C87BABB39DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{558496F9-FF37-4715-AB23-5C87BABB39DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{558496F9-FF37-4715-AB23-5C87BABB39DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1A5F449-FB16-4FB7-B2A6-2C43F3BDFF75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1A5F449-FB16-4FB7-B2A6-2C43F3BDFF75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1A5F449-FB16-4FB7-B2A6-2C43F3BDFF75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1A5F449-FB16-4FB7-B2A6-2C43F3BDFF75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

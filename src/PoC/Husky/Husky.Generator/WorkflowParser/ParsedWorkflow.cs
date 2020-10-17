@@ -1,9 +1,12 @@
-﻿using Husky.Core.Workflow;
+﻿using System.Collections.Generic;
+using Husky.Core.Workflow;
 
 namespace Husky.Generator.WorkflowParser
 {
     internal abstract class ParsedWorkflow
     {
-        public abstract HuskyWorkflow CreateWorkflow();
+        public abstract HuskyConfiguration GetHuskyConfiguration();
+
+        public abstract ParsedWorkflow CreateWorkflow();
     }
 }

@@ -1,14 +1,20 @@
 ﻿using System.Collections.Generic;
+using Husky.Core.Builder;
+using Husky.Core.HuskyConfiguration;
 
 namespace Husky.Core.Workflow
 {
-    public class HuskyWorkflow
+    public sealed class HuskyWorkflow
     {
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public string Publisher { get; set; }
-        public string[] Dependencies { get; set; }
-        public Dictionary<string, string> Variables { get; set; }
-        public Dictionary<string, HuskyJob> Jobs { get; set; }
+        public HuskyConfiguration Configuration { get; }
+        public Dictionary<string, string> Variables { get; } = new Dictionary<string, string>();
+        public List<HuskyStage> Stages { get; } = new List<HuskyStage>();
+
+        internal HuskyWorkflow(HuskyConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public static IHuskyWorkflowBuilder Create() => new WorkflowBuilder(new HuskyWorkflow(HuskyConfiguration.Create()));
     }
 }

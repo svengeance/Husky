@@ -18,11 +18,14 @@
 		<PackageReference Include="YamlDotNet" Version="8.1.2" PrivateAssets="all" GeneratePathProperty="true" />
 	</ItemGroup>
 
-	<Target Name="TestMessage" AfterTargets="Build" >
+	<ItemGroup>
+	  <Folder Include="CodeGen\" />
+	</ItemGroup>
+
+	<Target Name="TestMessage" AfterTargets="Build">
 
 		<!-- Use $(Property Name) to reference a property -->
-		<Message Text="$(PkgYamlDotNet)" Importance="high"/>
-		<Message Text="Hello" Importance="high"/>
+		<Message Text="$(PkgYamlDotNet)" Importance="high" />
 
 	</Target>
 
