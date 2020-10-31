@@ -7,7 +7,7 @@ namespace Husky.Core.Workflow
 {
     public class HuskyConfiguration
     {
-        private Dictionary<Type, IHuskyConfigurationBlock> _configurations;
+        private readonly Dictionary<Type, IHuskyConfigurationBlock> _configurations;
 
         private HuskyConfiguration(Dictionary<Type, IHuskyConfigurationBlock> configurations) => _configurations = configurations;
 
