@@ -1,7 +1,9 @@
-﻿namespace Husky.Core.Workflow
+﻿using FluentValidation.Results;
+
+namespace Husky.Core.Workflow
 {
-    public class HuskyTaskConfiguration
+    public abstract class HuskyTaskConfiguration
     {
-        
+        internal abstract ValidationResult Validate();
     }
 }

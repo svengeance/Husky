@@ -43,9 +43,9 @@ namespace Husky.Generator.WorkflowParser.YAML
         public Dictionary<string, string> With { get; set; }
         public Dictionary<string, string> Output{ get; set; }
 
-        public HuskyStep<HuskyTask> ToHuskyStep()
+        public HuskyStep<HuskyTaskConfiguration> ToHuskyStep()
         {
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

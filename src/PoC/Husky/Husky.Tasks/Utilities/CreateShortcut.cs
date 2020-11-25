@@ -1,12 +1,11 @@
 ﻿using System;
+using Husky.Core.TaskConfiguration.Utilities;
 using Husky.Core.Workflow;
 
 namespace Husky.Tasks.Utilities
 {
-    public class CreateShortcut : HuskyTask
+    public class CreateShortcut : HuskyTask<CreateShortcutOptions>
     {
-        public string Target { get; set; }
-
         protected override void EnsureConfigured()
         {
             throw new NotImplementedException();
@@ -20,6 +19,11 @@ namespace Husky.Tasks.Utilities
         protected override void Rollback()
         {
             throw new NotImplementedException();
+        }
+
+        public CreateShortcut(CreateShortcutOptions configuration) : base(configuration)
+        {
+
         }
     }
 }

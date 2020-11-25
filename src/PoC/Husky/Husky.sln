@@ -17,9 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Generator.Tests", "Hu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Tasks", "Husky.Tasks\Husky.Tasks.csproj", "{E1A5F449-FB16-4FB7-B2A6-2C43F3BDFF75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Husky.Installer", "Husky.Installer\Husky.Installer.csproj", "{1D6F3CE4-75D9-4BA0-B7DE-86AA41918AA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Installer", "Husky.Installer\Husky.Installer.csproj", "{1D6F3CE4-75D9-4BA0-B7DE-86AA41918AA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Husky.Services", "Husky.Services\Husky.Services.csproj", "{007C9861-5BE0-462A-9C02-E5DFEBCAAC1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Services", "Husky.Services\Husky.Services.csproj", "{007C9861-5BE0-462A-9C02-E5DFEBCAAC1F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{39154A80-2875-49CD-BFAE-6B053720304E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +66,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{1960BCD2-A6A7-4D8D-9E09-8E6F8BBCB8DB} = {39154A80-2875-49CD-BFAE-6B053720304E}
+		{E0879CE9-BBE3-4308-8C1B-6E3E8FE6DC56} = {39154A80-2875-49CD-BFAE-6B053720304E}
 		{558496F9-FF37-4715-AB23-5C87BABB39DA} = {D57AA5BC-E699-4A4D-9EF4-6A96FA71328D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

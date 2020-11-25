@@ -1,14 +1,11 @@
 ﻿using System;
+using Husky.Core.TaskConfiguration.Scripting;
 using Husky.Core.Workflow;
 
 namespace Husky.Tasks.Scripting
 {
-    public class CreateScriptFile : HuskyTask
+    public class CreateScriptFile : HuskyTask<CreateScriptFileOptions>
     {
-        public string Directory { get; set; }
-        public string FileName { get; set; }
-        public string Script { get; set; }
-
         protected override void EnsureConfigured()
         {
             throw new NotImplementedException();
@@ -22,6 +19,10 @@ namespace Husky.Tasks.Scripting
         protected override void Rollback()
         {
             throw new NotImplementedException();
+        }
+
+        public CreateScriptFile(CreateScriptFileOptions configuration) : base(configuration)
+        {
         }
     }
 }

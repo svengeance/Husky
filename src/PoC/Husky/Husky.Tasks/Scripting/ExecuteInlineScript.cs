@@ -1,12 +1,11 @@
 ﻿using System;
+using Husky.Core.TaskConfiguration.Scripting;
 using Husky.Core.Workflow;
 
 namespace Husky.Tasks.Scripting
 {
-    public class ExecuteInlineScript : HuskyTask
+    public class ExecuteInlineScript : HuskyTask<ExecuteInlineScriptOptions>
     {
-        public string Script { get; set; }
-
         protected override void EnsureConfigured()
         {
             throw new NotImplementedException();
@@ -20,6 +19,10 @@ namespace Husky.Tasks.Scripting
         protected override void Rollback()
         {
             throw new NotImplementedException();
+        }
+
+        public ExecuteInlineScript(ExecuteInlineScriptOptions configuration) : base(configuration)
+        {
         }
     }
 }

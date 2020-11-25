@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using Husky.Core.Enums;
 
 namespace Husky.Core.Workflow
 {
-    public class HuskyStep<TTask> where TTask : HuskyTask
+    public class HuskyStep<TTaskConfiguration> where TTaskConfiguration : HuskyTaskConfiguration
     {
         public string Name { get; set; }
-        public SupportedPlatforms SupportedPlatforms { get; set; }
         
-        internal TTask HuskyTask { get; set; }
+        internal HuskyStepConfiguration? HuskyStepConfiguration { get; set; }
+        internal TTaskConfiguration HuskyTaskConfiguration { get; set; }
 
-        public void Configure(Action<TTask> taskConfiguration) => taskConfiguration.Invoke(HuskyTask);
-
-        public HuskyStep(string name, TTask huskyTask)
+        public HuskyStep(string name, TTaskConfiguration huskyTaskConfiguration)
         {
             Name = name;
-            HuskyTask = huskyTask;
+            HuskyTaskConfiguration = huskyTaskConfiguration;
         }
     }
 }

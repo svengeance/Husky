@@ -10,6 +10,7 @@ namespace Husky.Core.Enums
         Mac = 1 << 2,
         // ReSharper disable once InconsistentNaming
         FreeBSD = 1 << 3,
+        UnixSystems = Linux | Mac | FreeBSD,
         All = Windows | Linux | Mac | FreeBSD
     }
 }

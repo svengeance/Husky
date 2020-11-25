@@ -22,17 +22,14 @@ namespace Husky.Core.Builder
     public interface IHuskyStageBuilder
     {
         IHuskyStageBuilder AddJob(string name, Action<IHuskyJobBuilder> jobBuilder);
+
+        IHuskyStageBuilder SetDefaultStepConfiguration(HuskyStepConfiguration defaultStepConfiguration);
     }
 
     public interface IHuskyJobBuilder
     {
-        IHuskyJobBuilder AddStep<TTask>(string name, Action<IHuskyStepBuilder<HuskyStep<TTask>, TTask>> stepConfiguration) where TTask : HuskyTask;
-    }
+        IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
 
-    public interface IHuskyStepBuilder<TStep, out TTask> where TStep: HuskyStep<TTask> where TTask: HuskyTask
-    {
-        IHuskyStepBuilder<TStep, TTask> SupportedOn(SupportedPlatforms supportedPlatforms);
-
-        IHuskyStepBuilder<TStep, TTask> Configure(Action<TTask> taskConfiguration);
+        IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
     }
 }

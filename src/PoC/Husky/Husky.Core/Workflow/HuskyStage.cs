@@ -5,6 +5,9 @@ namespace Husky.Core.Workflow
     public class HuskyStage
     {
         public string Name { get; set; }
+
+        public HuskyStepConfiguration? DefaultStepConfiguration { get; set; }
+
         public List<HuskyJob> Jobs { get; set; }
 
         public HuskyStage(string name)

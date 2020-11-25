@@ -1,14 +1,11 @@
 ﻿using System;
+using Husky.Core.TaskConfiguration.Resources;
 using Husky.Core.Workflow;
 
 namespace Husky.Tasks.Resources
 {
-    public class ExtractBundledResource : HuskyTask
+    public class ExtractBundledResource : HuskyTask<ExtractBundledResourceOptions>
     {
-        public string Resources { get; set; }
-        public string TargetDirectory { get; set; }
-        public bool Clean { get; set; }
-
         protected override void EnsureConfigured()
         {
             throw new NotImplementedException();
@@ -22,6 +19,10 @@ namespace Husky.Tasks.Resources
         protected override void Rollback()
         {
             throw new NotImplementedException();
+        }
+
+        public ExtractBundledResource(ExtractBundledResourceOptions configuration) : base(configuration)
+        {
         }
     }
 }

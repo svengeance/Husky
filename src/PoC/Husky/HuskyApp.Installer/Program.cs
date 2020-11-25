@@ -1,14 +1,35 @@
-﻿using Husky.Core.Enums;
+﻿using System.Runtime.InteropServices.ComTypes;
+using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
+using Husky.Core.TaskConfiguration.Resources;
+using Husky.Core.TaskConfiguration.Scripting;
+using Husky.Core.TaskConfiguration.Utilities;
 using Husky.Core.Workflow;
+using Husky.Installer;
 using Husky.Tasks.Resources;
 using Husky.Tasks.Scripting;
 using Husky.Tasks.Utilities;
 
+namespace Test
+{
+    public class SingleCat
+    {
+        public Cat Cat = new();
+    }
+    public class Cat
+    {
+
+    }
+}
+
 namespace HuskyApp.Installer
 {
+
     public static class Program
     {
+        private static readonly HuskyStepConfiguration _unixConfiguration = new(SupportedPlatforms.UnixSystems);
+        private static readonly HuskyStepConfiguration _windowsConfiguration = new(SupportedPlatforms.Windows);
+
         public static void Main(string[] args)
         {
             //HelloWorldGenerated.HelloWorld.SayHello();
@@ -22,6 +43,7 @@ cls &&
 echo Welcome to Husky-App! &&
 pause";
 
+
             var workflow = HuskyWorkflow.Create()
                                         .Configure<AuthorConfiguration>(a =>
                                          {
@@ -34,48 +56,47 @@ pause";
                                              a.Version = "1.0.0";
                                              a.Dependencies = new[]
                                              {
-                                                 new HuskyDependency("DotNet", "5")
+                                                     new HuskyDependency("DotNet", "5")
                                              };
                                          })
                                         .WithDefaultStage(
-                                             stage => stage.AddJob(
+                                             stage => stage.SetDefaultStepConfiguration(new HuskyStepConfiguration(SupportedPlatforms.All))
+                                                           .AddJob(
                                                                 "show-splash",
-                                                                splash => splash.AddStep<ExecuteInlineScript>(
+                                                                splash => splash.AddStep<ExecuteInlineScriptOptions>(
                                                                                      "show-unix-splash",
-                                                                                     step => step.Configure(c => c.Script = linuxScript)
-                                                                                                 .SupportedOn(SupportedPlatforms.FreeBSD |
-                                                                                                              SupportedPlatforms.Mac |
-                                                                                                              SupportedPlatforms.Linux))
-                                                                                .AddStep<ExecuteInlineScript>(
+                                                                                     task => task.Script = linuxScript,
+                                                                                     _unixConfiguration)
+                                                                                .AddStep<ExecuteInlineScriptOptions>(
                                                                                      "show-windows-splash",
-                                                                                     step => step.Configure(c => c.Script = windowsScript)
-                                                                                                 .SupportedOn(SupportedPlatforms.Windows)))
+                                                                                     task => task.Script = windowsScript,
+                                                                                     _windowsConfiguration))
                                                            .AddJob(
                                                                 "extract-husky-app",
-                                                                extract => extract.AddStep<ExtractBundledResource>(
+                                                                extract => extract.AddStep<ExtractBundledResourceOptions>(
                                                                     "extract-files",
-                                                                    step => step.Configure(c =>
+                                                                    task =>
                                                                     {
-                                                                        c.Clean = true;
-                                                                        c.Resources = "dist/program/**/*";
-                                                                        c.TargetDirectory = "$variables.installDir";
-                                                                    })))
+                                                                        task.Clean = true;
+                                                                        task.Resources = "dist/program/**/*";
+                                                                        task.TargetDirectory = "$variables.installDir";
+                                                                    }))
                                                            .AddJob(
                                                                 "create-launch-file",
-                                                                launch => launch.AddStep<CreateScriptFile>(
+                                                                launch => launch.AddStep<CreateScriptFileOptions>(
                                                                                      "create-launch-script",
-                                                                                     step => step.Configure(c =>
+                                                                                     task =>
                                                                                      {
-                                                                                         c.Directory = "$variables.installDir";
-                                                                                         c.FileName = "launch";
-                                                                                         c.Script = "dotnet HuskyApp.dll";
-                                                                                     }))
-                                                                                .AddStep<CreateShortcut>(
+                                                                                         task.Directory = "$variables.installDir";
+                                                                                         task.FileName = "launch";
+                                                                                         task.Script = "dotnet HuskyApp.dll";
+                                                                                     })
+                                                                                .AddStep<CreateShortcutOptions>(
                                                                                      "create-shortcut",
-                                                                                     step => step.Configure(c
-                                                                                         => c.Target =
-                                                                                             "$variables.create-launch-file.create-launch-script.createdFileName")))
+                                                                                     task => task.Target = "$variables.create-launch-file.create-launch-script.createdFileName"))
                                          ).Build();
+
+            var installer = new HuskyInstaller(workflow);
         }
     }
 }

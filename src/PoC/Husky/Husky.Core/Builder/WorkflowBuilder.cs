@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Workflow;
@@ -47,9 +48,16 @@ namespace Husky.Core.Builder
             _stage = new HuskyStage(stageName);
         }
 
+        public IHuskyStageBuilder SetDefaultStepConfiguration(HuskyStepConfiguration defaultStepConfiguration)
+        {
+            _stage.DefaultStepConfiguration = defaultStepConfiguration;
+
+            return this;
+        }
+
         public IHuskyStageBuilder AddJob(string name, Action<IHuskyJobBuilder> jobBuilderConfiguration)
         {
-            var jobBuilder = new JobBuilder(name);
+            var jobBuilder = new JobBuilder(name, _stage.DefaultStepConfiguration);
             jobBuilderConfiguration.Invoke(jobBuilder);
 
             _stage.Jobs.Add(jobBuilder.Build());
@@ -62,50 +70,37 @@ namespace Husky.Core.Builder
 
     public class JobBuilder: IHuskyJobBuilder
     {
+        private readonly HuskyStepConfiguration? _defaultStepConfiguration;
         private readonly HuskyJob _job;
 
-        public JobBuilder(string name)
+        public JobBuilder(string name, HuskyStepConfiguration? defaultStepConfiguration)
         {
+            _defaultStepConfiguration = defaultStepConfiguration;
             _job = new HuskyJob(name);
         }
 
         public HuskyJob Build() => _job;
 
-        public IHuskyJobBuilder AddStep<TTask>(string name, Action<IHuskyStepBuilder<HuskyStep<TTask>, TTask>> stepConfiguration) where TTask : HuskyTask
+        public IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration) where TTaskConfiguration : HuskyTaskConfiguration
         {
-            var stepBuilder = new StepBuilder<HuskyStep<TTask>, TTask>(name);
-            stepConfiguration.Invoke(stepBuilder);
+            var configuration = Activator.CreateInstance<TTaskConfiguration>();
+            taskConfiguration.Invoke(configuration);
 
-            _job.Steps.Add(stepBuilder.Build());
+            var step = new HuskyStep<HuskyTaskConfiguration>(name, configuration);
+            step.HuskyStepConfiguration = _defaultStepConfiguration;
 
-            return this;
-        }
-    }
-
-    public class StepBuilder<TStep, TTask> : IHuskyStepBuilder<TStep, TTask> where TStep : HuskyStep<TTask> where TTask : HuskyTask
-    {
-        private readonly HuskyStep<HuskyTask> _step;
-
-        public StepBuilder(string name)
-        {
-            var task = (TTask) Activator.CreateInstance(typeof(TTask)) as HuskyTask;
-            _step = new HuskyStep<HuskyTask>(name, task);
-        }
-
-        public IHuskyStepBuilder<TStep, TTask> Configure(Action<TTask> taskConfiguration)
-        {
-            taskConfiguration.Invoke((TTask) _step.HuskyTask);
+            _job.Steps.Add(step);
 
             return this;
         }
 
-        public IHuskyStepBuilder<TStep, TTask> SupportedOn(SupportedPlatforms supportedPlatforms)
+        public IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration
         {
-            _step.SupportedPlatforms = supportedPlatforms;
+            AddStep(name, taskConfiguration);
+
+            _job.Steps.Last().HuskyStepConfiguration = stepConfiguration;
 
             return this;
         }
-
-        internal HuskyStep<HuskyTask> Build() => _step;
     }
 }

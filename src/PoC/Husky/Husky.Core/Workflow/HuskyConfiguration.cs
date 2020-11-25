@@ -11,11 +11,12 @@ namespace Husky.Core.Workflow
 
         private HuskyConfiguration(Dictionary<Type, IHuskyConfigurationBlock> configurations) => _configurations = configurations;
 
-        public void Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock
+        internal void Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock
             => configuration.Invoke((T) _configurations[typeof(T)]);
 
         public static HuskyConfiguration Create()
         {
+            // Instantiate an instance of each configuration and cache it by its type
             var configBlocks = typeof(ApplicationConfiguration)
                               .Assembly
                               .GetTypes()

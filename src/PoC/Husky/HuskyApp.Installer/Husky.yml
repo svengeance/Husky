@@ -53,4 +53,6 @@
               create-shortcut:
                 task: Utilities.CreateShortcut # Create a platform-independent shortcut 
                 with:
+                  shortcutLocation: $folders.Desktop
+                  shortcutName: 'HuskyApp'
                   target: $variables.create-launch-file.create-launch-script.createdFileName # Retrieve variable from prior step
