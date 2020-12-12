@@ -1,18 +1,39 @@
-﻿namespace Husky.Core.Workflow
+﻿using System;
+using System.Threading.Tasks;
+using FluentValidation;
+
+namespace Husky.Core.Workflow
 {
     public abstract class HuskyTask<T> where T : HuskyTaskConfiguration
     {
-        protected T Configuration { get; }
+        protected T? Configuration { get; private set; }
 
-        protected HuskyTask(T configuration)
+        public void SetConfiguration(T configuration)
         {
+            if (Configuration is not null)
+                throw new ApplicationException("Configuration was set twice. Please only set a configuration for a service instance once.");
+
             Configuration = configuration;
         }
 
-        protected abstract void EnsureConfigured();
+        public Task Execute()
+        {
+            if (Configuration is null)
+                throw new ApplicationException($"Configuration was not set - aborting execution.");
 
-        protected abstract void Execute();
+            return ExecuteTask();
+        }
 
-        protected abstract void Rollback();
+        public Task Rollback()
+        {
+            if (Configuration is null)
+                throw new ApplicationException($"Configuration was not set - aborting rollback.");
+
+            return RollbackTask();
+        }
+
+        protected abstract Task ExecuteTask();
+
+        protected abstract Task RollbackTask();
     }
 }

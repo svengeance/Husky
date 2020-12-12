@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Husky.Core.TaskConfiguration.Resources;
 using Husky.Core.Workflow;
 
@@ -6,23 +7,14 @@ namespace Husky.Tasks.Resources
 {
     public class ExtractBundledResource : HuskyTask<ExtractBundledResourceOptions>
     {
-        protected override void EnsureConfigured()
+        protected override Task ExecuteTask()
         {
             throw new NotImplementedException();
         }
 
-        protected override void Execute()
+        protected override Task RollbackTask()
         {
             throw new NotImplementedException();
-        }
-
-        protected override void Rollback()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ExtractBundledResource(ExtractBundledResourceOptions configuration) : base(configuration)
-        {
         }
     }
 }

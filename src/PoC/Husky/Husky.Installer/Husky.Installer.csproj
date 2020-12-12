@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.3.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Husky.Core\Husky.Core.csproj" />
+    <ProjectReference Include="..\Husky.Services\Husky.Services.csproj" />
+    <ProjectReference Include="..\Husky.Tasks\Husky.Tasks.csproj" />
   </ItemGroup>
 
 </Project>

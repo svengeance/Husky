@@ -9,6 +9,7 @@ namespace Husky.Core.Workflow
         
         internal HuskyStepConfiguration? HuskyStepConfiguration { get; set; }
         internal TTaskConfiguration HuskyTaskConfiguration { get; set; }
+        internal ExecutionInformation ExecutionInformation { get; set; } = new();
 
         public HuskyStep(string name, TTaskConfiguration huskyTaskConfiguration)
         {
