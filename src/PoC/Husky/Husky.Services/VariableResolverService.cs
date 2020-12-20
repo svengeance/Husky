@@ -20,7 +20,7 @@ namespace Husky.Services
     
     public class VariableResolverService: IVariableResolverService
     {
-        private static Regex _varMatchingRegex = new(@"(?<!{){(\w|\.)+}");
+        private static readonly Regex _varMatchingRegex = new(@"(?<!{){(\w|\.)+}");
         
         /// <inheritdoc cref="IVariableResolverService"/>
         public void Resolve<T>(T obj, params IReadOnlyDictionary<string, string>[] variableSources)
@@ -63,6 +63,6 @@ namespace Husky.Services
             }
         }
 
-        private string SanitizeVariableName(string name) => name.Trim('{', '}');
+        private static string SanitizeVariableName(string name) => name.Trim('{', '}');
     }
 }
