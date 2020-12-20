@@ -10,8 +10,8 @@ namespace Husky.Core.Workflow
     public sealed class HuskyWorkflow
     {
         public HuskyConfiguration Configuration { get; }
-        public Dictionary<string, string> Variables { get; } = new Dictionary<string, string>();
-        public List<HuskyStage> Stages { get; } = new List<HuskyStage>();
+        public Dictionary<string, string> Variables { get; } = new();
+        public List<HuskyStage> Stages { get; } = new();
 
         internal HuskyWorkflow(HuskyConfiguration configuration)
         {
@@ -28,7 +28,7 @@ namespace Husky.Core.Workflow
                 TaskName = step.HuskyTaskConfiguration.GetType().Name,
                 StepName = step.Name,
                 JobName = job.Name,
-                StageName = stage.Name
+                StageName = stage.Name          
             })));
 
             var exceptionString = validations.Where(w => !w.Validation.IsValid)

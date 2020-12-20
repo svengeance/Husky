@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-	<LangVersion>Preview</LangVersion>
+    <Nullable>Enable</Nullable>
+	  <LangVersion>Preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FastMember" Version="1.5.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
   </ItemGroup>
 

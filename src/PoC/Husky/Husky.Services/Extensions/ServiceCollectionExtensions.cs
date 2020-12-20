@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +15,12 @@ namespace Husky.Services.Extensions
                                         .Select(s => (s.GetInterface($"I{s.Name}"), s));
 
             foreach (var (serviceInterface, serviceClass) in huskyServices)
-                services.AddScoped(serviceInterface, serviceClass);
+            {
+                if (serviceInterface is not null)
+                    services.AddScoped(serviceInterface, serviceClass);
+                else
+                    throw new ApplicationException($"Could not locate service interface for class {serviceClass.Name}");
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Workflow;
 
@@ -15,6 +14,13 @@ namespace Husky.Core.Builder
         public IHuskyWorkflowBuilder Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock
         {
             Workflow.Configuration.Configure(configuration);
+
+            return this;
+        }
+
+        public IHuskyWorkflowBuilder AddGlobalVariable(string key, string value)
+        {
+            Workflow.Variables[key] = value;
 
             return this;
         }
@@ -35,7 +41,6 @@ namespace Husky.Core.Builder
         public IHuskyWorkflowBuilder WithDefaultStageAndJob(Action<IHuskyJobBuilder> jobBuilderConfiguration)
             => AddStage(HuskyConstants.DefaultStageName, stage => stage.AddJob(HuskyConstants.DefaultJobName, jobBuilderConfiguration));
 
-        // Todo: Validate Workflow is.....valid
         public HuskyWorkflow Build() => Workflow;
     }
 
@@ -86,8 +91,10 @@ namespace Husky.Core.Builder
             var configuration = Activator.CreateInstance<TTaskConfiguration>();
             taskConfiguration.Invoke(configuration);
 
-            var step = new HuskyStep<HuskyTaskConfiguration>(name, configuration);
-            step.HuskyStepConfiguration = _defaultStepConfiguration;
+            var step = new HuskyStep<HuskyTaskConfiguration>(name, configuration)
+            {
+                HuskyStepConfiguration = _defaultStepConfiguration
+            };
 
             _job.Steps.Add(step);
 

@@ -7,8 +7,6 @@ namespace Husky.Installer.Tests.InstallerTests
 {
     public class HuskyInstallerTests: BaseInstallerTest
     {
-        protected override TestHuskyTaskOptions TaskConfiguration { get; set; }
-
         [Test]
         public async Task Installer_validates_workflow()
         {
@@ -22,8 +20,27 @@ namespace Husky.Installer.Tests.InstallerTests
             await installer.Install();
 
             // Assert
-            var testTask = (TestHuskyTaskOptions) Workflow!.Stages[0].Jobs[0].Steps[0].HuskyTaskConfiguration;
-            Assert.True(testTask.HasValidated);
+            var testTaskOptions = (TestHuskyTaskOptions) Workflow.Stages[0].Jobs[0].Steps[0].HuskyTaskConfiguration;
+            Assert.True(testTaskOptions.HasValidated);
+        }
+
+        [Test]
+        public async Task Installer_replaces_variables_on_task_configuration()
+        {
+            // Arrange
+            var expectedTitle = "Test - 4";
+
+            // Act
+            await Installer.Install();
+
+            // Assert
+            var testTaskOptions = (TestHuskyTaskOptions)Workflow.Stages[0].Jobs[0].Steps[0].HuskyTaskConfiguration;
+            Assert.AreEqual(testTaskOptions.Title, expectedTitle);
+        }
+
+        protected override void ConfigureTestTaskOptions(TestHuskyTaskOptions options)
+        {
+            options.Title = "Test - {random.RandomNumber}";
         }
     }
 }

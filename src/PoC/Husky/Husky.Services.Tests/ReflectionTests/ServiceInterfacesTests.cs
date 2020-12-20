@@ -46,7 +46,7 @@ namespace Husky.Services.Tests.ReflectionTests
             var methodCountsByTypeName = GetServiceClasses().Select(s => new
             {
                 s.Name,
-                NumberOfInterfaceMethods = s.GetInterfaces().Single().GetMethods(BindingFlags.Instance).Length,
+                NumberOfInterfaceMethods = s.GetInterfaces().Single().GetMethods(BindingFlags.Instance | BindingFlags.Public).Length,
                 NumberOfPublicClassMethods = s.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Length
             });
 

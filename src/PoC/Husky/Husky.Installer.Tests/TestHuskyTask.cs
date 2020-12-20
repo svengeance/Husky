@@ -1,12 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Husky.Core.Workflow;
+using Husky.Tasks;
 
 namespace Husky.Installer.Tests
 {
     public class TestHuskyTask: HuskyTask<TestHuskyTaskOptions>
     {
         public bool HasRan = false;
-        public bool HasRollbacked = false;
+        public bool HasRolledBack = false;
 
         protected override Task ExecuteTask()
         {
@@ -16,7 +17,7 @@ namespace Husky.Installer.Tests
 
         protected override Task RollbackTask()
         {
-            HasRollbacked = true;
+            HasRolledBack = true;
             return Task.CompletedTask;
         }
     }

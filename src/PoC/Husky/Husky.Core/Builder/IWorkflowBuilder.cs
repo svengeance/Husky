@@ -10,6 +10,8 @@ namespace Husky.Core.Builder
     {
         IHuskyWorkflowBuilder Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock;
 
+        IHuskyWorkflowBuilder AddGlobalVariable(string key, string value);
+
         IHuskyWorkflowBuilder AddStage(string name, Action<IHuskyStageBuilder> stageBuilderConfiguration);
 
         IHuskyWorkflowBuilder WithDefaultStage(Action<IHuskyStageBuilder> stageBuilderConfiguration);
