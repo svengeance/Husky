@@ -5,7 +5,7 @@
   dependencies: # Dependencies that Husky can track are explicitly stated
       - DotNetCore>=5.0
   variables: # Global constant values the user can set up top
-      installDir: {folders.ProgramFiles}/HuskyApp
+      installDir: '{folders.ProgramFiles}/HuskyApp'
 
   jobs: # A single job can exist without an explicitly declared stage
       show-splash:
@@ -38,7 +38,7 @@
                 task: Resources.ExtractBundledResource
                 with:
                   resources: dist/program/**/* # standard file globbing pattern
-                  targetDirectory: $variables.installDir
+                  targetDirectory: '{variables.installDir}'
                   clean: true # Clean the destination directory 
 
       create-launch-file:
@@ -46,13 +46,13 @@
               create-launch-script:
                 task: Scripting.CreateScriptFile # Create a platform-independent script file (.sh on linux, .bat on windows)
                 with:
-                  directory: $variables.installDir
+                  directory: '{variables.installDir}'
                   fileName: launch
                   script: dotnet Huskyapp.dll
 
               create-shortcut:
                 task: Utilities.CreateShortcut # Create a platform-independent shortcut 
                 with:
-                  shortcutLocation: $folders.Desktop
+                  shortcutLocation: '{folders.Desktop}'
                   shortcutName: 'HuskyApp'
-                  target: $variables.create-launch-file.create-launch-script.createdFileName # Retrieve variable from prior step
+                  target: '{variables.create-launch-file.create-launch-script.createdFileName}' # Retrieve variable from prior step
