@@ -18,9 +18,10 @@
                 task: Scripting.ExecuteInlineScript
                 with:
                   script: | # Unix-specific script
-                    cls &&
+                    clear &&
                     echo Welcome to Husky-App! &&
-                    read -n 1 -r -s -p $'Press any key to continue installation...\n'              
+                    sleep 10 &&
+                    exit 0
 
               show-windows-splash:
                 platforms:
@@ -28,9 +29,9 @@
                 task: Scripting.ExecuteInlineScript
                 with:
                   script: | # Windows (cmd) specific script
-                    clear &&
+                    cls &&
                     echo Welcome to Husky-App! &&
-                    pause
+                    timeout 10 /NOBREAK
                 
       extract-husky-app:
           steps:
