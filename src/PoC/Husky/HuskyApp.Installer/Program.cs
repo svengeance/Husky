@@ -59,10 +59,10 @@ pause";
                                              a.Version = "1.0.0";
                                              a.Dependencies = new[]
                                              {
-                                                     new HuskyDependency("DotNet", "5")
+                                                new HuskyDependency("DotNet", "5")
                                              };
                                          })
-                                         .AddGlobalVariable("installDir", $"{HuskyVariables.Folders.ProgramFiles}")
+                                        .AddGlobalVariable("installDir", $"{HuskyVariables.Folders.ProgramFiles}")
                                         .WithDefaultStage(
                                              stage => stage.SetDefaultStepConfiguration(new HuskyStepConfiguration(SupportedPlatforms.All))
                                                            .AddJob(

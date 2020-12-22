@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Husky.Core\Husky.Core.csproj" />
+    <ProjectReference Include="..\Husky.Services\Husky.Services.csproj" />
   </ItemGroup>
 
 </Project>

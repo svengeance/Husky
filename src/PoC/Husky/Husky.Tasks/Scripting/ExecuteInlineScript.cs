@@ -1,20 +1,28 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Husky.Core.TaskConfiguration.Scripting;
 using Husky.Core.Workflow;
+using Husky.Services;
 
 namespace Husky.Tasks.Scripting
 {
     public class ExecuteInlineScript : HuskyTask<ExecuteInlineScriptOptions>
     {
-        protected override Task ExecuteTask()
+        private readonly IScriptingService _scriptingService;
+
+        public ExecuteInlineScript(IScriptingService scriptingService)
         {
-            throw new NotImplementedException();
+            _scriptingService = scriptingService;
+        }
+        
+        protected override async Task ExecuteTask()
+        {
+            var exitCode = await _scriptingService.ExecuteCommand(Configuration.Script, Configuration.IsWindowVisible);
+            if (exitCode != 0)
+                throw new ApplicationException("Script execution resulted in non-0 exit code");
         }
 
-        protected override Task RollbackTask()
-        {
-            throw new NotImplementedException();
-        }
+        protected override Task RollbackTask() => Task.CompletedTask;
     }
 }

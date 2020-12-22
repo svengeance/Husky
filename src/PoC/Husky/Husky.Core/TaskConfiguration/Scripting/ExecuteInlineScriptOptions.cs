@@ -6,7 +6,8 @@ namespace Husky.Core.TaskConfiguration.Scripting
 {
     public class ExecuteInlineScriptOptions : HuskyTaskConfiguration
     {
-        public string? Script { get; set; }
+        public string Script { get; set; } = string.Empty;
+        public bool IsWindowVisible { get; set; } = false;
 
         internal override ValidationResult Validate() => new ExecuteInlineScriptOptionsValidator().Validate(this);
 
