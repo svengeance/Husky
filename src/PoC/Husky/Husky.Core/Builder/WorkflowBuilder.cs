@@ -75,12 +75,12 @@ namespace Husky.Core.Builder
 
     public class JobBuilder: IHuskyJobBuilder
     {
-        private readonly HuskyStepConfiguration? _defaultStepConfiguration;
+        private readonly HuskyStepConfiguration _defaultStepConfiguration;
         private readonly HuskyJob _job;
 
         public JobBuilder(string name, HuskyStepConfiguration? defaultStepConfiguration)
         {
-            _defaultStepConfiguration = defaultStepConfiguration;
+            _defaultStepConfiguration = defaultStepConfiguration ?? HuskyStepConfiguration.DefaultConfiguration;
             _job = new HuskyJob(name);
         }
 

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Workflow;
+using Husky.Installer.Extensions;
 using Husky.Services;
 using Husky.Services.Extensions;
 using Husky.Tasks;
@@ -64,7 +66,7 @@ namespace Husky.Installer
 
         private async Task ExecuteJob(HuskyJob job, IServiceProvider services)
         {
-            foreach (var step in job.Steps)
+            foreach (var step in job.Steps.Where(w => w.HuskyStepConfiguration.SupportedPlatforms.IsCurrentPlatformSupported()))
             {
                 await ExecuteStep(step, services);
             }

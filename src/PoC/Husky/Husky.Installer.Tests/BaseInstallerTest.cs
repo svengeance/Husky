@@ -6,6 +6,10 @@ using NUnit.Framework;
 
 namespace Husky.Installer.Tests
 {
+    /*
+     * Todo: This is really configured for one TestBed atm. Need to either make this more generic for additional testing
+     * scenarios, or remove this base testing class entirely.
+     */
     public abstract class BaseInstallerTest
     {
         protected HuskyWorkflow Workflow { get; private set; } = null!;

@@ -14,21 +14,6 @@ using Husky.Tasks.Utilities;
 
 namespace HuskyApp.Installer
 {   
-    /*
-     * Todo: Step & Global variables
-     * Theories:
-     *
-     * Global: Let's avoid something fancy for now and stick with something simple. "Simple.
-     * Pass in raw strings all the way through.
-     * Create a ConfigureVariables method in the IHuskyWorkflowBuilder that allows the simple passing through of raw strings into a list or so.
-     * Then on the installer's initialization it can do a once-over on the global vars to tokenize & initialize them
-     *
-     * Step: Step variables can be a combination of both local and global. This will necessitate two services, with the local service (scoped lifetime)
-     * depending on the global service (static lifetime). This combination, along with appropriate reuse of a tokenizer, should be able to properly
-     * resolve & initialize all variables.
-     *
-     */
-
     public static class Program
     {
         private static readonly HuskyStepConfiguration _unixConfiguration = new(SupportedPlatforms.UnixSystems);

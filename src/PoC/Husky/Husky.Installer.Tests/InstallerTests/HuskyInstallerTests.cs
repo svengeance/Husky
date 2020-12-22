@@ -35,7 +35,7 @@ namespace Husky.Installer.Tests.InstallerTests
 
             // Assert
             var testTaskOptions = (TestHuskyTaskOptions)Workflow.Stages[0].Jobs[0].Steps[0].HuskyTaskConfiguration;
-            Assert.AreEqual(testTaskOptions.Title, expectedTitle);
+            Assert.AreEqual(expectedTitle, testTaskOptions.Title);
         }
 
         protected override void ConfigureTestTaskOptions(TestHuskyTaskOptions options)
