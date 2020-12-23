@@ -31,7 +31,8 @@
                   script: | # Windows (cmd) specific script
                     cls &&
                     echo Welcome to Husky-App! &&
-                    timeout 10 /NOBREAK
+                    timeout 10 /NOBREAK &&
+                    exit
                 
       extract-husky-app:
           steps:
