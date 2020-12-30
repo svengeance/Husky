@@ -48,11 +48,13 @@ The final tier of a workflow. A task represents a specific action that Husky can
 Tasks can be custom code by the user, or pre-defined tasks that Husky is trained to execute.   
 Tasks do not execute in parallel, as they are typically linear in nature and usually dependent upon each other.
 
+A Task may or may not write out variables which the user can use at a later time. 
+
 ## C#-Specific DSL 
 *Note: The following is still in the discovery phase and subject to change between now and the v1 public release*
 
 ### HuskyStage
-1:1 Correlation with a [YAML Stage](#stage), this class wrap a collection of [HuskyJobs](#HuskyJob).
+1:1 Correlation with a [YAML Stage](#stage), this class wraps a collection of [HuskyJobs](#HuskyJob).
 
 ### HuskyJob
 1:1 Correlation with a [YAML Job](#job), this class wrap a collection of [HuskyTasks](#HuskyTask) and adds the necessary behavior to communicate with other HuskyJobs.
@@ -60,8 +62,8 @@ Tasks do not execute in parallel, as they are typically linear in nature and usu
 The internal Service Provider for Husky has a "scope" of a HuskyJob; all scoped services will thusly be reinitialized per-job.
 
 ### HuskyTask
-1:1 Correlation with a [YAML Task](#task), a HuskyTask is a wrapper around a [HuskyAction](#huskyAction) that adds the necessary behavior to communicate with other HuskyTasks. 
+1:1 Correlation with a [YAML Task](#task), a HuskyTask hosts the execution (and rollback) code that calls upon various services to fulfill the task.
 
-### HuskyAction
-A generic wrapper around an invokable action. This class defines all of the boilerplate necessary for an action to be friendly to Husky - Execution, progress events, logging/output, rollback behavior, etc.
+### HuskyTaskConfiguration
+All [HuskyTasks](#HuskyTask) come with some level of configuration, which allows users to alter how a Task is executed.
 
