@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Husky.Core.HuskyConfiguration;
-using Husky.Core.Workflow;
 using YamlDotNet.Serialization;
 
 namespace Husky.Generator.WorkflowParser.YAML
@@ -19,10 +16,6 @@ namespace Husky.Generator.WorkflowParser.YAML
 
         public Dictionary<string, YamlJob> Jobs { get; set; }
 
-        public override HuskyConfiguration GetHuskyConfiguration()
-        {
-            throw new NotImplementedException();
-        }
 
         public override ParsedWorkflow CreateWorkflow()
         {
@@ -42,10 +35,5 @@ namespace Husky.Generator.WorkflowParser.YAML
         public string Task { get; set; }
         public Dictionary<string, string> With { get; set; }
         public Dictionary<string, string> Output{ get; set; }
-
-        public HuskyStep<HuskyTaskConfiguration> ToHuskyStep()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
