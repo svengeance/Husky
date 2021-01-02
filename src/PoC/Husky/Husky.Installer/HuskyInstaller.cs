@@ -15,12 +15,12 @@ namespace Husky.Installer
 {
     public class HuskyInstaller
     {
-        private InstallationConfiguration Configuration { get; }
+        private InstallationConfiguration InstallationConfiguration { get; } = new();
 
         private readonly HuskyWorkflow _workflow;
 
         public HuskyInstaller(HuskyWorkflow workflow, Action<InstallationConfiguration> configureInstallation): this(workflow)
-            => configureInstallation(Configuration = new InstallationConfiguration());
+            => configureInstallation(InstallationConfiguration);
 
         public HuskyInstaller(HuskyWorkflow workflow)
         {
@@ -29,27 +29,12 @@ namespace Husky.Installer
 
         public async Task Install()
         {
-            // Todo: Register services from external assemblies
-            // Todo: Move this to a cleaner home?
-            foreach (var externalAssembly in Configuration.ResolveModulesFromAssemblies)
-                HuskyTaskResolver.AddAssemblyForScanning(externalAssembly);
-
-            var services = new ServiceCollection();
-            services.AddScoped<InstallationContext>();
-            services.AddHuskyServices();
-            services.AddHuskyTasks();
-            /*
-             * Todo: Maybe make the internal configurations visible and do the registrations here? Seems like a slight bit of cross-contamination to have the
-             * models/public config be responsible for its own registration
-             */
-            _workflow.Configuration.AddConfigurationToServiceCollection(services);
-
-            var servicesRoot = services.BuildServiceProvider(validateScopes: true);
+            var serviceProvider = new ServiceCollection().AddHuskyInstaller(InstallationConfiguration, _workflow.Configuration);
             _workflow.Validate();
 
             foreach (var stage in _workflow.Stages)
             {
-                var scopeFactory = servicesRoot.GetRequiredService<IServiceScopeFactory>();
+                var scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
                 using var scope = scopeFactory.CreateScope();
                 await ExecuteStage(stage, scope.ServiceProvider);
             }
@@ -112,7 +97,7 @@ namespace Husky.Installer
             step.ExecutionInformation.Finish();
         }
 
-        private Task ExecuteTask<T>(HuskyTask<T> task) where T: HuskyTaskConfiguration
+        private static Task ExecuteTask<T>(HuskyTask<T> task) where T: HuskyTaskConfiguration
         {
             return task.Execute();
         }
