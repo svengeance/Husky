@@ -8,6 +8,7 @@ namespace Husky.Installer.Tests.InstallerTests
     public class HuskyInstallerTests: BaseInstallerTest
     {
         [Test]
+        [Category("UnitTest")]
         public async Task Installer_validates_workflow()
         {
             // Arrange
@@ -25,6 +26,8 @@ namespace Husky.Installer.Tests.InstallerTests
         }
 
         [Test]
+        [Category("UnitTest")]
+
         public async Task Installer_replaces_variables_on_task_configuration()
         {
             // Arrange

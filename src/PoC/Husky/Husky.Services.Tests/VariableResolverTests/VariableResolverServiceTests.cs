@@ -8,6 +8,7 @@ namespace Husky.Services.Tests.VariableResolverTests
     public class VariableResolverServiceTests: BaseUnitTest<VariableResolverService>
     {
         [Test]
+        [Category("UnitTest")]
         public void Resolver_does_not_change_null_values()
         {
             // Arrange
@@ -15,7 +16,7 @@ namespace Husky.Services.Tests.VariableResolverTests
             var testObject = new Cat(null, null, 1);
 
             // Act
-            _sut.Resolve(testObject, emptySource);
+            Sut.Resolve(testObject, emptySource);
 
             // Assert
             Assert.IsNull(testObject.Name);
@@ -24,6 +25,7 @@ namespace Husky.Services.Tests.VariableResolverTests
         }
 
         [Test]
+        [Category("UnitTest")]
         public void Resolver_changes_single_value_of_known_string()
         {
             // Arrange
@@ -32,13 +34,14 @@ namespace Husky.Services.Tests.VariableResolverTests
             var testObject = new Cat("{randomName}", null, 1);
 
             // Act
-            _sut.Resolve(testObject, varSource);
+            Sut.Resolve(testObject, varSource);
 
             // Assert
             Assert.AreEqual(expectedName, testObject.Name);
         }
 
         [Test]
+        [Category("UnitTest")]
         public void Resolver_changes_multiple_properties_from_multiple_sources()
         {
             // Arrange
@@ -51,7 +54,7 @@ namespace Husky.Services.Tests.VariableResolverTests
             var testObject = new Cat("{cat.Name}", "{cat.NickName}", 1);
 
             // Act
-            _sut.Resolve(testObject, firstSource, secondSource);
+            Sut.Resolve(testObject, firstSource, secondSource);
 
             // Assert
             Assert.AreEqual(expectedName, testObject.Name);
@@ -59,6 +62,7 @@ namespace Husky.Services.Tests.VariableResolverTests
         }
 
         [Test]
+        [Category("UnitTest")]
         public void Resolver_changes_multiple_variables_in_one_property()
         {
             // Arrange
@@ -76,7 +80,7 @@ namespace Husky.Services.Tests.VariableResolverTests
             var testObject = new Cat("{prefixes.Ser} {catNames.Name}, {titles.FirstOfName}; {titles.Protector}", string.Empty, 5);
 
             // Act
-            _sut.Resolve(testObject, prefixesSource, namesSource, titlesSource1, titlesSource2);
+            Sut.Resolve(testObject, prefixesSource, namesSource, titlesSource1, titlesSource2);
 
             // Assert
             Assert.AreEqual(expectedFinalName, testObject.Name);
@@ -85,6 +89,7 @@ namespace Husky.Services.Tests.VariableResolverTests
         }
 
         [Test]
+        [Category("UnitTest")]
         public void Resolver_throws_detailed_exception_when_unable_to_locate_variables()
         {
             // Arrange
@@ -92,16 +97,16 @@ namespace Husky.Services.Tests.VariableResolverTests
             var testObject = new Cat("{she.loves.me.not}", null, 1);
 
             // Act
-            TestDelegate resolve = () => _sut.Resolve(testObject, varSource);
+            void Resolve() => Sut.Resolve(testObject, varSource);
 
             // Assert
-            var exception = Assert.Catch<ArgumentException>(resolve);
+            var exception = Assert.Catch<ArgumentException>(Resolve);
             Assert.True(exception.Message.Contains("she.loves.me.not"));
             Assert.True(exception.Message.Contains(nameof(Cat)));
             Assert.True(exception.Message.Contains(nameof(Cat.Name)));
         }
         
-        private Dictionary<string, string> CreateSource(params (string key, string value)[] input)
+        private static Dictionary<string, string> CreateSource(params (string key, string value)[] input)
             => input.ToDictionary(k => k.key, v => v.value);
 
         private class Cat
