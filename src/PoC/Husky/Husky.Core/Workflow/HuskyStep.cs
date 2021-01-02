@@ -5,16 +5,17 @@ namespace Husky.Core.Workflow
 {
     public class HuskyStep<TTaskConfiguration> where TTaskConfiguration : HuskyTaskConfiguration
     {
-        public string Name { get; set; }
+        public string Name { get; }
 
-        internal HuskyStepConfiguration HuskyStepConfiguration { get; set; } = null!;
-        internal TTaskConfiguration HuskyTaskConfiguration { get; set; }
-        internal ExecutionInformation ExecutionInformation { get; set; } = new();
+        internal HuskyStepConfiguration HuskyStepConfiguration { get; }
+        internal TTaskConfiguration HuskyTaskConfiguration { get; }
+        internal ExecutionInformation ExecutionInformation { get; } = new();
 
-        public HuskyStep(string name, TTaskConfiguration huskyTaskConfiguration)
+        public HuskyStep(string name, TTaskConfiguration huskyTaskConfiguration, HuskyStepConfiguration huskyStepConfiguration)
         {
             Name = name;
             HuskyTaskConfiguration = huskyTaskConfiguration;
+            HuskyStepConfiguration = huskyStepConfiguration;
         }
     }
 }

@@ -88,24 +88,19 @@ namespace Husky.Core.Builder
 
         public IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration) where TTaskConfiguration : HuskyTaskConfiguration
         {
-            var configuration = Activator.CreateInstance<TTaskConfiguration>();
-            taskConfiguration.Invoke(configuration);
-
-            var step = new HuskyStep<HuskyTaskConfiguration>(name, configuration)
-            {
-                HuskyStepConfiguration = _defaultStepConfiguration
-            };
-
-            _job.Steps.Add(step);
+            AddStep(name, taskConfiguration, _defaultStepConfiguration);
 
             return this;
         }
 
         public IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration
         {
-            AddStep(name, taskConfiguration);
+            var configuration = Activator.CreateInstance<TTaskConfiguration>();
+            taskConfiguration.Invoke(configuration);
 
-            _job.Steps.Last().HuskyStepConfiguration = stepConfiguration;
+            var step = new HuskyStep<HuskyTaskConfiguration>(name, configuration, stepConfiguration);
+
+            _job.Steps.Add(step);
 
             return this;
         }
