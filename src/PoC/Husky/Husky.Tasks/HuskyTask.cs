@@ -7,9 +7,16 @@ namespace Husky.Tasks
 {
     public abstract class HuskyTask<T> where T : HuskyTaskConfiguration
     {
-        protected T? Configuration { get; private set; }
-        protected InstallationContext? InstallationContext { get; private set; }
-        protected ExecutionInformation? ExecutionInformation { get; private set; }
+        /*
+         * Todo: Find a way to make the properties in each HuskyTask's Configuration readonly.
+         *       While we obviously want users to be able to set the properties (and the Action<T> syntax isn't compatible with init;),
+         *       we do not want to commit some sin like changing a Task's configuration at runtime.
+         *
+         *       That would be horrible.
+         */
+        protected T Configuration { get; private set; } = null!;
+        protected InstallationContext InstallationContext { get; private set; } = null!;
+        protected ExecutionInformation ExecutionInformation { get; private set; } = null!;
 
         public void SetExecutionContext(T configuration, InstallationContext installationContext, ExecutionInformation executionInformation)
         {
