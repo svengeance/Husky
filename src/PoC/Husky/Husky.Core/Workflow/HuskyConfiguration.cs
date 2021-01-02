@@ -12,7 +12,7 @@ namespace Husky.Core.Workflow
 
         private HuskyConfiguration(Dictionary<Type, IHuskyConfigurationBlock> configurations) => _configurations = configurations;
 
-        internal void Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock
+        public void Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock
             => configuration.Invoke((T) _configurations[typeof(T)]);
 
         // Todo: Not sure if this belongs here. Could expose a readonly to the public & register in HuskyInstaller.
