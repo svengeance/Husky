@@ -66,7 +66,8 @@ pause";
                                                                     "extract-files",
                                                                     task =>
                                                                     {
-                                                                        task.Clean = true;
+                                                                        task.CleanDirectories = true;
+                                                                        task.CleanFiles = true;
                                                                         task.Resources = "dist/program/**/*";
                                                                         task.TargetDirectory = "$variables.installDir";
                                                                     }))
