@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using FluentValidation;
 using Husky.Core;
 using Husky.Core.Workflow;
 using Husky.Installer;
@@ -53,8 +54,9 @@ namespace Husky.Tasks.Tests
                 throw new ArgumentException($"Attempted to update TaskConfiguration {DefaultTaskConfiguration.GetType()} with a different type ({updateParameterType})");
 
             update((TOptions) DefaultTaskConfiguration);
+            ValidateConfiguration();
         }
-        
+
         protected abstract void ConfigureHusky(HuskyConfiguration huskyConfiguration);
 
         protected virtual InstallationContext CreateDefaultInstallationContext() => new(Assembly.GetExecutingAssembly());
@@ -70,8 +72,15 @@ namespace Husky.Tasks.Tests
             var installationContext = CreateDefaultInstallationContext();
             var defaultExecutionInformation = new ExecutionInformation();
             Unsafe.As<HuskyTask<HuskyTaskConfiguration>>(task).SetExecutionContext(taskConfiguration, installationContext, defaultExecutionInformation);
-
+            ValidateConfiguration();
             Sut = task;
+        }
+
+        private void ValidateConfiguration()
+        {
+            var validation = DefaultTaskConfiguration.Validate();
+            if (!validation.IsValid)
+                throw new ValidationException(validation.Errors);
         }
     }
 }
