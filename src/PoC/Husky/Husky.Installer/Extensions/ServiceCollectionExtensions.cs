@@ -16,7 +16,7 @@ namespace Husky.Installer.Extensions
                 HuskyTaskResolver.AddAssemblyForScanning(externalAssembly);
 
             var services = new ServiceCollection();
-            services.AddScoped<InstallationContext>(svc => new InstallationContext(Assembly.GetEntryAssembly()!));
+            services.AddScoped(svc => new InstallationContext(Assembly.GetEntryAssembly()!));
             services.AddHuskyServices();
             services.AddHuskyTasks();
             /*

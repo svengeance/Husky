@@ -42,22 +42,26 @@ namespace Husky.Installer
 
         private async Task ExecuteStage(HuskyStage stage, IServiceProvider services)
         {
-          
             foreach (var job in stage.Jobs)
             {
-                await ExecuteJob(job, services); 
+                var installationContext = services.GetRequiredService<InstallationContext>();
+                installationContext.CurrentJobName = job.Name;
+                
+                await ExecuteJob(job, installationContext, services); 
             }
         }
 
-        private async Task ExecuteJob(HuskyJob job, IServiceProvider services)
+        private async Task ExecuteJob(HuskyJob job, InstallationContext installationContext, IServiceProvider services)
         {
             foreach (var step in job.Steps.Where(w => w.HuskyStepConfiguration.SupportedPlatforms.IsCurrentPlatformSupported()))
             {
-                await ExecuteStep(step, services);
+                installationContext.CurrentStepName = step.Name;
+                
+                await ExecuteStep(step, installationContext, services);
             }
         }
 
-        private async Task ExecuteStep<T>(HuskyStep<T> step, IServiceProvider services) where T: HuskyTaskConfiguration
+        private async Task ExecuteStep<T>(HuskyStep<T> step, InstallationContext installationContext, IServiceProvider services) where T: HuskyTaskConfiguration
         {
             /* Todo: We currently have a "related type" issue, where we don't give a damn what type <T> is here, we just *know* it's a HuskyTaskConfiguration
             *  Unfortunately, the invariance on class-generic-types causes failures when trying to upcast T here, which is a *specific* configuration, to the base HTC.
@@ -68,7 +72,6 @@ namespace Husky.Installer
             var taskType = HuskyTaskResolver.GetTaskForConfiguration(step.HuskyTaskConfiguration);
             var task = Unsafe.As<HuskyTask<T>>(services.GetRequiredService(taskType));
             
-            var installationContext = services.GetRequiredService<InstallationContext>();
             var variableResolver = services.GetRequiredService<IVariableResolverService>();
             variableResolver.Resolve(step.HuskyTaskConfiguration, installationContext.Variables, _workflow.Variables, HuskyVariables.AsDictionary());
             
