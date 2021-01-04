@@ -17,12 +17,16 @@ namespace Husky.Services
     {
         public async Task<int> ExecuteCommand(string command, bool showWindow = false)
         {
-            // Todo: Maybe pipe stdout/stderror and return a comprehensive ProcessResult class
+            /*
+             * Todo: Maybe pipe stdout/stderror and return a comprehensive ProcessResult class
+             *       The above thought bubble is actually nicely encapsulated by the following lib. Please make note.
+             *       https://github.com/Tyrrrz/CliWrap
+             */
             var procInfo = GetShellProcessStartInfo();
             procInfo.ArgumentList.Add(command);
             procInfo.CreateNoWindow = !showWindow;
             procInfo.WindowStyle = showWindow ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
-            
+
             var proc = new Process { StartInfo = procInfo };
             proc.Start();
             await proc.WaitForExitAsync();
@@ -30,6 +34,9 @@ namespace Husky.Services
             return proc.ExitCode;
         }
 
+        /*
+         * Todo: Going to need to acquire some wrapper or another to set 755 perms on Linux systems
+         */
         public async Task<string> CreateScriptFile(string destinationDirectory, string fileName, string script)
         {
             var destFileInfo = new FileInfo(Path.Combine(destinationDirectory, fileName + GetScriptFileExtension()));
