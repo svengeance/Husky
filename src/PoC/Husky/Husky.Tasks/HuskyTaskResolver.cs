@@ -22,7 +22,7 @@ namespace Husky.Tasks
 
         private static Dictionary<Type, Type> ResolveHuskyTasks(Assembly assembly)
             => assembly.GetExportedTypes()
-                       .Where(w => w.BaseType?.GetGenericArguments().Length > 0 && w.BaseType?.GetGenericArguments().FirstOrDefault()?.BaseType == typeof(HuskyTaskConfiguration))
+                       .Where(w => w.BaseType?.GetGenericArguments().FirstOrDefault()?.BaseType == typeof(HuskyTaskConfiguration))
                        .ToDictionary(k => k.BaseType!.GenericTypeArguments[0], v => v);
 
         public static Type GetTaskForConfiguration<TConfiguration>(TConfiguration configuration) where TConfiguration : HuskyTaskConfiguration
