@@ -59,8 +59,6 @@ A Task may or may not write out variables which the user can use at a later time
 ### HuskyJob
 1:1 Correlation with a [YAML Job](#job), this class wrap a collection of [HuskyTasks](#HuskyTask) and adds the necessary behavior to communicate with other HuskyJobs.
 
-The internal Service Provider for Husky has a "scope" of a HuskyJob; all scoped services will thusly be reinitialized per-job.
-
 ### HuskyTask
 1:1 Correlation with a [YAML Task](#task), a HuskyTask hosts the execution (and rollback) code that calls upon various services to fulfill the task.
 
