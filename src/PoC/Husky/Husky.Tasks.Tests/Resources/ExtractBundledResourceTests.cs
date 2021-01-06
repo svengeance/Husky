@@ -11,35 +11,8 @@ using NUnit.Framework;
 
 namespace Husky.Tasks.Tests.Resources
 {
-    public class ExtractBundledResourceTests: BaseHuskyTaskTest<ExtractBundledResource>
+    public class ExtractBundledResourceTests: BaseFileSystemTest<ExtractBundledResource>
     {
-        private DirectoryInfo _tempDirectory;
-
-        [OneTimeSetUp]
-        public void SetupDirectory()
-        {
-            var tempDirPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(tempDirPath);
-            _tempDirectory = new DirectoryInfo(tempDirPath);
-        }
-
-        [TearDown]
-        public void CleanDirectory()
-        {
-            _tempDirectory.Delete(true);
-            _tempDirectory.Create();
-            _tempDirectory.Refresh();
-        }
-
-        [OneTimeTearDown]
-        public void RemoveDirectory()
-        {
-            _tempDirectory.Refresh();
-            
-            if (_tempDirectory.Exists)
-                _tempDirectory.Delete(true);
-        }
-
         [Test]
         [Category("IntegrationTest")]
         public async Task Extract_bundled_resource_creates_identical_files_and_folders_from_embedded_resources()

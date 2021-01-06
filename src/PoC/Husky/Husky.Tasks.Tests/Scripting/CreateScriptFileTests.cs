@@ -8,37 +8,10 @@ using NUnit.Framework;
 
 namespace Husky.Tasks.Tests.Scripting
 {
-    public class CreateScriptFileTests: BaseHuskyTaskTest<CreateScriptFile>
+    public class CreateScriptFileTests: BaseFileSystemTest<CreateScriptFile>
     {
-        private DirectoryInfo _tempDirectory;
-
         private string _scriptFileName = "TestScript";
         private string _script = "echo Woof!";
-        
-        [OneTimeSetUp]
-        public void SetupDirectory()
-        {
-            var tempDirPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(tempDirPath);
-            _tempDirectory = new DirectoryInfo(tempDirPath);
-        }
-
-        [TearDown]
-        public void CleanDirectory()
-        {
-            _tempDirectory.Delete(true);
-            _tempDirectory.Create();
-            _tempDirectory.Refresh();
-        }
-
-        [OneTimeTearDown]
-        public void RemoveDirectory()
-        {
-            _tempDirectory.Refresh();
-
-            if (_tempDirectory.Exists)
-                _tempDirectory.Delete(true);
-        }
 
         [Test]
         [Category("IntegrationTest")]
