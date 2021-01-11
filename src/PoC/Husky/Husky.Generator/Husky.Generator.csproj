@@ -6,19 +6,15 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1" PrivateAssets="all" />
+	  <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="YamlDotNet" Version="9.1.0" PrivateAssets="all" GeneratePathProperty="true" />
+		<PackageReference Include="YamlDotNet" Version="9.1.1" PrivateAssets="all" GeneratePathProperty="true" />
 	</ItemGroup>
 
 	<Target Name="TestMessage" AfterTargets="Build">
 
 		<!-- Use $(Property Name) to reference a property -->
 		<Message Text="$(PkgYamlDotNet)" Importance="high" />
-
 	</Target>
 
 	<PropertyGroup>
