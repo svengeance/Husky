@@ -3,12 +3,16 @@
   <PropertyGroup>
 	  <TargetFramework>net5.0</TargetFramework>
 	  <Nullable>Enable</Nullable>
-	  <LangVersion>Preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="9.3.0" />
+    <PackageReference Include="FluentValidation" Version="9.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    <PackageReference Include="SemanticVersioning" Version="1.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Husky.Internal.Shared\Husky.Internal.Shared.csproj" />
   </ItemGroup>
 
 </Project>
