@@ -28,6 +28,11 @@ namespace Husky.Services
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
 
+            /*
+             * Todo: We're not going to be able to use FastMember and
+             *       TypeAccessor here because of the runtime IL Generation, which is incompatible
+             *       with any sort of Native AoT work we want to do.
+             */
             var accessor = TypeAccessor.Create(obj.GetType());
             var stringProperties = accessor.GetMembers()
                                            .Where(w => w.Type == typeof(string))
