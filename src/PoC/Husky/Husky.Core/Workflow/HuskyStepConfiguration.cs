@@ -4,13 +4,14 @@ namespace Husky.Core.Workflow
 {
     public class HuskyStepConfiguration
     {
-        public SupportedPlatforms SupportedPlatforms { get; }
+        public OS Os { get; }
 
-        public static HuskyStepConfiguration DefaultConfiguration = new(SupportedPlatforms.All);
+        // Without any specification, we can assume that the task is "any" operating system - it will work for our current platform.
+        public static readonly HuskyStepConfiguration DefaultConfiguration = new(CurrentPlatform.OS);
         
-        public HuskyStepConfiguration(SupportedPlatforms supportedPlatforms)
+        public HuskyStepConfiguration(OS os)
         {
-            SupportedPlatforms = supportedPlatforms;
+            Os = os;
         }
     }
 }
