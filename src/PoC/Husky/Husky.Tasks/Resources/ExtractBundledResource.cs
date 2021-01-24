@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using Husky.Core.TaskConfiguration.Resources;
-using Husky.Core.Workflow;
 using Husky.Services;
 
 namespace Husky.Tasks.Resources
@@ -16,7 +15,7 @@ namespace Husky.Tasks.Resources
             _embeddedResourceService = embeddedResourceService;
         }
 
-        protected override async Task ExecuteTask()
+        protected override async ValueTask ExecuteTask()
         {
             var availableFiles = _embeddedResourceService.ListResources(InstallationContext.InstallationAssembly, Configuration.Resources);
 
@@ -49,7 +48,7 @@ namespace Husky.Tasks.Resources
             }
         }
 
-        protected override Task RollbackTask()
+        protected override ValueTask RollbackTask()
         {
             throw new NotImplementedException();
         }

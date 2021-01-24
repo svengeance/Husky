@@ -28,7 +28,7 @@ namespace Husky.Tasks
             ExecutionInformation = executionInformation;
         }
 
-        public Task Execute()
+        public ValueTask Execute()
         {
             if (Configuration is null || InstallationContext is null || ExecutionInformation is null)
                 throw new ApplicationException($"Task was not configured - aborting execution.");
@@ -36,7 +36,7 @@ namespace Husky.Tasks
             return ExecuteTask();
         }
 
-        public Task Rollback()
+        public ValueTask Rollback()
         {
             if (Configuration is null || InstallationContext is null || ExecutionInformation is null)
                 throw new ApplicationException($"Task was not configured - aborting rollback.");
@@ -44,8 +44,8 @@ namespace Husky.Tasks
             return RollbackTask();
         }
 
-        protected abstract Task ExecuteTask();
+        protected abstract ValueTask ExecuteTask();
 
-        protected abstract Task RollbackTask();
+        protected abstract ValueTask RollbackTask();
     }
 }

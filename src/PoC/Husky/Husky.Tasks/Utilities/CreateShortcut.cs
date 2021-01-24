@@ -16,16 +16,16 @@ namespace Husky.Tasks.Utilities
         private string _windowsShortcutFileExtension = ".lnk";
         private string _unixShortcutFileExtension = ".desktop";
         
-        private readonly IScriptingService _scriptingService;
+        private readonly IShellExecutionService _shellExecutionService;
         private readonly ApplicationConfiguration _applicationConfiguration;
 
-        public CreateShortcut(IScriptingService scriptingService, ApplicationConfiguration applicationConfiguration)
+        public CreateShortcut(IShellExecutionService shellExecutionService, ApplicationConfiguration applicationConfiguration)
         {
-            _scriptingService = scriptingService;
+            _shellExecutionService = shellExecutionService;
             _applicationConfiguration = applicationConfiguration;
         }
         
-        protected override async Task ExecuteTask()
+        protected override async ValueTask ExecuteTask()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 CreateWindowsShortcut();
@@ -53,7 +53,7 @@ namespace Husky.Tasks.Utilities
             file.Save(pathToSave, false);
         }
 
-        private async Task CreateLinuxShortcut()
+        private async ValueTask CreateLinuxShortcut()
         {
             (string key, string value)[] desktopFileSettings =
             {
@@ -77,7 +77,7 @@ namespace Husky.Tasks.Utilities
             await File.WriteAllTextAsync(path, desktopStringBuilder.ToString());
         }
 
-        protected override Task RollbackTask()
+        protected override ValueTask RollbackTask()
         {
             /*
              * Todo: We should probably have a comprehensive HuskyNotSupportException that encapsulates the current operation,
@@ -92,7 +92,7 @@ namespace Husky.Tasks.Utilities
             if (fileThatShouldExist.Exists)
                 fileThatShouldExist.Delete();
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
         /*

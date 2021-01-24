@@ -9,16 +9,16 @@ namespace Husky.Installer.Tests
         public bool HasRan = false;
         public bool HasRolledBack = false;
 
-        protected override Task ExecuteTask()
+        protected override ValueTask ExecuteTask()
         {
             HasRan = true;
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        protected override Task RollbackTask()
+        protected override ValueTask RollbackTask()
         {
             HasRolledBack = true;
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
     }
 }

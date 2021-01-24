@@ -7,29 +7,29 @@ namespace Husky.Tasks.Scripting
 {
     public class CreateScriptFile : HuskyTask<CreateScriptFileOptions>
     {
-        private readonly IScriptingService _scriptingService;
+        private readonly IFileSystemService _fileSystemService;
 
-        public CreateScriptFile(IScriptingService scriptingService)
+        public CreateScriptFile(IFileSystemService fileSystemService)
         {
-            _scriptingService = scriptingService;
+            _fileSystemService = fileSystemService;
         }
 
-        protected override async Task ExecuteTask()
+        protected override async ValueTask ExecuteTask()
         {
-            var createdScriptFile = await _scriptingService.CreateScriptFile(Configuration.Directory, Configuration.FileName, Configuration.Script);
+            var createdScriptFile = await _fileSystemService.CreateScriptFile(Configuration.Directory, Configuration.FileName, Configuration.Script);
             InstallationContext.SetVariable("CreatedFileName", createdScriptFile);
         }
 
-        protected override Task RollbackTask()
+        protected override ValueTask RollbackTask()
         {
-            var createdExtension = _scriptingService.GetScriptFileExtension();
+            var createdExtension = _fileSystemService.GetScriptFileExtension();
             var createdScriptFile = Path.Combine(Configuration.Directory, Configuration.FileName + createdExtension);
 
             var existingScriptFile = new FileInfo(createdScriptFile);
             if (existingScriptFile.Exists)
                 existingScriptFile.Delete();
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
     }
 }
