@@ -1,14 +1,15 @@
-﻿namespace Husky.Core.HuskyConfiguration
-{
-    public class HuskyDependency
-    {
-        public string Name { get; set; }
-        public string Version { get; set; }
+﻿using SemVer;
 
-        public HuskyDependency(string name, string version)
-        {
-            Name = name;
-            Version = version;
-        }
+namespace Husky.Core.HuskyConfiguration
+{
+    public abstract record HuskyDependency
+    {
+        public Range ParsedRange { get; }
+
+        private string Range => ParsedRange.ToString();
+
+        protected HuskyDependency(string range) : this(new Range(range)) { }
+
+        private HuskyDependency(Range range) => ParsedRange = range;
     }
 }

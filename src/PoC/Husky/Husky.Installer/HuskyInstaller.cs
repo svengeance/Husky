@@ -3,12 +3,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Husky.Core;
+using Husky.Core.HuskyConfiguration;
 using Husky.Core.Workflow;
+using Husky.Dependencies;
 using Husky.Installer.Extensions;
 using Husky.Services;
-using Husky.Services.Extensions;
 using Husky.Tasks;
-using Husky.Tasks.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Husky.Installer
@@ -27,10 +27,33 @@ namespace Husky.Installer
             _workflow = workflow;
         }
 
-        public async Task Install()
+        public async ValueTask Install()
         {
+            await CurrentPlatform.LoadCurrentPlatformInformation();
+
             var serviceProvider = new ServiceCollection().AddHuskyInstaller(InstallationConfiguration, _workflow.Configuration);
             _workflow.Validate();
+
+            foreach (var dependency in _workflow.Dependencies)
+            {
+                var dependencyHandler = GetDependencyHandler(dependency, serviceProvider);
+                if (await dependencyHandler.IsAlreadyInstalled(dependency))
+                {
+                    // Todo: Log installed
+                }
+                else
+                {
+                    if (dependencyHandler.TrySatisfyDependency(dependency, out var acquisitionMethod))
+                    {
+                        await acquisitionMethod.AcquireDependency(serviceProvider);
+                        // Todo: Verify installed (maybe call IsAlreadyInstalled again? :D
+                    }
+                    else
+                    {
+                        throw new ApplicationException($"Unable to acquire dependency {dependency.GetType()}, installation will abort");
+                    }
+                }
+            }
 
             foreach (var stage in _workflow.Stages)
             {
@@ -40,7 +63,7 @@ namespace Husky.Installer
             }
         }
 
-        private async Task ExecuteStage(HuskyStage stage, IServiceProvider services)
+        private async ValueTask ExecuteStage(HuskyStage stage, IServiceProvider services)
         {
             foreach (var job in stage.Jobs)
             {
@@ -51,9 +74,9 @@ namespace Husky.Installer
             }
         }
 
-        private async Task ExecuteJob(HuskyJob job, InstallationContext installationContext, IServiceProvider services)
+        private async ValueTask ExecuteJob(HuskyJob job, InstallationContext installationContext, IServiceProvider services)
         {
-            foreach (var step in job.Steps.Where(w => w.HuskyStepConfiguration.SupportedPlatforms.IsCurrentPlatformSupported()))
+            foreach (var step in job.Steps.Where(w => w.HuskyStepConfiguration.Os == CurrentPlatform.OS))
             {
                 installationContext.CurrentStepName = step.Name;
                 
@@ -61,12 +84,12 @@ namespace Husky.Installer
             }
         }
 
-        private async Task ExecuteStep<T>(HuskyStep<T> step, InstallationContext installationContext, IServiceProvider services) where T: HuskyTaskConfiguration
+        private async ValueTask ExecuteStep<T>(HuskyStep<T> step, InstallationContext installationContext, IServiceProvider services) where T: HuskyTaskConfiguration
         {
             /* Todo: We currently have a "related type" issue, where we don't give a damn what type <T> is here, we just *know* it's a HuskyTaskConfiguration
             *  Unfortunately, the invariance on class-generic-types causes failures when trying to upcast T here, which is a *specific* configuration, to the base HTC.
-            *  This *can* cause issues if we were to try to send *ANY OTHER* type other than the related type (i.e. send in Task1Configuration to a Task2)
-            *  However, since I am only resolving and using the related type (i.e. we will *only* ever set Task1Configuration on Task1 here), this is somewhat safe
+            *  This *can* cause issues if we were to try to send *ANY OTHER* type other than the related type (i.e. send in ValueTask1Configuration to a ValueTask2)
+            *  However, since I am only resolving and using the related type (i.e. we will *only* ever set ValueTask1Configuration on ValueTask1 here), this is somewhat safe
             *  In short, it may behoove us to get away from this if a different approach works better.
             */
             var taskType = HuskyTaskResolver.GetTaskForConfiguration(step.HuskyTaskConfiguration);
@@ -80,8 +103,8 @@ namespace Husky.Installer
             step.ExecutionInformation.Start();
 
             /*
-             * Todo: We should be catching exceptions in the Task Execution and returning a detailed Result of what failed.
-             * In addition, Success cases should likewise be returning a receipt of the task-specific execution for analytics
+             * Todo: We should be catching exceptions in the ValueTask Execution and returning a detailed Result of what failed.
+             * In addition, Success cases should likewise be returning a receipt of the ValueTask-specific execution for analytics
              */
 
             try
@@ -100,9 +123,16 @@ namespace Husky.Installer
             step.ExecutionInformation.Finish();
         }
 
-        private static Task ExecuteTask<T>(HuskyTask<T> task) where T: HuskyTaskConfiguration
+        private static ValueTask ExecuteTask<T>(HuskyTask<T> task) where T: HuskyTaskConfiguration
         {
             return task.Execute();
+        }
+
+        private static IDependencyHandler<HuskyDependency> GetDependencyHandler(HuskyDependency dependency, IServiceProvider serviceProvider)
+        {
+            var dependencyType = dependency.GetType();
+            var dependencyHandlerType = typeof(IDependencyHandler<>).MakeGenericType(dependencyType);
+            return (IDependencyHandler<HuskyDependency>)serviceProvider.GetRequiredService(dependencyHandlerType);
         }
     }
 }

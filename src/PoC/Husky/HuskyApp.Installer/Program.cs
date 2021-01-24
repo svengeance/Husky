@@ -1,6 +1,6 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Husky.Core;
+using Husky.Core.Dependencies;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.TaskConfiguration.Resources;
@@ -8,16 +8,13 @@ using Husky.Core.TaskConfiguration.Scripting;
 using Husky.Core.TaskConfiguration.Utilities;
 using Husky.Core.Workflow;
 using Husky.Installer;
-using Husky.Tasks.Resources;
-using Husky.Tasks.Scripting;
-using Husky.Tasks.Utilities;
 
 namespace HuskyApp.Installer
 {   
     public static class Program
     {
-        private static readonly HuskyStepConfiguration _unixConfiguration = new(SupportedPlatforms.UnixSystems);
-        private static readonly HuskyStepConfiguration _windowsConfiguration = new(SupportedPlatforms.Windows);
+        private static readonly HuskyStepConfiguration _lunixConfiguration = new(OS.Linux);
+        private static readonly HuskyStepConfiguration _windowsConfiguration = new(OS.Windows);
 
         public static async Task Main(string[] args)
         {
@@ -42,20 +39,17 @@ pause";
                                          {
                                              a.Name = "HuskyApp";
                                              a.Version = "1.0.0";
-                                             a.Dependencies = new[]
-                                             {
-                                                new HuskyDependency("DotNet", "5")
-                                             };
                                          })
+                                        .AddDependency(new DotNet(Range: ">=5.0.0", FrameworkType: FrameworkInstallationType.Runtime, Kind: DotNet.RuntimeKind.RuntimeOnly))
                                         .AddGlobalVariable("installDir", $"{HuskyVariables.Folders.ProgramFiles}")
                                         .WithDefaultStage(
-                                             stage => stage.SetDefaultStepConfiguration(new HuskyStepConfiguration(SupportedPlatforms.All))
+                                             stage => stage.SetDefaultStepConfiguration(HuskyStepConfiguration.DefaultConfiguration)
                                                            .AddJob(
                                                                 "show-splash",
                                                                 splash => splash.AddStep<ExecuteInlineScriptOptions>(
                                                                                      "show-unix-splash",
                                                                                      task => task.Script = linuxScript,
-                                                                                     _unixConfiguration)
+                                                                                     _lunixConfiguration)
                                                                                 .AddStep<ExecuteInlineScriptOptions>(
                                                                                      "show-windows-splash",
                                                                                      task => task.Script = windowsScript,

@@ -27,9 +27,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Services.Tests", "Hus
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Installer.Tests", "Husky.Installer.Tests\Husky.Installer.Tests.csproj", "{096E1630-C391-48FD-A048-411CE14D1BBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Husky.Tasks.Tests", "Husky.Tasks.Tests\Husky.Tasks.Tests.csproj", "{2725330E-37C1-48B7-BE5E-BF0F955C6989}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Tasks.Tests", "Husky.Tasks.Tests\Husky.Tasks.Tests.csproj", "{2725330E-37C1-48B7-BE5E-BF0F955C6989}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Husky.Core.Tests", "Husky.Core.Tests\Husky.Core.Tests.csproj", "{EAE3D5E3-4FED-4735-880F-DAF5EE7D3418}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Core.Tests", "Husky.Core.Tests\Husky.Core.Tests.csproj", "{EAE3D5E3-4FED-4735-880F-DAF5EE7D3418}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Dependencies", "Husky.Dependencies\Husky.Dependencies.csproj", "{E7D1F2A9-32F0-476F-8654-6AA3D3534D11}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{638500B6-2CC1-439C-AE5F-BBE022407D0F}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husky.Internal.Shared", "Husky.Internal.Shared\Husky.Internal.Shared.csproj", "{FB13561C-9E0D-4E40-86BC-6E9FE75DBD79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Husky.Dependencies.Test", "Husky.Dependencies.Test\Husky.Dependencies.Test.csproj", "{956D3B14-0D6D-4363-9B77-E4EE8ABC03B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +96,18 @@ Global
 		{EAE3D5E3-4FED-4735-880F-DAF5EE7D3418}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAE3D5E3-4FED-4735-880F-DAF5EE7D3418}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAE3D5E3-4FED-4735-880F-DAF5EE7D3418}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7D1F2A9-32F0-476F-8654-6AA3D3534D11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7D1F2A9-32F0-476F-8654-6AA3D3534D11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7D1F2A9-32F0-476F-8654-6AA3D3534D11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7D1F2A9-32F0-476F-8654-6AA3D3534D11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB13561C-9E0D-4E40-86BC-6E9FE75DBD79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB13561C-9E0D-4E40-86BC-6E9FE75DBD79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB13561C-9E0D-4E40-86BC-6E9FE75DBD79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB13561C-9E0D-4E40-86BC-6E9FE75DBD79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{956D3B14-0D6D-4363-9B77-E4EE8ABC03B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{956D3B14-0D6D-4363-9B77-E4EE8ABC03B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{956D3B14-0D6D-4363-9B77-E4EE8ABC03B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{956D3B14-0D6D-4363-9B77-E4EE8ABC03B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,6 +120,7 @@ Global
 		{096E1630-C391-48FD-A048-411CE14D1BBE} = {D57AA5BC-E699-4A4D-9EF4-6A96FA71328D}
 		{2725330E-37C1-48B7-BE5E-BF0F955C6989} = {D57AA5BC-E699-4A4D-9EF4-6A96FA71328D}
 		{EAE3D5E3-4FED-4735-880F-DAF5EE7D3418} = {D57AA5BC-E699-4A4D-9EF4-6A96FA71328D}
+		{956D3B14-0D6D-4363-9B77-E4EE8ABC03B4} = {D57AA5BC-E699-4A4D-9EF4-6A96FA71328D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2940D1AB-7EB1-4AA8-A491-13596FDE6636}

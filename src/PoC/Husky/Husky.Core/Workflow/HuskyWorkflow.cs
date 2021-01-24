@@ -12,8 +12,9 @@ namespace Husky.Core.Workflow
         public HuskyConfiguration Configuration { get; }
         public Dictionary<string, string> Variables { get; } = new();
         public List<HuskyStage> Stages { get; } = new();
+        public List<HuskyDependency> Dependencies { get; } = new();
 
-        internal HuskyWorkflow(HuskyConfiguration configuration)
+        private HuskyWorkflow(HuskyConfiguration configuration)
         {
             Configuration = configuration;
         }

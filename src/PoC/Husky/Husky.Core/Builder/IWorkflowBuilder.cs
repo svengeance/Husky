@@ -17,6 +17,8 @@ namespace Husky.Core.Builder
         IHuskyWorkflowBuilder WithDefaultStage(Action<IHuskyStageBuilder> stageBuilderConfiguration);
 
         IHuskyWorkflowBuilder WithDefaultStageAndJob(Action<IHuskyJobBuilder> jobBuilderConfiguration);
+        
+        IHuskyWorkflowBuilder AddDependency(HuskyDependency huskyDependency);
 
         HuskyWorkflow Build();
     }
