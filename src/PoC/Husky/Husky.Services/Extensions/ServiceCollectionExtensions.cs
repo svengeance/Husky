@@ -9,6 +9,8 @@ namespace Husky.Services.Extensions
     {
         public static void AddHuskyServices(this IServiceCollection services)
         {
+            services.AddHttpClient();
+            
             var huskyServices = Assembly.GetExecutingAssembly()
                                         .GetExportedTypes()
                                         .Where(w => w.IsClass && w.IsPublic && !(w.IsSealed && w.IsAbstract))

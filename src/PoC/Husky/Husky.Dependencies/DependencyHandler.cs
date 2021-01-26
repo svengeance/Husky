@@ -15,10 +15,7 @@ namespace Husky.Dependencies
         {
             acquisitionMethod = GetAvailableDependenciesForCurrentPlatform(dependency).FirstOrDefault(f => f.SatisfiesDependency(dependency));
 
-            if (acquisitionMethod != null)
-                return true;
-
-            return false;
+            return acquisitionMethod != null;
         }
 
         protected abstract IEnumerable<DependencyAcquisitionMethod<T>> GetAvailableWindowsDependencies(T dependency);

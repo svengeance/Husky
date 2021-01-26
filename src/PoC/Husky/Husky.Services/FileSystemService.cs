@@ -17,7 +17,6 @@ namespace Husky.Services
         string GetScriptFileExtension();
     }
 
-    // Todo: Add tests
     public class FileSystemService: IFileSystemService
     {
         protected virtual string WindowsScriptFileExtension => ".cmd";
@@ -87,7 +86,7 @@ namespace Husky.Services
             public readonly long BytesLength;
             public readonly long BytesWritten;
 
-            public string ProgressPercent => $"{BytesWritten / BytesLength:P}";
+            public string ProgressPercent => $"{BytesWritten / BytesLength:P0}";
 
             public FileWriteProgress(long bytesLength, long bytesWritten)
             {

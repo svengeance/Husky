@@ -13,7 +13,6 @@ namespace Husky.Services
             IProgress<FileSystemService.FileWriteProgress>? progress = null);
     }
     
-    // Todo: Add Integration Tests
     public class HttpService: IHttpService
     {
         private readonly IFileSystemService _fileSystemService;
@@ -32,7 +31,7 @@ namespace Husky.Services
             IProgress<FileSystemService.FileWriteProgress>? progress = null)
         {
             // Todo: Log successes & failures
-            var response = await _httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead);
+            var response = await _httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseContentRead);
             response.EnsureSuccessStatusCode();
 
             var contentLength = response.Content.Headers.ContentLength;
