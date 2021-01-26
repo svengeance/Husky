@@ -1,5 +1,4 @@
-﻿
-/*
+﻿/*
  * Shamelessly stolen from https://github.com/adamreeve/semver.net,
  * the author of which having decided that it be better for consumers to reimplement this
  * functionality rather than make it available.
@@ -14,17 +13,17 @@ namespace Husky.Internal.Shared
 {
     // A version that might not have a minor or patch
     // number, for use in ranges like "^1.2" or "2.x"
-    internal class PartialVersion
+    internal record PartialVersion
     {
-        public int? Major { get; set; }
+        public int? Major { get; }
 
-        public int? Minor { get; set; }
+        public int? Minor { get; }
 
-        public int? Patch { get; set; }
+        public int? Patch { get; }
 
-        public string? PreRelease { get; set; }
+        public string? PreRelease { get; }
 
-        private static Regex regex = new Regex(@"^
+        private static Regex regex = new(@"^
                 [v=\s]*
                 (\d+|[Xx\*])                      # major version
                 (
@@ -40,7 +39,7 @@ namespace Husky.Internal.Shared
                 $",
             RegexOptions.IgnorePatternWhitespace);
 
-        public PartialVersion(int? major, int? minor = null, int? patch = null, string preRelease = null)
+        public PartialVersion(int? major, int? minor = null, int? patch = null, string? preRelease = null)
         {
             Major = major;
             Minor = minor;
@@ -50,7 +49,6 @@ namespace Husky.Internal.Shared
 
         public PartialVersion(string input)
         {
-
             string[] xValues = { "X", "x", "*" };
 
             if (input.Trim() == "")
@@ -104,18 +102,6 @@ namespace Husky.Internal.Shared
             }
         }
 
-        public Version ToZeroVersion()
-        {
-            return new Version(
-                    Major ?? 0,
-                    Minor ?? 0,
-                    Patch ?? 0,
-                    PreRelease);
-        }
-
-        public bool IsFull()
-        {
-            return Major.HasValue && Minor.HasValue && Patch.HasValue;
-        }
+        public Version ToZeroVersion() => new(Major ?? 0, Minor ?? 0, Patch ?? 0, PreRelease);
     }
 }
