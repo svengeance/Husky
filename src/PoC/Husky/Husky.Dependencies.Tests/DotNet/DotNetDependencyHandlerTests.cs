@@ -29,9 +29,34 @@ namespace Husky.Dependencies.Tests.DotNet
         };
 
         private DotNetDependencyHandler _sut = null!;
+        private Mock<IShellExecutionService> _shellExecutionServiceMock;
 
         [SetUp]
-        public void Setup() => _sut = new DotNetDependencyHandler(Mock.Of<IShellExecutionService>());
+        public void Setup()
+        {
+            _shellExecutionServiceMock = new Mock<IShellExecutionService>();
+            _sut = new DotNetDependencyHandler(_shellExecutionServiceMock.Object);
+        }
+        
+        [TestCase(FrameworkInstallationType.Runtime, "dotnet --list-runtimes")]
+        [TestCase(FrameworkInstallationType.Sdk, "dotnet --list-sdks")]
+        [Category("UnitTest")]
+        public void Dotnet_is_installed_check_runs_appropriate_shell_command(FrameworkInstallationType frameworkInstallationType, string expectedCommand)
+        {
+            // Arrange
+            _shellExecutionServiceMock.Setup(s => s.ExecuteShellCommand(It.IsAny<string>()))
+                                      .ReturnsAsync(new ShellExecutionService.ScriptExecutionResult(0, string.Empty, string.Empty));
+
+            var dependency = new Core.Dependencies.DotNet("1.0.0", frameworkInstallationType, frameworkInstallationType == FrameworkInstallationType.Runtime
+                ? Core.Dependencies.DotNet.RuntimeKind.AspNet
+                : Core.Dependencies.DotNet.RuntimeKind.Sdk);
+            
+            // Act
+            _ = _sut.IsAlreadyInstalled(dependency);
+            
+            // Assert
+            _shellExecutionServiceMock.Verify(v => v.ExecuteShellCommand(expectedCommand), Times.Once);
+        }
 
         [TestCase(">=5", true)]
         [TestCase("2.2.0", false)]
