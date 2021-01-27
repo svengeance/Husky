@@ -31,7 +31,7 @@ namespace Husky.Dependencies.DependencyHandlers
         public override async ValueTask<bool> IsAlreadyInstalled(DotNet dependency)
             => IsAlreadyInstalled(dependency, await GetDotnetInstallationOutput(dependency.FrameworkType));
 
-        private bool IsAlreadyInstalled(DotNet dependency, string[] splitDotnetOutput)
+        internal bool IsAlreadyInstalled(DotNet dependency, string[] splitDotnetOutput)
             => dependency.FrameworkType switch
             {
                 FrameworkInstallationType.Sdk => GetInstalledSdks(splitDotnetOutput).Any(a => dependency.ParsedRange.IsSatisfied(a)),

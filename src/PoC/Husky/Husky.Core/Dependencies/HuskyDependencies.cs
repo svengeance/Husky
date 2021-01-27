@@ -4,10 +4,11 @@ using Husky.Core.HuskyConfiguration;
 // Todo: Probably should split this out. But they all look so cute together!
 namespace Husky.Core.Dependencies
 {
-    public record DotNet(string Range, FrameworkInstallationType FrameworkType, DotNet.RuntimeKind Kind): HuskyDependency(Range)
+    public record DotNet(string Range, FrameworkInstallationType FrameworkType, DotNet.RuntimeKind Kind = DotNet.RuntimeKind.Sdk): HuskyDependency(Range)
     {
         public enum RuntimeKind
         {
+            Sdk,
             AspNet,
             Desktop,
             RuntimeOnly

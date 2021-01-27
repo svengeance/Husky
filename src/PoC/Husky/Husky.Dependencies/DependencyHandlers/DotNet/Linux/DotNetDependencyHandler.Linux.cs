@@ -27,14 +27,15 @@ namespace Husky.Dependencies.DependencyHandlers
         };
 
         private string FormatPackageName(DotNet dependency)
-            => $"{DerivePackageProduct(dependency.Kind)}-{dependency.FrameworkType.ToString().ToLowerInvariant()}-{GetHighestMatchingVersionString(dependency.ParsedRange)}";
+            => $"{DerivePackageProduct(dependency)}-{dependency.FrameworkType.ToString().ToLowerInvariant()}-{GetHighestMatchingVersionString(dependency.ParsedRange)}";
 
-        private string DerivePackageProduct(DotNet.RuntimeKind kind)
-            => kind switch
+        private string DerivePackageProduct(DotNet dependency)
+            => dependency.Kind switch
                {
+                   _ when dependency.FrameworkType == FrameworkInstallationType.Sdk => "dotnet",
                    DotNet.RuntimeKind.AspNet => "aspnetcore",
                    DotNet.RuntimeKind.RuntimeOnly => "dotnet",
-                   _ => throw new PlatformNotSupportedException($"Invalid DotNet product specified: {kind} is invalid on Linux platforms.")
+                   _ => throw new PlatformNotSupportedException($"Invalid DotNet product specified: {dependency} is invalid on Linux platforms.")
                };
 
         private string GetHighestMatchingVersionString(Range versionRange)
