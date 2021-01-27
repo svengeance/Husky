@@ -1,4 +1,6 @@
-﻿using Husky.Core.Enums;
+﻿using System;
+using System.Threading.Tasks;
+using Husky.Core.Enums;
 using Husky.Dependencies.DependencyHandlers;
 using Husky.Services;
 using Moq;
@@ -29,12 +31,19 @@ namespace Husky.Dependencies.Tests.DotNet
         };
 
         private DotNetDependencyHandler _sut = null!;
-        private Mock<IShellExecutionService> _shellExecutionServiceMock;
+        private Mock<IShellExecutionService> _shellExecutionServiceMock = null!;
 
         [SetUp]
         public void Setup()
         {
             _shellExecutionServiceMock = new Mock<IShellExecutionService>();
+
+            _shellExecutionServiceMock.Setup(s => s.ExecuteShellCommand("dotnet --list-runtimes"))
+                                      .ReturnsAsync(new ShellExecutionService.ScriptExecutionResult(0, string.Join(Environment.NewLine, _runtimeOutput), string.Empty));
+
+            _shellExecutionServiceMock.Setup(s => s.ExecuteShellCommand("dotnet --list-sdks"))
+                                      .ReturnsAsync(new ShellExecutionService.ScriptExecutionResult(0, string.Join(Environment.NewLine, _sdkOutput), string.Empty));
+
             _sut = new DotNetDependencyHandler(_shellExecutionServiceMock.Object);
         }
         
@@ -63,13 +72,13 @@ namespace Husky.Dependencies.Tests.DotNet
         [TestCase("<2.2.0", false)]
         [TestCase("3.1.x", true)]
         [Category("UnitTest")]
-        public void Dotnet_handler_identifies_installed_sdk(string range, bool expectedIsInstalledResult)
+        public async ValueTask Dotnet_handler_identifies_installed_sdk(string range, bool expectedIsInstalledResult)
         {
             // Arrange
             var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallationType.Sdk);
 
             // Act
-            var isInstalled = _sut.IsAlreadyInstalled(dependency, _sdkOutput);
+            var isInstalled = await _sut.IsAlreadyInstalled(dependency);
 
             // Assert
             Assert.AreEqual(expectedIsInstalledResult, isInstalled);
@@ -79,13 +88,13 @@ namespace Husky.Dependencies.Tests.DotNet
         [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeKind.RuntimeOnly, true)]
         [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeKind.Desktop, false)]
         [Category("UnitTest")]
-        public void Dotnet_handler_identifies_installed_runtime(string range, Core.Dependencies.DotNet.RuntimeKind runtimeKind, bool expectedIsInstalledResult)
+        public async ValueTask Dotnet_handler_identifies_installed_runtime(string range, Core.Dependencies.DotNet.RuntimeKind runtimeKind, bool expectedIsInstalledResult)
         {
             // Arrange
             var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallationType.Runtime, runtimeKind);
 
             // Act
-            var isInstalled = _sut.IsAlreadyInstalled(dependency, _runtimeOutput);
+            var isInstalled = await _sut.IsAlreadyInstalled(dependency);
 
             // Assert
             Assert.AreEqual(expectedIsInstalledResult, isInstalled);
