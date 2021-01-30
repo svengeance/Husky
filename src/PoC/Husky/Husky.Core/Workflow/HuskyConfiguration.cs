@@ -8,19 +8,18 @@ namespace Husky.Core.Workflow
 {
     public class HuskyConfiguration
     {
-        private readonly Dictionary<Type, IHuskyConfigurationBlock> _configurations;
+        private readonly Dictionary<Type, HuskyConfigurationBlock> _configurations;
 
-        private HuskyConfiguration(Dictionary<Type, IHuskyConfigurationBlock> configurations) => _configurations = configurations;
+        public IReadOnlyList<HuskyConfigurationBlock> GetConfigurationBlocks()
+            => _configurations.Values
+                              .Select(s => s with { })
+                              .ToList()
+                              .AsReadOnly();
 
-        public void Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock
+        private HuskyConfiguration(Dictionary<Type, HuskyConfigurationBlock> configurations) => _configurations = configurations;
+
+        public void Configure<T>(Action<T> configuration) where T : HuskyConfigurationBlock
             => configuration.Invoke((T) _configurations[typeof(T)]);
-
-        // Todo: Not sure if this belongs here. Could expose a readonly to the public & register in HuskyInstaller.
-        public void AddConfigurationToServiceCollection(IServiceCollection collection)
-        {
-            foreach (var typeAndConfiguration in _configurations)
-                collection.AddSingleton(typeAndConfiguration.Key, typeAndConfiguration.Value);
-        }
 
         public static HuskyConfiguration Create()
         {
@@ -28,9 +27,9 @@ namespace Husky.Core.Workflow
             var configBlocks = typeof(ApplicationConfiguration)
                               .Assembly
                               .GetTypes()
-                              .Where(w => w.GetInterfaces().Any(a => a == typeof(IHuskyConfigurationBlock)))
+                              .Where(w => w.BaseType == typeof(HuskyConfigurationBlock))
                               .Where(w => w.IsClass && !w.IsAbstract)
-                              .ToDictionary(k => k, v => (IHuskyConfigurationBlock) Activator.CreateInstance(v)!);
+                              .ToDictionary(k => k, v => (HuskyConfigurationBlock) Activator.CreateInstance(v)!);
 
             return new HuskyConfiguration(configBlocks);
         }

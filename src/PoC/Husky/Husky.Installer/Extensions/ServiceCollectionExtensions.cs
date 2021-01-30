@@ -19,12 +19,9 @@ namespace Husky.Installer.Extensions
             services.AddScoped(svc => new InstallationContext(Assembly.GetEntryAssembly()!));
             services.AddHuskyServices();
             services.AddHuskyTasks();
-            
-            /*
-             * Todo: Maybe make the internal configurations visible and do the registrations here? Seems like a slight bit of cross-contamination to have the
-             * models/public config be responsible for its own registration
-             */
-            huskyConfiguration.AddConfigurationToServiceCollection(services);
+
+            foreach (var configurationBlock in huskyConfiguration.GetConfigurationBlocks())
+                services.AddSingleton(configurationBlock.GetType(), configurationBlock);
 
             return services.BuildServiceProvider(validateScopes: true);
         }
