@@ -5,48 +5,32 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using FluentValidation;
 using Husky.Core;
+using Husky.Core.Platform;
 using Husky.Core.Workflow;
-using Husky.Installer;
-using Husky.Installer.Extensions;
-using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NUnit.Framework;
 
 namespace Husky.Tasks.Tests
 {
     [TestFixture]
-    public abstract class BaseHuskyTaskTest<T>
+    public abstract class BaseHuskyTaskTest<T> where T: class
     {
-        protected T Sut { get; private set; }
+        protected T Sut { get; private set; } = default!;
+
+        protected Mock<IPlatformInformation> PlatformInformationMock { get; } = new();
+            
+        private HuskyTaskConfiguration DefaultTaskConfiguration { get; set; } = null!;
         
-        private HuskyTaskConfiguration DefaultTaskConfiguration { get; set; }
-        
-        private IServiceProvider ScopedServiceProvider { get; set; }
-        private IServiceScope CurrentTestScope { get; set; }
-        private IServiceProvider RootServiceProvider { get; set; }
         private HashSet<Type> HuskyTaskTypes { get; } = HuskyTaskResolver.GetAvailableTasks().ToHashSet();
-
-        [OneTimeSetUp]
-        protected void BaseSetup()
-        {
-            var installerConfiguration = new InstallationConfiguration();
-            var huskyConfiguration = HuskyConfiguration.Create();
-            ConfigureHusky(huskyConfiguration);
-            RootServiceProvider = new ServiceCollection().AddHuskyInstaller(installerConfiguration, huskyConfiguration);
-        }
-
+        
         [SetUp]
-        public void Setup()
+        public void SetupBaseHuskyTaskTest()
         {
-            var scopeFactory = RootServiceProvider.GetRequiredService<IServiceScopeFactory>();
-            CurrentTestScope = scopeFactory.CreateScope();
-            ScopedServiceProvider = CurrentTestScope.ServiceProvider;
             DefaultTaskConfiguration = CreateDefaultTaskConfiguration();
-            SetTask(DefaultTaskConfiguration);
+            Sut = CreateAndConfigureTask(DefaultTaskConfiguration);
+            CurrentPlatform.LoadPlatformInformation(PlatformInformationMock.Object);
         }
-
-        [TearDown]
-        public void TearDown() => CurrentTestScope.Dispose();
-
+        
         protected void UpdateTaskConfiguration<TOptions>(Action<TOptions> update) where TOptions: HuskyTaskConfiguration
         {
             var updateParameterType = update.GetMethodInfo().GetParameters().First().ParameterType;
@@ -63,17 +47,22 @@ namespace Husky.Tasks.Tests
 
         protected abstract HuskyTaskConfiguration CreateDefaultTaskConfiguration();
 
-        private void SetTask(HuskyTaskConfiguration taskConfiguration)
+        protected abstract void BeforeSetup();
+        
+        protected abstract T CreateInstanceOfType();
+        
+        private T CreateAndConfigureTask(HuskyTaskConfiguration taskConfiguration)
         {
             if (!HuskyTaskTypes.Contains(typeof(T)))
                 Assert.Fail($"Unable to locate Type {typeof(T)} for testing");
 
-            var task = (T)ScopedServiceProvider.GetRequiredService(typeof(T));
+            BeforeSetup(); // Allows our unit tests to properly setup Mocks 
+            var task = CreateInstanceOfType();
             var installationContext = CreateDefaultInstallationContext();
             var defaultExecutionInformation = new ExecutionInformation();
-            Unsafe.As<HuskyTask<HuskyTaskConfiguration>>(task).SetExecutionContext(taskConfiguration, installationContext, defaultExecutionInformation);
+            Unsafe.As<HuskyTask<HuskyTaskConfiguration>>(task)!.SetExecutionContext(taskConfiguration, installationContext, defaultExecutionInformation);
             ValidateConfiguration();
-            Sut = task;
+            return task;
         }
 
         private void ValidateConfiguration()
