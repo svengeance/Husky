@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.HuskyConfiguration;
+using Husky.Core.Platform;
+using Husky.Core.TaskConfiguration.Installation;
 using Husky.Core.Workflow;
 using Husky.Dependencies;
 using Husky.Installer.Extensions;
@@ -19,18 +21,17 @@ namespace Husky.Installer
 
         private readonly HuskyWorkflow _workflow;
 
-        public HuskyInstaller(HuskyWorkflow workflow, Action<InstallationConfiguration> configureInstallation): this(workflow)
+        public HuskyInstaller(HuskyWorkflow workflow, Action<InstallationConfiguration> configureInstallation) : this(workflow)
             => configureInstallation(InstallationConfiguration);
 
         public HuskyInstaller(HuskyWorkflow workflow)
         {
             _workflow = workflow;
+            _workflow.Stages.Insert(0, GeneratePreInstallationStage());
         }
 
         public async ValueTask Install()
         {
-            await CurrentPlatform.LoadCurrentPlatformInformation();
-
             var serviceProvider = new ServiceCollection().AddHuskyInstaller(InstallationConfiguration, _workflow.Configuration);
             _workflow.Validate();
 
@@ -69,8 +70,8 @@ namespace Husky.Installer
             {
                 var installationContext = services.GetRequiredService<InstallationContext>();
                 installationContext.CurrentJobName = job.Name;
-                
-                await ExecuteJob(job, installationContext, services); 
+
+                await ExecuteJob(job, installationContext, services);
             }
         }
 
@@ -79,25 +80,25 @@ namespace Husky.Installer
             foreach (var step in job.Steps.Where(w => w.HuskyStepConfiguration.Os == CurrentPlatform.OS))
             {
                 installationContext.CurrentStepName = step.Name;
-                
+
                 await ExecuteStep(step, installationContext, services);
             }
         }
 
-        private async ValueTask ExecuteStep<T>(HuskyStep<T> step, InstallationContext installationContext, IServiceProvider services) where T: HuskyTaskConfiguration
+        private async ValueTask ExecuteStep<T>(HuskyStep<T> step, InstallationContext installationContext, IServiceProvider services) where T : HuskyTaskConfiguration
         {
             /* Todo: We currently have a "related type" issue, where we don't give a damn what type <T> is here, we just *know* it's a HuskyTaskConfiguration
             *  Unfortunately, the invariance on class-generic-types causes failures when trying to upcast T here, which is a *specific* configuration, to the base HTC.
-            *  This *can* cause issues if we were to try to send *ANY OTHER* type other than the related type (i.e. send in ValueTask1Configuration to a ValueTask2)
+            *  This *can* cause issues if we were to try to send *ANY OTHER* type other than the related type (i.e. send in Task1Configuration to a Task2)
             *  However, since I am only resolving and using the related type (i.e. we will *only* ever set ValueTask1Configuration on ValueTask1 here), this is somewhat safe
             *  In short, it may behoove us to get away from this if a different approach works better.
             */
             var taskType = HuskyTaskResolver.GetTaskForConfiguration(step.HuskyTaskConfiguration);
             var task = Unsafe.As<HuskyTask<T>>(services.GetRequiredService(taskType));
-            
+
             var variableResolver = services.GetRequiredService<IVariableResolverService>();
             variableResolver.Resolve(step.HuskyTaskConfiguration, installationContext.Variables, _workflow.Variables, HuskyVariables.AsDictionary());
-            
+
             task.SetExecutionContext(step.HuskyTaskConfiguration, installationContext, step.ExecutionInformation);
 
             step.ExecutionInformation.Start();
@@ -123,7 +124,7 @@ namespace Husky.Installer
             step.ExecutionInformation.Finish();
         }
 
-        private static ValueTask ExecuteTask<T>(HuskyTask<T> task) where T: HuskyTaskConfiguration
+        private static ValueTask ExecuteTask<T>(HuskyTask<T> task) where T : HuskyTaskConfiguration
         {
             return task.Execute();
         }
@@ -134,5 +135,13 @@ namespace Husky.Installer
             var dependencyHandlerType = typeof(IDependencyHandler<>).MakeGenericType(dependencyType);
             return (IDependencyHandler<HuskyDependency>)serviceProvider.GetRequiredService(dependencyHandlerType);
         }
+
+        private static HuskyStage GeneratePreInstallationStage()
+            => HuskyWorkflow.Create()
+                            .AddStage(HuskyConstants.PreInstallation.DefaultPreInstallationStageName,
+                                 stage => stage.AddJob(HuskyConstants.PreInstallation.DefaultPreInstallationJobName,
+                                     job => job.AddStep<VerifyMachineMeetsRequirementsOptions>(HuskyConstants.PreInstallation.Steps.VerifyClientMachineMeetsRequirements)))
+                            .Build()
+                            .Stages[0];
     }
 }

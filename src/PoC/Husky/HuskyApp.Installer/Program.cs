@@ -40,6 +40,12 @@ pause";
                                              a.Name = "HuskyApp";
                                              a.Version = "1.0.0";
                                          })
+                                        .Configure<ClientMachineRequirementsConfiguration>(c =>
+                                         {
+                                             c.SupportedOperatingSystems = new[] { OS.Windows, OS.Linux };
+                                             c.FreeSpaceMb = 128;
+                                             c.RamMb = 1024;
+                                         })
                                         .AddDependency(new DotNet(Range: ">=5.0.0", FrameworkType: FrameworkInstallationType.Runtime, Kind: DotNet.RuntimeKind.RuntimeOnly))
                                         .AddGlobalVariable("installDir", $"{HuskyVariables.Folders.ProgramFiles}")
                                         .WithDefaultStage(

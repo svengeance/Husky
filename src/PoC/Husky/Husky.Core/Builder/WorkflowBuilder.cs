@@ -11,7 +11,7 @@ namespace Husky.Core.Builder
 
         internal WorkflowBuilder(HuskyWorkflow workflow) => Workflow = workflow;
 
-        public IHuskyWorkflowBuilder Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock
+        public IHuskyWorkflowBuilder Configure<T>(Action<T> configuration) where T : HuskyConfigurationBlock
         {
             Workflow.Configuration.Configure(configuration);
 

@@ -5,6 +5,17 @@
         public const string DefaultStageName = "Default Stage";
         public const string DefaultJobName = "Default Job";
 
+        public static class PreInstallation
+        {
+            public const string DefaultPreInstallationStageName = "Husky-PreInstallation-Checks-Stage";
+            public const string DefaultPreInstallationJobName = "Husky-PreInstallation-Checks-Job";
+
+            public static class Steps
+            {
+                public const string VerifyClientMachineMeetsRequirements = nameof(VerifyClientMachineMeetsRequirements);
+            }
+        }
+
         public static class UnixDesktopFileTypes
         {
             public const string Application = nameof(Application);

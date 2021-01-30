@@ -8,7 +8,7 @@ namespace Husky.Core.Builder
 {
     public interface IHuskyWorkflowBuilder
     {
-        IHuskyWorkflowBuilder Configure<T>(Action<T> configuration) where T : class, IHuskyConfigurationBlock;
+        IHuskyWorkflowBuilder Configure<T>(Action<T> configuration) where T : HuskyConfigurationBlock;
 
         IHuskyWorkflowBuilder AddGlobalVariable(string key, string value);
 
@@ -32,6 +32,12 @@ namespace Husky.Core.Builder
 
     public interface IHuskyJobBuilder
     {
+        /*
+         * Intention here is that clients will never explicitly add steps with zero configuration, however steps managed by the system may
+         * be automatically added as a result of specific client configuration
+         */
+        internal IHuskyJobBuilder AddStep<TTaskConfiguration>(string name) where TTaskConfiguration : HuskyTaskConfiguration => AddStep<TTaskConfiguration>(name, _ => { });
+
         IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
 
         IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
