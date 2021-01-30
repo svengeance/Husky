@@ -1,4 +1,4 @@
 ﻿namespace Husky.Core.HuskyConfiguration
 {
-    public interface IHuskyConfigurationBlock { }
+    public record HuskyConfigurationBlock { }
 }
