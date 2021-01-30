@@ -13,7 +13,7 @@ namespace Husky.Services.Extensions
             
             var huskyServices = Assembly.GetExecutingAssembly()
                                         .GetExportedTypes()
-                                        .Where(w => w.IsClass && w.IsPublic && !(w.IsSealed && w.IsAbstract))
+                                        .Where(w => w.IsClass && w.IsPublic && w.Name.EndsWith("Service"))
                                         .Select(s => (s.GetInterface($"I{s.Name}"), s));
 
             foreach (var (serviceInterface, serviceClass) in huskyServices)
