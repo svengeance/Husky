@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
+using Husky.Core.Platform;
 using Husky.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Version = SemVer.Version;

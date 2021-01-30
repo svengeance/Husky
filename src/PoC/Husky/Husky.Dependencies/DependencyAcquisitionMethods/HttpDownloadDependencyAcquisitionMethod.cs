@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.HuskyConfiguration;
+using Husky.Core.Platform;
 using Husky.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -53,6 +52,7 @@ namespace Husky.Dependencies.DependencyAcquisitionMethods
             var downloadFileFullPath = Path.Combine(downloadFileDirectory.FullName, GetDownloadFileName());
             var downloadedFile = await httpService.DownloadFile(GetDownloadUrl(), downloadFileFullPath);
 
+            // Todo: Log execution result
             var executionResult = await shellExecutionService.ExecuteFile(downloadedFile.FullName, InstallationArguments);
 
             Console.WriteLine($"Executed HTTP Acquisition for {Dependency.GetType().Name}");

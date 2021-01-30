@@ -3,6 +3,7 @@ using CliWrap;
 using CliWrap.Buffered;
 using Husky.Core;
 using Husky.Core.Enums;
+using Husky.Core.Platform;
 
 namespace Husky.Services
 {
@@ -62,6 +63,9 @@ namespace Husky.Services
                    _          => LinuxShellFileName,
                };
 
-        public record ScriptExecutionResult(int ExitCode, string StdOutput, string StdError);
+        public record ScriptExecutionResult(int ExitCode, string StdOutput, string StdError)
+        {
+            public bool WasSuccessful => ExitCode == 0;
+        }
     }
 }

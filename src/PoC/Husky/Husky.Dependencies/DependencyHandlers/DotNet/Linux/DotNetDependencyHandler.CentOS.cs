@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Husky.Core;
 using Husky.Core.Dependencies;
+using Husky.Core.Platform;
 using Husky.Dependencies.DependencyAcquisitionMethods;
 using Version = SemVer.Version;
 
