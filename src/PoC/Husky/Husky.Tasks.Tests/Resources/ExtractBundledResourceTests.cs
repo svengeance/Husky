@@ -23,7 +23,7 @@ namespace Husky.Tasks.Tests.Resources
 
             // Assert
             var availableResources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-            var newFilePaths = _tempDirectory.GetFiles("*", SearchOption.AllDirectories) // Standardize to forward slashes
+            var newFilePaths = TempDirectory.GetFiles("*", SearchOption.AllDirectories) // Standardize to forward slashes
                                              .Select(s => s.FullName.Replace(@"\", "/")) // for win/linux compatibility
                                              .ToList();
 
@@ -32,7 +32,7 @@ namespace Husky.Tasks.Tests.Resources
             foreach (var resource in availableResources)
             {
                 var matchingNewFile = newFilePaths.Single(s => s.EndsWith(resource));
-                var newFileRelativeDir = matchingNewFile.Substring(_tempDirectory.FullName.Length + 1); // Remove the trailing slash (c:\temp -> c:\temp\)
+                var newFileRelativeDir = matchingNewFile.Substring(TempDirectory.FullName.Length + 1); // Remove the trailing slash (c:\temp -> c:\temp\)
                 Assert.AreEqual(resource, newFileRelativeDir);
             }
         }
@@ -43,7 +43,7 @@ namespace Husky.Tasks.Tests.Resources
         {
             // Arrange
             UpdateTaskConfiguration<ExtractBundledResourceOptions>(conf => conf.CleanDirectories = true);
-            var dirtyDirInfo = _tempDirectory.CreateSubdirectory("NefariousDirectory/");
+            var dirtyDirInfo = TempDirectory.CreateSubdirectory("NefariousDirectory/");
 
             // Act
             await Sut.Execute();
@@ -58,7 +58,7 @@ namespace Husky.Tasks.Tests.Resources
         {
             // Arrange
             UpdateTaskConfiguration<ExtractBundledResourceOptions>(conf => conf.CleanFiles = true);
-            var dirtyFileInfo = new FileInfo(Path.Combine(_tempDirectory.FullName, "NefariousFile.txt"));
+            var dirtyFileInfo = new FileInfo(Path.Combine(TempDirectory.FullName, "NefariousFile.txt"));
             await File.WriteAllTextAsync(dirtyFileInfo.FullName, "Nobody expects the Husky Inquisition!");
 
             // Act
@@ -79,7 +79,7 @@ namespace Husky.Tasks.Tests.Resources
             await Sut.Execute();
 
             // Assert
-            var expectedFileInfo = new FileInfo(Path.Combine(_tempDirectory.FullName, "EmbeddedSample_1.txt"));
+            var expectedFileInfo = new FileInfo(Path.Combine(TempDirectory.FullName, "EmbeddedSample_1.txt"));
             FileAssert.Exists(expectedFileInfo);
 
             await using var expectedStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("EmbeddedSample_1.txt");
@@ -92,7 +92,7 @@ namespace Husky.Tasks.Tests.Resources
 
         protected override HuskyTaskConfiguration CreateDefaultTaskConfiguration() => new ExtractBundledResourceOptions
         {
-            TargetDirectory = _tempDirectory.FullName,
+            TargetDirectory = TempDirectory.FullName,
             CleanDirectories = false,
             CleanFiles = false,
             Resources = "**/*"

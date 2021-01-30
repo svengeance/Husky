@@ -3,33 +3,33 @@ using NUnit.Framework;
 
 namespace Husky.Tasks.Tests
 {
-    public abstract class BaseFileSystemTest<T>: BaseHuskyTaskTest<T>
+    public abstract class BaseFileSystemTest<T>: BaseHuskyTaskIntegrationTest<T> where T: class
     {
-        protected DirectoryInfo _tempDirectory;
+        protected DirectoryInfo TempDirectory = null!;
 
         [OneTimeSetUp]
         public void SetupDirectory()
         {
             var tempDirPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(tempDirPath);
-            _tempDirectory = new DirectoryInfo(tempDirPath);
+            TempDirectory = new DirectoryInfo(tempDirPath);
         }
 
         [TearDown]
         public void CleanDirectory()
         {
-            _tempDirectory.Delete(true);
-            _tempDirectory.Create();
-            _tempDirectory.Refresh();
+            TempDirectory.Delete(true);
+            TempDirectory.Create();
+            TempDirectory.Refresh();
         }
 
         [OneTimeTearDown]
         public void RemoveDirectory()
         {
-            _tempDirectory.Refresh();
+            TempDirectory.Refresh();
 
-            if (_tempDirectory.Exists)
-                _tempDirectory.Delete(true);
+            if (TempDirectory.Exists)
+                TempDirectory.Delete(true);
         }
     }
 }

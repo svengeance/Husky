@@ -22,12 +22,12 @@ namespace Husky.Tasks.Tests.Scripting
             await Sut.Execute();
 
             // Assert
-            var foundFile = _tempDirectory.EnumerateFiles().FirstOrDefault(s => s.Name.StartsWith(_scriptFileName));
+            var foundFile = TempDirectory.EnumerateFiles().FirstOrDefault(s => s.Name.StartsWith(_scriptFileName));
 
             Assert.NotNull(foundFile);
             FileAssert.Exists(foundFile);
 
-            var fileContents = await File.ReadAllTextAsync(foundFile.FullName);
+            var fileContents = await File.ReadAllTextAsync(foundFile!.FullName);
             Assert.AreEqual(_script, fileContents);
         }
 
@@ -38,7 +38,7 @@ namespace Husky.Tasks.Tests.Scripting
             // Arrange
             // Act
             await Sut.Execute();
-            var foundFile = _tempDirectory.EnumerateFiles().First(s => s.Name.StartsWith(_scriptFileName));
+            var foundFile = TempDirectory.EnumerateFiles().First(s => s.Name.StartsWith(_scriptFileName));
             await Sut.Rollback();
 
             // Assert
@@ -50,7 +50,7 @@ namespace Husky.Tasks.Tests.Scripting
 
         protected override HuskyTaskConfiguration CreateDefaultTaskConfiguration() => new CreateScriptFileOptions
         {
-            Directory = _tempDirectory.FullName,
+            Directory = TempDirectory.FullName,
             FileName = "TestScript",
             Script = _script
         };

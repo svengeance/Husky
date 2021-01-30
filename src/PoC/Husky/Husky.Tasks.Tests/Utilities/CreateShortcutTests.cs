@@ -20,7 +20,7 @@ namespace Husky.Tasks.Tests.Utilities
             await Sut.Execute();
 
             // Assert
-            var expectedShortcut = new FileInfo(Path.Combine(_tempDirectory.FullName, "Shortcut.lnk"));
+            var expectedShortcut = new FileInfo(Path.Combine(TempDirectory.FullName, "Shortcut.lnk"));
             FileAssert.Exists(expectedShortcut);
         }
 
@@ -31,7 +31,7 @@ namespace Husky.Tasks.Tests.Utilities
             // Arrange
             // Act
             await Sut.Execute();
-            var expectedShortcut = new FileInfo(Path.Combine(_tempDirectory.FullName, "Shortcut.lnk"));
+            var expectedShortcut = new FileInfo(Path.Combine(TempDirectory.FullName, "Shortcut.lnk"));
             await Sut.Rollback();
 
             // Assert
@@ -44,8 +44,8 @@ namespace Husky.Tasks.Tests.Utilities
             {
                 ShortcutName = "Shortcut",
                 ShortcutImageFilePath = "test.ico",
-                ShortcutLocation = _tempDirectory.FullName,
-                Target = Path.Combine(_tempDirectory.FullName, "example.txt")
+                ShortcutLocation = TempDirectory.FullName,
+                Target = Path.Combine(TempDirectory.FullName, "example.txt")
             };
     }
 }
