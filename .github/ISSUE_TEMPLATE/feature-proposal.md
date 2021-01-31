@@ -9,8 +9,6 @@ assignees: svengeance
 
 ## Context
 
-
-## Elevator Pitch
-
+## Proposals
 
 ## Interested Users
