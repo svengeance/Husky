@@ -11,4 +11,5 @@ assignees: svengeance
 
 ## Proposals
 
+<!-- Husky Developers, Developers (users of Husky Framework), End-Users (clients installing Husky with Husky Installers) -->
 ## Interested Users
