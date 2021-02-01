@@ -104,7 +104,7 @@ namespace Husky.Installer
             step.ExecutionInformation.Start();
 
             /*
-             * Todo: We should be catching exceptions in the ValueTask Execution and returning a detailed Result of what failed.
+             * Todo: We should be catching exceptions in the Task Execution and returning a detailed Result of what failed.
              * In addition, Success cases should likewise be returning a receipt of the ValueTask-specific execution for analytics
              */
 
