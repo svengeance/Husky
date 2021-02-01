@@ -11,5 +11,9 @@ assignees: svengeance
 
 ## Proposals
 
-<!-- Husky Developers, Developers (users of Husky Framework), End-Users (clients installing Husky with Husky Installers) -->
+<!--
+Husky Developers: This feature benefits maintainers of Husky
+Developers: This feature benefits clients writing installers
+End-Users: This feature benefits users installing from a Husky Installer
+-->
 ## Interested Users
