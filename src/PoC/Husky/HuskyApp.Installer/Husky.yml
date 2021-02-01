@@ -1,7 +1,14 @@
 ---
-  name: Husky App # Initial app metadata is set at the top
-  version: 0.1
-  publisher: Svengeance
+  author:
+    publisher: Svengeance
+    publisherUrl: https://sven.ai
+  application:
+    name: Husky App # Initial app metadata is set at the top
+    version: 0.1
+  clientMachineRequirements:
+    supportedOperatingSystems: [Windows, Linux]
+    freeSpaceMb: 128
+    memoryMb: 1024
   dependencies: # Dependencies that Husky can track are explicitly stated
       - DotNet:
           Version: '>=5.0.0'
