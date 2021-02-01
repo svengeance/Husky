@@ -34,10 +34,9 @@ namespace Husky.Services
                               };
 
             var driveInformation = DriveInfo.GetDrives()
-                                            .Select(s => new SystemDriveInformation
+                                            .Select(s => new SystemDriveInformation(s.RootDirectory)
                                              {
                                                  FreeSpaceMb = s.AvailableFreeSpace / 1024 / 1024,
-                                                 RootDirectory = s.RootDirectory
                                              });
 
             return new SystemInformation
@@ -97,7 +96,7 @@ namespace Husky.Services
     {
         public DirectoryInfo RootDirectory { get; init; }
         public long FreeSpaceMb { get; init; }
-            
-        internal SystemDriveInformation() { }
+
+        internal SystemDriveInformation(DirectoryInfo rootDirectory) => RootDirectory = rootDirectory;
     }
 }

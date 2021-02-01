@@ -31,7 +31,7 @@ namespace Husky.Tasks.Tests.Installation
             _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 100,
-                DriveInformation = new[] { new SystemDriveInformation { FreeSpaceMb = 200, RootDirectory = new DirectoryInfo(@"C:\") } }
+                DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 200 } }
             });
         }
 
@@ -86,7 +86,7 @@ namespace Husky.Tasks.Tests.Installation
             _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 2,
-                DriveInformation = new[] { new SystemDriveInformation { FreeSpaceMb = 200, RootDirectory = new DirectoryInfo(@"C:\") } }
+                DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 200 } }
             });
 
             // Act
@@ -104,7 +104,7 @@ namespace Husky.Tasks.Tests.Installation
             _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 200,
-                DriveInformation = new[] { new SystemDriveInformation { FreeSpaceMb = 2, RootDirectory = new DirectoryInfo(@"C:\") } }
+                DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 2 } }
             });
 
             // Act
@@ -119,7 +119,7 @@ namespace Husky.Tasks.Tests.Installation
             huskyConfiguration.Configure<ClientMachineRequirementsConfiguration>(config =>
             {
                 config.FreeSpaceMb = 10;
-                config.RamMb = 20;
+                config.MemoryMb = 20;
                 config.OsVersion = Range.Parse(">=5");
                 config.LinuxDistribution = LinuxDistribution.Debian;
                 config.SupportedOperatingSystems = new[] { OS.Linux };

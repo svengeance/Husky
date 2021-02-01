@@ -31,7 +31,7 @@ namespace Husky.Tasks.Tests.Installation
             _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 100,
-                DriveInformation = new[] { new SystemDriveInformation { FreeSpaceMb = 200, RootDirectory = new DirectoryInfo(@"C:\") } }
+                DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 200 } }
             });
         }
 
@@ -43,7 +43,7 @@ namespace Husky.Tasks.Tests.Installation
             _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 1,
-                DriveInformation = new[] { new SystemDriveInformation { FreeSpaceMb = 2, RootDirectory = new DirectoryInfo(@"C:\") } }
+                DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 2 } }
             });
 
             // Act
@@ -58,7 +58,7 @@ namespace Husky.Tasks.Tests.Installation
             huskyConfiguration.Configure<ClientMachineRequirementsConfiguration>(config =>
             {
                 config.FreeSpaceMb = null;
-                config.RamMb = null;
+                config.MemoryMb = null;
                 config.OsVersion = null;
                 config.LinuxDistribution = LinuxDistribution.Unknown;
                 config.SupportedOperatingSystems = Array.Empty<OS>();

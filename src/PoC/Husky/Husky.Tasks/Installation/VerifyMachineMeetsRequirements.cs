@@ -34,8 +34,8 @@ namespace Husky.Tasks.Installation
             if (_requirements.LinuxDistribution != LinuxDistribution.Unknown && _requirements.LinuxDistribution != CurrentPlatform.LinuxDistribution)
                 HandleIssue($"Machine's Linux Distribution is not supported. Required: {_requirements.LinuxDistribution}, Detected: {CurrentPlatform.LinuxDistribution}");
 
-            if (systemInformation.TotalMemoryMb < _requirements.RamMb)
-                HandleIssue($"Machine has less than the required amount of memory. Required: {_requirements.RamMb}, Detected: {systemInformation.TotalMemoryMb}");
+            if (systemInformation.TotalMemoryMb < _requirements.MemoryMb)
+                HandleIssue($"Machine has less than the required amount of memory. Required: {_requirements.MemoryMb}, Detected: {systemInformation.TotalMemoryMb}");
             
             if (systemInformation.DriveInformation.All(a => a.FreeSpaceMb < _requirements.FreeSpaceMb))
                 HandleIssue($"Machine has less than the required amount of free space. Required: {_requirements.FreeSpaceMb}");
