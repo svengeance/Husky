@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Husky.Installer
 {
-    public class InstallationConfiguration
+    public class HuskyInstallerSettings
     {
         public IEnumerable<Assembly> ResolveModulesFromAssemblies { get; set; } = Array.Empty<Assembly>();
     }

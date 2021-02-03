@@ -22,7 +22,7 @@ namespace Husky.Tasks.Tests
         [OneTimeSetUp]
         protected void BaseSetup()
         {
-            var installerConfiguration = new InstallationConfiguration();
+            var installerConfiguration = new HuskyInstallerSettings();
             var huskyConfiguration = HuskyConfiguration.Create();
             ConfigureHusky(huskyConfiguration);
             RootServiceProvider = new ServiceCollection().AddHuskyInstaller(installerConfiguration, huskyConfiguration);

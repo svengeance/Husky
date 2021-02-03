@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Husky.Core;
+using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
 using Husky.Core.TaskConfiguration.Installation;
@@ -17,22 +18,23 @@ namespace Husky.Installer
 {
     public class HuskyInstaller
     {
-        private InstallationConfiguration InstallationConfiguration { get; } = new();
+        private HuskyInstallerSettings HuskyInstallerSettings { get; } = new();
 
         private readonly HuskyWorkflow _workflow;
 
-        public HuskyInstaller(HuskyWorkflow workflow, Action<InstallationConfiguration> configureInstallation) : this(workflow)
-            => configureInstallation(InstallationConfiguration);
+        public HuskyInstaller(HuskyWorkflow workflow, Action<HuskyInstallerSettings> configureInstallation) : this(workflow)
+            => configureInstallation(HuskyInstallerSettings);
 
         public HuskyInstaller(HuskyWorkflow workflow)
         {
             _workflow = workflow;
             _workflow.Stages.Insert(0, GeneratePreInstallationStage());
+            _workflow.Stages.Add(GeneratePostInstallationStage());
         }
 
         public async ValueTask Install()
         {
-            var serviceProvider = new ServiceCollection().AddHuskyInstaller(InstallationConfiguration, _workflow.Configuration);
+            var serviceProvider = new ServiceCollection().AddHuskyInstaller(HuskyInstallerSettings, _workflow.Configuration);
             _workflow.Validate();
 
             foreach (var dependency in _workflow.Dependencies)
@@ -138,9 +140,18 @@ namespace Husky.Installer
 
         private static HuskyStage GeneratePreInstallationStage()
             => HuskyWorkflow.Create()
-                            .AddStage(HuskyConstants.PreInstallation.DefaultPreInstallationStageName,
-                                 stage => stage.AddJob(HuskyConstants.PreInstallation.DefaultPreInstallationJobName,
-                                     job => job.AddStep<VerifyMachineMeetsRequirementsOptions>(HuskyConstants.PreInstallation.Steps.VerifyClientMachineMeetsRequirements)))
+                            .AddStage(HuskyConstants.Workflows.PreInstallation.DefaultStageName,
+                                 stage => stage.AddJob(HuskyConstants.Workflows.PreInstallation.DefaultJobName,
+                                     job => job.AddStep<VerifyMachineMeetsRequirementsOptions>(HuskyConstants.Workflows.PreInstallation.Steps.VerifyClientMachineMeetsRequirements)))
+                            .Build()
+                            .Stages[0];
+
+        private static HuskyStage GeneratePostInstallationStage()
+            => HuskyWorkflow.Create()
+                            .AddStage(HuskyConstants.Workflows.PostInstallation.DefaultStageName,
+                                 stage => stage.AddJob(HuskyConstants.Workflows.PostInstallation.DefaultJobName,
+                                     job => job.AddStep<VerifyMachineMeetsRequirementsOptions>(
+                                         HuskyConstants.Workflows.PostInstallation.Steps.PostInstallationApplicationRegistration)))
                             .Build()
                             .Stages[0];
     }

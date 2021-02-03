@@ -36,10 +36,10 @@ namespace Husky.Core.Builder
         }
 
         public IHuskyWorkflowBuilder WithDefaultStage(Action<IHuskyStageBuilder> stageBuilderConfiguration)
-            => AddStage(HuskyConstants.DefaultStageName, stageBuilderConfiguration);
+            => AddStage(HuskyConstants.Workflows.DefaultStageName, stageBuilderConfiguration);
 
         public IHuskyWorkflowBuilder WithDefaultStageAndJob(Action<IHuskyJobBuilder> jobBuilderConfiguration)
-            => AddStage(HuskyConstants.DefaultStageName, stage => stage.AddJob(HuskyConstants.DefaultJobName, jobBuilderConfiguration));
+            => AddStage(HuskyConstants.Workflows.DefaultStageName, stage => stage.AddJob(HuskyConstants.Workflows.DefaultJobName, jobBuilderConfiguration));
 
         public IHuskyWorkflowBuilder AddDependency(HuskyDependency huskyDependency)
         {

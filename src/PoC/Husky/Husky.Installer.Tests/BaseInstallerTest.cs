@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Reflection;
 using Husky.Core.Builder;
+using Husky.Core.HuskyConfiguration;
 using Husky.Core.Workflow;
 using NUnit.Framework;
 
 namespace Husky.Installer.Tests
 {
     /*
-     * Todo: This is really configured for one TestBed atm. Need to either make this more generic for additional testing
-     * scenarios, or remove this base testing class entirely.
+     * Todo: Replace this class being an IntegrationTest with a new suite of tests - DockerIntegrationTests
+     *       These tests will spin up docker containers and execute inside.
+     *
+     *       https://github.com/svengeance/Husky/issues/4
+     *
+     *       She won't be quick, but damnit if I'm going to start integration testing Registry changes on my desktop.
      */
     public abstract class BaseInstallerTest
     {
@@ -23,6 +28,7 @@ namespace Husky.Installer.Tests
         {
             Workflow = HuskyWorkflow.Create()
                                     .AddGlobalVariable("random.RandomNumber", "4")
+                                    .Configure<InstallationConfiguration>(install => install.AddToRegistry = false)
                                     .WithDefaultStageAndJob(job =>
                                          job.AddStep<TestHuskyTaskOptions>("TestStep", ConfigureTestTaskOptions)).Build();
 

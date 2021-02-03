@@ -6,6 +6,7 @@ using AutoFixture.Kernel;
 using Husky.Core.Workflow;
 using Moq;
 using NUnit.Framework;
+using SemVer;
 using BindingFlags = System.Reflection.BindingFlags;
 
 namespace Husky.Tasks.Tests
@@ -17,6 +18,8 @@ namespace Husky.Tasks.Tests
         protected override void BeforeSetup()
         {
             _fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
+            _fixture.Inject(new SemVer.Version("0.1.2"));
+            
             var sutConstructorTypes = typeof(T).GetConstructors(BindingFlags.Public | BindingFlags.Instance)
                                                .Single()
                                                .GetParameters()
