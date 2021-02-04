@@ -70,6 +70,16 @@
             public const string DefaultStageName = "default-stage";
             public const string DefaultJobName = "default-job";
 
+            public static class StepTags
+            {
+                // All tasks by default should be able executable on Install and Uninstall
+                public static readonly string[] DefaultStepTags = { Install, Uninstall };
+                public const string Install = nameof(Install);
+                public const string Repair = nameof(Repair);
+                public const string Modify = nameof(Modify);
+                public const string Uninstall = nameof(Uninstall);
+            }
+
             public static class PreInstallation
             {
                 public const string DefaultStageName = "husky-preinstallation-checks-stage";

@@ -5,6 +5,7 @@
   application:
     name: Husky App # Initial app metadata is set at the top
     version: 0.1
+    installDirectory: '{folders.ProgramFiles}/HuskyApp'
   clientMachineRequirements:
     supportedOperatingSystems: [Windows, Linux]
     freeSpaceMb: 128
@@ -15,10 +16,10 @@
           FrameworkType: Runtime
           Kind: RuntimeOnly
   variables: # Global constant values the user can set up top
-      installDir: '{folders.ProgramFiles}/HuskyApp'
 
   jobs: # A single job can exist without an explicitly declared stage
       show-splash:
+          tags: [Install]
           steps:
               show-unix-splash:
                 platforms:

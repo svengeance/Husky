@@ -3,6 +3,7 @@ using Husky.Core;
 using Husky.Core.Dependencies;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
+using Husky.Core.Platform;
 using Husky.Core.TaskConfiguration.Resources;
 using Husky.Core.TaskConfiguration.Scripting;
 using Husky.Core.TaskConfiguration.Utilities;
@@ -49,10 +50,14 @@ pause";
                                         .AddDependency(new DotNet(Range: ">=5.0.0", FrameworkType: FrameworkInstallationType.Runtime, Kind: DotNet.RuntimeKind.RuntimeOnly))
                                         .AddGlobalVariable("installDir", $"{HuskyVariables.Folders.ProgramFiles}")
                                         .WithDefaultStage(
-                                             stage => stage.SetDefaultStepConfiguration(HuskyStepConfiguration.DefaultConfiguration)
+                                             stage => stage
                                                            .AddJob(
                                                                 "show-splash",
-                                                                splash => splash.AddStep<ExecuteInlineScriptOptions>(
+                                                                splash => splash.SetDefaultStepConfiguration(new HuskyStepConfiguration(CurrentPlatform.OS)
+                                                                                 {
+                                                                                     Tags = new[] { "Install" }
+                                                                                 })
+                                                                                .AddStep<ExecuteInlineScriptOptions>(
                                                                                      "show-unix-splash",
                                                                                      task => task.Script = linuxScript,
                                                                                      _lunixConfiguration)

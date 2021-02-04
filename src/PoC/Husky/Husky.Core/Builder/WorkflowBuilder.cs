@@ -59,13 +59,6 @@ namespace Husky.Core.Builder
             _stage = new HuskyStage(stageName);
         }
 
-        public IHuskyStageBuilder SetDefaultStepConfiguration(HuskyStepConfiguration defaultStepConfiguration)
-        {
-            _stage.DefaultStepConfiguration = defaultStepConfiguration;
-
-            return this;
-        }
-
         public IHuskyStageBuilder AddJob(string name, Action<IHuskyJobBuilder> jobBuilderConfiguration)
         {
             var jobBuilder = new JobBuilder(name, _stage.DefaultStepConfiguration);
@@ -81,7 +74,7 @@ namespace Husky.Core.Builder
 
     public class JobBuilder: IHuskyJobBuilder
     {
-        private readonly HuskyStepConfiguration _defaultStepConfiguration;
+        private HuskyStepConfiguration _defaultStepConfiguration;
         private readonly HuskyJob _job;
 
         public JobBuilder(string name, HuskyStepConfiguration? defaultStepConfiguration)
@@ -91,6 +84,13 @@ namespace Husky.Core.Builder
         }
 
         public HuskyJob Build() => _job;
+
+        public IHuskyJobBuilder SetDefaultStepConfiguration(HuskyStepConfiguration defaultStepConfiguration)
+        {
+            _defaultStepConfiguration = defaultStepConfiguration;
+
+            return this;
+        }
 
         public IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration) where TTaskConfiguration : HuskyTaskConfiguration
         {

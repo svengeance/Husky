@@ -1,4 +1,5 @@
-﻿using Husky.Core.Enums;
+﻿using System;
+using Husky.Core.Enums;
 using Husky.Core.Platform;
 
 namespace Husky.Core.Workflow
@@ -7,8 +8,13 @@ namespace Husky.Core.Workflow
     {
         public OS Os { get; }
 
+        public string[] Tags { get; init; } = Array.Empty<string>();
+        
         // Without any specification, we can assume that the task is "any" operating system - it will work for our current platform.
-        public static readonly HuskyStepConfiguration DefaultConfiguration = new(CurrentPlatform.OS);
+        public static readonly HuskyStepConfiguration DefaultConfiguration = new(CurrentPlatform.OS)
+        {
+            Tags = HuskyConstants.Workflows.StepTags.DefaultStepTags
+        };
         
         public HuskyStepConfiguration(OS os)
         {
