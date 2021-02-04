@@ -11,7 +11,7 @@ namespace Husky.Services
     {
         public void WriteKey(RegistryHive root, string path, string keyName, object value)
         {
-            var regRoot = RegistryKey.OpenBaseKey(root, RegistryView.Default);
+            using var regRoot = RegistryKey.OpenBaseKey(root, RegistryView.Default);
             var regKey = regRoot.CreateSubKey(path, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryOptions.None);
             regKey.SetValue(keyName, value);
         }
