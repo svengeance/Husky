@@ -10,7 +10,7 @@ namespace Husky.Core.Workflow
     {
         private readonly Dictionary<Type, HuskyConfigurationBlock> _configurations;
 
-        public IReadOnlyList<HuskyConfigurationBlock> GetConfigurationBlocks()
+        public IEnumerable<HuskyConfigurationBlock> GetConfigurationBlocks()
             => _configurations.Values
                               .Select(s => s with { })
                               .ToList()
