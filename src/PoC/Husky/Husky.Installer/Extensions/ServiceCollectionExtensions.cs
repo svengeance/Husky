@@ -15,15 +15,14 @@ namespace Husky.Installer.Extensions
             foreach (var externalAssembly in huskyInstallerSettings.ResolveModulesFromAssemblies)
                 HuskyTaskResolver.AddAssemblyForScanning(externalAssembly);
 
-            var services = new ServiceCollection();
-            services.AddScoped(svc => new InstallationContext(Assembly.GetEntryAssembly()!));
-            services.AddHuskyServices();
-            services.AddHuskyTasks();
+            serviceCollection.AddScoped(svc => new InstallationContext(Assembly.GetEntryAssembly()!));
+            serviceCollection.AddHuskyServices();
+            serviceCollection.AddHuskyTasks();
 
             foreach (var configurationBlock in huskyConfiguration.GetConfigurationBlocks())
-                services.AddSingleton(configurationBlock.GetType(), configurationBlock);
+                serviceCollection.AddSingleton(configurationBlock.GetType(), configurationBlock);
 
-            return services.BuildServiceProvider(validateScopes: true);
+            return serviceCollection.BuildServiceProvider(validateScopes: true);
         }
     }
 }
