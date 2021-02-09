@@ -37,7 +37,7 @@ namespace Husky.Tasks.Tests.Installation
 
         [Test]
         [Category("UnitTest")]
-        public void Verification_does_nothing_when_requireS_configuration_is_null()
+        public void Verification_does_nothing_when_requires_configuration_is_null()
         {
             // Arrange
             _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
