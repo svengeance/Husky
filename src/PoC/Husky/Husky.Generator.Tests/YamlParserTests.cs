@@ -73,7 +73,7 @@ namespace Husky.Generator.Tests
                 task: Utilities.CreateShortcut # Create a platform-independent shortcut 
                 with:
                   target: $jobs.create-shortcut.variables.app-launch-file # Variables are scoped at the job level")]
-        [Test]
+        [Category("UnitTest")]
         public void Test1(string yaml)
         {
             // Arrange
