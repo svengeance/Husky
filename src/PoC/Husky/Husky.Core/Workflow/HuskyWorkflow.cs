@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Text;
 using FluentValidation;
-using Husky.Core.Builder;
 using Husky.Core.HuskyConfiguration;
+using Husky.Core.Workflow.Builder;
 
 namespace Husky.Core.Workflow
 {

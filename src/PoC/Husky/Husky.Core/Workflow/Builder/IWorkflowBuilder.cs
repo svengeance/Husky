@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
-using Husky.Core.Workflow;
 
-namespace Husky.Core.Builder
+namespace Husky.Core.Workflow.Builder
 {
     public interface IHuskyWorkflowBuilder
     {
@@ -38,8 +35,10 @@ namespace Husky.Core.Builder
         internal IHuskyJobBuilder AddStep<TTaskConfiguration>(string name) where TTaskConfiguration : HuskyTaskConfiguration => AddStep<TTaskConfiguration>(name, _ => { });
 
         IHuskyJobBuilder SetDefaultStepConfiguration(HuskyStepConfiguration defaultStepConfiguration);
-        
+
         IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
+
+        IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
 
         IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
     }
