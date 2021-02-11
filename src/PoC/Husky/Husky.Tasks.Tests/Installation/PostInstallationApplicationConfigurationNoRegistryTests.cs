@@ -2,7 +2,7 @@
 using AutoFixture;
 using Husky.Core;
 using Husky.Core.HuskyConfiguration;
-using Husky.Core.TaskConfiguration.Installation;
+using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Services;
 using Husky.Tasks.Installation;
@@ -35,6 +35,6 @@ namespace Husky.Tasks.Tests.Installation
             huskyConfiguration.Configure<InstallationConfiguration>(install => install.AddToRegistry = false);
         }
 
-        protected override PostInstallationApplicationRegistrationConfiguration CreateDefaultTaskConfiguration() => new();
+        protected override PostInstallationApplicationRegistrationOptions CreateDefaultTaskConfiguration() => new();
     }
 }

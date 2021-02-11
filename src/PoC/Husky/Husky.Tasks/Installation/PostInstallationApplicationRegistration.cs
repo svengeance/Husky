@@ -4,7 +4,7 @@ using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
-using Husky.Core.TaskConfiguration.Installation;
+using Husky.Core.TaskOptions.Installation;
 using Husky.Internal.Shared;
 using Husky.Services;
 using Microsoft.Win32;
@@ -13,7 +13,7 @@ using static Husky.Core.HuskyConstants.RegistryKeys;
 
 namespace Husky.Tasks.Installation
 {
-    public class PostInstallationApplicationRegistration: HuskyTask<PostInstallationApplicationRegistrationConfiguration>
+    public class PostInstallationApplicationRegistration: HuskyTask<PostInstallationApplicationRegistrationOptions>
     {
         private readonly ApplicationConfiguration _applicationConfiguration;
         private readonly AuthorConfiguration _authorConfiguration;
@@ -61,17 +61,22 @@ namespace Husky.Tasks.Installation
             WriteUninstallKey(AppUninstalls.NoRepair, _installationConfiguration.AllowRepair ? 0 : 1);
             WriteUninstallKey(AppUninstalls.NoRemove, _installationConfiguration.AllowRemove ? 0 : 1);
 
-
-            // Todo: Uninstaller, https://github.com/svengeance/Husky/issues/17
+            // Todo: GH #17 && GH #12 Uninstaller and dynamic resolution of variables (such as "What directory did I install to?")
             //WriteUninstallKey(UninstallKeyNames.UninstallString, !ImplementMe);
             //WriteUninstallKey(UninstallKeyNames.QuietUninstallString, !ImplementMe);
             return ValueTask.CompletedTask;
         }
 
-        // Todo: Support HKCU and HKLM https://github.com/svengeance/Husky/issues/11
-        private void WriteUninstallKey(string key, object value)
-            => _registryService.WriteKey(RegistryHive.LocalMachine, HuskyConstants.RegistryKeys.AppUninstalls.RootKey, key, value);
+        protected override ValueTask RollbackTask()
+        {
+            _registryService.RemoveSubKey(RegistryHive.LocalMachine, GetApplicationUninstallationRootKey());
+            return ValueTask.CompletedTask;
+        }
 
-        protected override ValueTask RollbackTask() => throw new System.NotImplementedException();
+        private string GetApplicationUninstallationRootKey() => @$"{AppUninstalls.RootKey}\{_applicationConfiguration.Name}_Husky";
+
+        // Todo: GH #11 - Support HKCU and HKLM
+        private void WriteUninstallKey(string key, object value)
+            => _registryService.WriteKey(RegistryHive.LocalMachine, GetApplicationUninstallationRootKey(), key, value);
     }
 }
