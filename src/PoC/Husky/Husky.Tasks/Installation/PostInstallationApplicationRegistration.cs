@@ -36,7 +36,6 @@ namespace Husky.Tasks.Installation
             if (CurrentPlatform.OS != OS.Windows || !_installationConfiguration.AddToRegistry)
                 return ValueTask.CompletedTask;
 
-            var productVersion = new PartialVersion(_applicationConfiguration.Version);
             WriteUninstallKey(AppUninstalls.DisplayName, _applicationConfiguration.Name);
             WriteUninstallKey(AppUninstalls.Publisher, _authorConfiguration.Publisher);
             WriteUninstallKey(AppUninstalls.Comments, _applicationConfiguration.Description);
@@ -49,6 +48,7 @@ namespace Husky.Tasks.Installation
              * Todo: Reassess at a later time - these Version properties appear to be a way for
              *       the glorious Windows Installer to drive its updates, and should not be used. Could. But maybe should not be.
              */ 
+            //var productVersion = new PartialVersion(_applicationConfiguration.Version);
             //WriteUninstallKey(AppUninstalls.VersionMajor, productVersion.Minor ?? 0);
             //WriteUninstallKey(AppUninstalls.VersionMinor, productVersion.Major ?? 0);
             //WriteUninstallKey(AppUninstalls.Version, productVersion.ToString());
