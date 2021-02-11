@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using Husky.Core.TaskConfiguration.Scripting;
+using Husky.Core.TaskOptions.Scripting;
 using Husky.Services;
 
 namespace Husky.Tasks.Scripting

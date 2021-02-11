@@ -5,7 +5,7 @@ using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
-using Husky.Core.TaskConfiguration.Installation;
+using Husky.Core.TaskOptions.Installation;
 using Husky.Services;
 
 namespace Husky.Tasks.Installation

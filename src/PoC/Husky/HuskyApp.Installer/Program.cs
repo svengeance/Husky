@@ -5,9 +5,9 @@ using Husky.Core.Dependencies;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
-using Husky.Core.TaskConfiguration.Resources;
-using Husky.Core.TaskConfiguration.Scripting;
-using Husky.Core.TaskConfiguration.Utilities;
+using Husky.Core.TaskOptions.Resources;
+using Husky.Core.TaskOptions.Scripting;
+using Husky.Core.TaskOptions.Utilities;
 using Husky.Core.Workflow;
 using Husky.Installer;
 

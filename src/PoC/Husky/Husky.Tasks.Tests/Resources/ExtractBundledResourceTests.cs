@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Husky.Core;
-using Husky.Core.TaskConfiguration.Resources;
+using Husky.Core.TaskOptions.Resources;
 using Husky.Core.Workflow;
 using Husky.Tasks.Resources;
 using NUnit.Framework;

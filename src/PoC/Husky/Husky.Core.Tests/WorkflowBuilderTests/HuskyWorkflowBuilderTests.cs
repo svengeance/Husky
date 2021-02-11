@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Husky.Core.Enums;
-using Husky.Core.TaskConfiguration.Scripting;
+using Husky.Core.TaskOptions.Scripting;
 using Husky.Core.Workflow;
 using NUnit.Framework;
 

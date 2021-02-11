@@ -6,7 +6,7 @@ using AutoFixture;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
-using Husky.Core.TaskConfiguration.Installation;
+using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Services;
 using Husky.Tasks.Installation;

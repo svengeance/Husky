@@ -1,9 +1,8 @@
-﻿using System.IO;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Husky.Core.Workflow;
 
-namespace Husky.Core.TaskConfiguration.Resources
+namespace Husky.Core.TaskOptions.Resources
 {
     public class ExtractBundledResourceOptions : HuskyTaskConfiguration
     {

@@ -3,7 +3,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Husky.Core.Workflow;
 
-namespace Husky.Core.TaskConfiguration.Scripting
+namespace Husky.Core.TaskOptions.Scripting
 {
     public class CreateScriptFileOptions : HuskyTaskConfiguration
     {

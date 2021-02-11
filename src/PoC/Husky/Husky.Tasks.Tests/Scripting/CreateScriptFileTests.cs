@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Husky.Core.TaskConfiguration.Scripting;
+using Husky.Core.TaskOptions.Scripting;
 using Husky.Core.Workflow;
 using Husky.Tasks.Scripting;
 using NUnit.Framework;

@@ -1,10 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using FluentValidation;
 using FluentValidation.Results;
 using Husky.Core.Workflow;
 
-namespace Husky.Core.TaskConfiguration.Utilities
+namespace Husky.Core.TaskOptions.Utilities
 {
     public class CreateShortcutOptions : HuskyTaskConfiguration
     {

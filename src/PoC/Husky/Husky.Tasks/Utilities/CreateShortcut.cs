@@ -5,7 +5,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using Husky.Core.HuskyConfiguration;
-using Husky.Core.TaskConfiguration.Utilities;
+using Husky.Core.TaskOptions.Utilities;
 using Husky.Services;
 
 namespace Husky.Tasks.Utilities

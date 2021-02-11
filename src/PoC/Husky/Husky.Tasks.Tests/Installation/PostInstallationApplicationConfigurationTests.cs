@@ -5,7 +5,7 @@ using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
-using Husky.Core.TaskConfiguration.Installation;
+using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Services;
 using Husky.Tasks.Installation;
@@ -25,17 +25,18 @@ namespace Husky.Tasks.Tests.Installation
         {
             // Arrange
             var registryMock = _fixture.Create<Mock<IRegistryService>>();
+            var appUninstallRootKey = $@"{AppUninstalls.RootKey}\Jawbreakers_Husky";
 
             // Act
             await Sut.Execute();
 
             // Assert
-            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, AppUninstalls.RootKey, AppUninstalls.DisplayName, "Jawbreakers"), Times.Once());
-            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, AppUninstalls.RootKey, AppUninstalls.DisplayVersion, "25"), Times.Once());
-            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, AppUninstalls.RootKey, AppUninstalls.Publisher, "Cul-de-sac"), Times.Once());
-            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, AppUninstalls.RootKey, AppUninstalls.NoRemove, 1), Times.Once());
-            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, AppUninstalls.RootKey, AppUninstalls.Comments, "Every Ed's dream"), Times.Once());
-            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, AppUninstalls.RootKey, AppUninstalls.InstallDate, DateTime.Today.ToString("yyyyMMdd")), Times.Once());
+            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.DisplayName, "Jawbreakers"), Times.Once());
+            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.DisplayVersion, "25"), Times.Once());
+            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.Publisher, "Cul-de-sac"), Times.Once());
+            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.NoRemove, 1), Times.Once());
+            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.Comments, "Every Ed's dream"), Times.Once());
+            registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.InstallDate, DateTime.Today.ToString("yyyyMMdd")), Times.Once());
         }
 
         [Test]
@@ -51,6 +52,23 @@ namespace Husky.Tasks.Tests.Installation
 
             // Assert
             registryMock.VerifyNoOtherCalls();
+        }
+
+
+        [Test]
+        [Category("UnitTest")]
+        public async ValueTask Post_installation_uninstall_removes_created_application_regkey()
+        {
+            // Arrange
+            var registryMock = _fixture.Create<Mock<IRegistryService>>();
+            var appUninstallRootKey = $@"{AppUninstalls.RootKey}\Jawbreakers_Husky";
+            PlatformInformationMock.Setup(s => s.OS).Returns(OS.Windows);
+
+            // Act
+            await Sut.Rollback();
+
+            // Assert
+            registryMock.Verify(v => v.RemoveSubKey(RegistryHive.LocalMachine, appUninstallRootKey), Times.Once);
         }
 
         protected override void ConfigureHusky(HuskyConfiguration huskyConfiguration)
@@ -70,6 +88,6 @@ namespace Husky.Tasks.Tests.Installation
             huskyConfiguration.Configure<InstallationConfiguration>(install => install.AllowRemove = false);
         }
 
-        protected override PostInstallationApplicationRegistrationConfiguration CreateDefaultTaskConfiguration() => new();
+        protected override PostInstallationApplicationRegistrationOptions CreateDefaultTaskConfiguration() => new();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Husky.Core.TaskConfiguration.Resources;
+using Husky.Core.TaskOptions.Resources;
 using Husky.Services;
 
 namespace Husky.Tasks.Resources

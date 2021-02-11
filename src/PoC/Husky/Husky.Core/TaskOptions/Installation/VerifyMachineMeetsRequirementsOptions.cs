@@ -2,7 +2,7 @@
 using FluentValidation.Results;
 using Husky.Core.Workflow;
 
-namespace Husky.Core.TaskConfiguration.Installation
+namespace Husky.Core.TaskOptions.Installation
 {
     public class VerifyMachineMeetsRequirementsOptions: HuskyTaskConfiguration
     {

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using Husky.Core.TaskConfiguration.Utilities;
+using Husky.Core.TaskOptions.Utilities;
 using Husky.Core.Workflow;
 using Husky.Tasks.Utilities;
 using NUnit.Framework;
