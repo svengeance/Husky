@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Dependencies;
 using Husky.Core.Enums;
@@ -28,7 +29,9 @@ namespace HuskyApp.Installer
              *       that executes per-step, per-job, per-stage, etc..
              */
             var installationSettings = new HuskyInstallerSettings();
-            await installationSettings.LoadFromStartArgs(args);
+            var argParsingResult = await installationSettings.LoadFromStartArgs(args);
+            if (argParsingResult != 0)
+                return;
 
             //HelloWorldGenerated.HelloWorld.SayHello();
             const string linuxScript = @"
