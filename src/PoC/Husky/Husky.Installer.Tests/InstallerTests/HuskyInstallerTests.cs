@@ -2,6 +2,9 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Husky.Core;
+using Husky.Core.Enums;
+using Husky.Core.Platform;
+using Husky.Core.Workflow;
 using Moq;
 using NUnit.Framework;
 
@@ -31,26 +34,22 @@ namespace Husky.Installer.Tests.InstallerTests
             Assert.AreEqual(HuskyConstants.Workflows.PostInstallation.DefaultJobName, Workflow.Stages[^1].Jobs[0].Name);
         }
 
-        [Ignore("No longer safe to run with the addition of setting windows registry keys as part of the install process")]
         [Test]
         [Category("IntegrationTest")]
         public async ValueTask Installer_validates_workflow()
         {
             // Arrange
-            var installer = new HuskyInstaller(Workflow, cfg =>
-            {
-                cfg.ResolveModulesFromAssemblies = new[] { Assembly.GetExecutingAssembly() };
-            });
+            var settings = new HuskyInstallerSettings { ResolveModulesFromAssemblies = new[] { Assembly.GetExecutingAssembly() } };
+            var installer = new HuskyInstaller(Workflow, settings);
 
             // Act
-            await installer.Install();
+            await installer.Execute();
 
             // Assert
             var testTaskOptions = (TestHuskyTaskOptions) Workflow.Stages.First(f => f.Name != HuskyConstants.Workflows.PreInstallation.DefaultStageName).Jobs[0].Steps[0].HuskyTaskConfiguration;
             Assert.True(testTaskOptions.HasValidated);
         }
 
-        [Ignore("No longer safe to run with the addition of setting windows registry keys as part of the install process")]
         [Test]
         [Category("IntegrationTest")]
         public async ValueTask Installer_replaces_variables_on_task_configuration()
@@ -59,11 +58,39 @@ namespace Husky.Installer.Tests.InstallerTests
             var expectedTitle = "Test - 4";
 
             // Act
-            await Installer.Install();
+            await Installer.Execute();
 
             // Assert
             var testTaskOptions = (TestHuskyTaskOptions)Workflow.Stages.First(f => f.Name != HuskyConstants.Workflows.PreInstallation.DefaultStageName).Jobs[0].Steps[0].HuskyTaskConfiguration;
             Assert.AreEqual(expectedTitle, testTaskOptions.Title);
+        }
+
+        [Test]
+        [Category("IntegrationTest")]
+        public async ValueTask Installer_executes_only_tasks_with_correct_tag()
+        {
+            // Arrange
+            var tasksToExecute = HuskyConstants.Workflows.StepTags.Repair;
+            var additionalWorkflow = HuskyWorkflow.Create()
+                                                  .WithDefaultStageAndJob(
+                                                       job => job.AddStep<TestHuskyTaskOptions>("RepairStep", ConfigureTestTaskOptions,
+                                                           new HuskyStepConfiguration(CurrentPlatform.OS) { Tags = new[] { HuskyConstants.Workflows.StepTags.Repair } }))
+                                                  .Build();
+
+            var repairStep = additionalWorkflow.Stages[0].Jobs[0].Steps[0];
+            Workflow.Stages[0].Jobs[0].Steps.Add(repairStep);
+
+            // Act
+            await Installer.Execute();
+
+            // Assert
+            foreach (var step in Workflow.Stages.SelectMany(s => s.Jobs).SelectMany(s => s.Steps))
+            {
+                if (step.HuskyStepConfiguration.Tags.Contains(InstallerSettings.TagToExecute))
+                    Assert.AreEqual(ExecutionStatus.Completed, step.ExecutionInformation.ExecutionStatus);
+                else
+                    Assert.AreEqual(ExecutionStatus.NotStarted, step.ExecutionInformation.ExecutionStatus);
+            }
         }
 
         protected override void ConfigureTestTaskOptions(TestHuskyTaskOptions options)

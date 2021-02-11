@@ -22,17 +22,17 @@ namespace Husky.Installer
 
         private readonly HuskyWorkflow _workflow;
 
-        public HuskyInstaller(HuskyWorkflow workflow, Action<HuskyInstallerSettings> configureInstallation) : this(workflow)
-            => configureInstallation(HuskyInstallerSettings);
+        public HuskyInstaller(HuskyWorkflow workflow, HuskyInstallerSettings installationSettings): this(workflow)
+            => HuskyInstallerSettings = installationSettings;
 
-        public HuskyInstaller(HuskyWorkflow workflow)
+        private HuskyInstaller(HuskyWorkflow workflow)
         {
             _workflow = workflow;
             _workflow.Stages.Insert(0, GeneratePreInstallationStage());
             _workflow.Stages.Add(GeneratePostInstallationStage());
         }
 
-        public async ValueTask Install()
+        public async ValueTask Execute()
         {
             var serviceProvider = new ServiceCollection().AddHuskyInstaller(HuskyInstallerSettings, _workflow.Configuration);
             _workflow.Validate();
@@ -79,7 +79,8 @@ namespace Husky.Installer
 
         private async ValueTask ExecuteJob(HuskyJob job, InstallationContext installationContext, IServiceProvider services)
         {
-            foreach (var step in job.Steps.Where(w => w.HuskyStepConfiguration.Os == CurrentPlatform.OS))
+            var stepsToExecute = job.Steps.Where(w => w.HuskyStepConfiguration.Os == CurrentPlatform.OS && w.HuskyStepConfiguration.Tags.Any(a => a == HuskyInstallerSettings.TagToExecute));
+            foreach (var step in stepsToExecute)
             {
                 installationContext.CurrentStepName = step.Name;
 

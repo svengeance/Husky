@@ -14,11 +14,22 @@ namespace HuskyApp.Installer
 {   
     public static class Program
     {
-        private static readonly HuskyStepConfiguration _lunixConfiguration = new(OS.Linux);
-        private static readonly HuskyStepConfiguration _windowsConfiguration = new(OS.Windows);
+        private static readonly HuskyStepConfiguration LunixConfiguration = new(OS.Linux);
+        private static readonly HuskyStepConfiguration WindowsConfiguration = new(OS.Windows);
 
         public static async Task Main(string[] args)
         {
+            /*
+             * Todo: When we fully flesh out the Source Generator pattern, we should likely remove this kind of thing from the users' visibility.
+             *       Husky should elegantly manage its requisite startup _stuff_ (such as arg parsing) in generated classes,
+             *       while exposing extensibility points for the user to make their own modifications.
+             *
+             *       One possible solution is to find a way to give the user access to the ServiceProvider and possible allow some sort of Middleware
+             *       that executes per-step, per-job, per-stage, etc..
+             */
+            var installationSettings = new HuskyInstallerSettings();
+            await installationSettings.LoadFromStartArgs(args);
+
             //HelloWorldGenerated.HelloWorld.SayHello();
             const string linuxScript = @"
 cls &&
@@ -60,11 +71,11 @@ pause";
                                                                                 .AddStep<ExecuteInlineScriptOptions>(
                                                                                      "show-unix-splash",
                                                                                      task => task.Script = linuxScript,
-                                                                                     _lunixConfiguration)
+                                                                                     LunixConfiguration)
                                                                                 .AddStep<ExecuteInlineScriptOptions>(
                                                                                      "show-windows-splash",
                                                                                      task => task.Script = windowsScript,
-                                                                                     _windowsConfiguration))
+                                                                                     WindowsConfiguration))
                                                            .AddJob(
                                                                 "extract-husky-app",
                                                                 extract => extract.AddStep<ExtractBundledResourceOptions>(
@@ -91,9 +102,7 @@ pause";
                                                                                      task => task.Target = "$variables.create-launch-file.create-launch-script.createdFileName"))
                                          ).Build();
 
-            var installer = new HuskyInstaller(workflow);
-
-            await installer.Install();
+            await new HuskyInstaller(workflow, installationSettings).Execute();
         }
     }
 }

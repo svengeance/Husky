@@ -74,10 +74,10 @@
             {
                 // All tasks by default should be able executable on Install and Uninstall
                 public static readonly string[] DefaultStepTags = { Install, Uninstall };
-                public const string Install = nameof(Install);
-                public const string Repair = nameof(Repair);
-                public const string Modify = nameof(Modify);
-                public const string Uninstall = nameof(Uninstall);
+                public const string Install = "install";
+                public const string Repair = "repair";
+                public const string Modify = "modify";
+                public const string Uninstall = "uninstall";
             }
 
             public static class PreInstallation

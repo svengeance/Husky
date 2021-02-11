@@ -1,9 +1,9 @@
-﻿using System;
-using System.Reflection;
-using Husky.Core.Builder;
-using Husky.Core.HuskyConfiguration;
+﻿using System.Reflection;
+using Husky.Core;
 using Husky.Core.Workflow;
 using NUnit.Framework;
+using Husky.Core.HuskyConfiguration;
+using Husky.Core.Platform;
 
 namespace Husky.Installer.Tests
 {
@@ -21,6 +21,8 @@ namespace Husky.Installer.Tests
 
         protected HuskyInstaller Installer { get; private set; } = null!;
 
+        protected HuskyInstallerSettings InstallerSettings { get; private set; } = null!;
+
         protected abstract void ConfigureTestTaskOptions(TestHuskyTaskOptions options);
 
         [SetUp]
@@ -30,12 +32,13 @@ namespace Husky.Installer.Tests
                                     .AddGlobalVariable("random.RandomNumber", "4")
                                     .Configure<InstallationConfiguration>(install => install.AddToRegistry = false)
                                     .WithDefaultStageAndJob(job =>
-                                         job.AddStep<TestHuskyTaskOptions>("TestStep", ConfigureTestTaskOptions)).Build();
+                                         job.AddStep<TestHuskyTaskOptions>("TestStep", ConfigureTestTaskOptions))
+                                    .Build();
 
-            Installer = new HuskyInstaller(Workflow, cfg =>
-            {
-                cfg.ResolveModulesFromAssemblies = new[] { Assembly.GetExecutingAssembly() };
-            });
+            InstallerSettings = new HuskyInstallerSettings { ResolveModulesFromAssemblies = new[] { Assembly.GetExecutingAssembly() } };
+            InstallerSettings.LoadFromStartArgs(new[] { "install" });
+
+            Installer = new HuskyInstaller(Workflow, InstallerSettings);
         }
     }
 }
