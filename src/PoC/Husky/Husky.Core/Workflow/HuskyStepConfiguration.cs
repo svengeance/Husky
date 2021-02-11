@@ -13,12 +13,18 @@ namespace Husky.Core.Workflow
         // Without any specification, we can assume that the task is "any" operating system - it will work for our current platform.
         public static readonly HuskyStepConfiguration DefaultConfiguration = new(CurrentPlatform.OS)
         {
-            Tags = HuskyConstants.Workflows.StepTags.DefaultStepTags
+            Tags = HuskyConstants.StepTags.DefaultStepTags
         };
-        
+
         public HuskyStepConfiguration(OS os)
         {
             Os = os;
+        }
+
+        public HuskyStepConfiguration(OS os, params string[] tags)
+        {
+            Os = os;
+            Tags = tags;
         }
     }
 }
