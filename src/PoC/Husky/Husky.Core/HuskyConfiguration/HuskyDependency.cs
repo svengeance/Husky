@@ -6,8 +6,6 @@ namespace Husky.Core.HuskyConfiguration
     {
         public Range ParsedRange { get; }
 
-        private string Range => ParsedRange.ToString();
-
         protected HuskyDependency(string range) : this(new Range(range)) { }
 
         private HuskyDependency(Range range) => ParsedRange = range;

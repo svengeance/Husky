@@ -15,10 +15,10 @@ namespace Husky.Installer.Tests.InstallerSettingsTests
             Sut = new HuskyInstallerSettings();
         }
 
-        [TestCase(HuskyConstants.Workflows.StepTags.Install, HuskyConstants.Workflows.StepTags.Install)]
-        [TestCase(HuskyConstants.Workflows.StepTags.Uninstall, HuskyConstants.Workflows.StepTags.Uninstall)]
-        [TestCase(HuskyConstants.Workflows.StepTags.Modify, HuskyConstants.Workflows.StepTags.Modify)]
-        [TestCase(HuskyConstants.Workflows.StepTags.Repair, HuskyConstants.Workflows.StepTags.Repair)]
+        [TestCase(HuskyConstants.StepTags.Install, HuskyConstants.StepTags.Install)]
+        [TestCase(HuskyConstants.StepTags.Uninstall, HuskyConstants.StepTags.Uninstall)]
+        [TestCase(HuskyConstants.StepTags.Modify, HuskyConstants.StepTags.Modify)]
+        [TestCase(HuskyConstants.StepTags.Repair, HuskyConstants.StepTags.Repair)]
         [TestCase("validate", "")]
         [Category("UnitTest")]
         public async ValueTask Parsing_args_determines_steps_to_use(string verb, string expectedTag)

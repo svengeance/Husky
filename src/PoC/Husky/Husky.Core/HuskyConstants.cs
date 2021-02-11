@@ -1,4 +1,5 @@
-﻿namespace Husky.Core
+﻿// ReSharper disable InconsistentNaming
+namespace Husky.Core
 {
     public static class HuskyConstants
     {
@@ -38,6 +39,16 @@
             }
         }
 
+        public static class StepTags
+        {
+            // All tasks by default should be able executable on Install and Uninstall
+            public static readonly string[] DefaultStepTags = { Install, Uninstall };
+            public const string Install = "install";
+            public const string Repair = "repair";
+            public const string Modify = "modify";
+            public const string Uninstall = "uninstall";
+        }
+
         public static class UnixDesktopFileTypes
         {
             public const string Application = nameof(Application);
@@ -65,25 +76,15 @@
             }
         }
 
-        public static class Workflows
+        public static class WorkflowDefaults
         {
             public const string DefaultStageName = "default-stage";
             public const string DefaultJobName = "default-job";
 
-            public static class StepTags
-            {
-                // All tasks by default should be able executable on Install and Uninstall
-                public static readonly string[] DefaultStepTags = { Install, Uninstall };
-                public const string Install = "install";
-                public const string Repair = "repair";
-                public const string Modify = "modify";
-                public const string Uninstall = "uninstall";
-            }
-
             public static class PreInstallation
             {
-                public const string DefaultStageName = "husky-preinstallation-checks-stage";
-                public const string DefaultJobName = "husky-preinstallation-checks-job";
+                public const string StageName = "husky-pre-installation-checks-stage";
+                public const string JobName = "husky-pre-installation-checks-job";
 
                 public static class Steps
                 {
@@ -93,8 +94,8 @@
 
             public static class PostInstallation
             {
-                public const string DefaultStageName = "husky-postinstallation-checks-stage";
-                public const string DefaultJobName = "husky-postinstallation-checks-job";
+                public const string StageName = "husky-post-installation-checks-stage";
+                public const string JobName = "husky-post-installation-checks-job";
 
                 public static class Steps
                 {

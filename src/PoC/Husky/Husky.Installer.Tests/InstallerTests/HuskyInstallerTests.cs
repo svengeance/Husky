@@ -19,8 +19,8 @@ namespace Husky.Installer.Tests.InstallerTests
             // Arrange
             // Act
             // Assert
-            Assert.AreEqual(HuskyConstants.Workflows.PreInstallation.DefaultStageName, Workflow.Stages[0].Name);
-            Assert.AreEqual(HuskyConstants.Workflows.PreInstallation.DefaultJobName, Workflow.Stages[0].Jobs[0].Name);
+            Assert.AreEqual(HuskyConstants.WorkflowDefaults.PreInstallation.StageName, Workflow.Stages[0].Name);
+            Assert.AreEqual(HuskyConstants.WorkflowDefaults.PreInstallation.JobName, Workflow.Stages[0].Jobs[0].Name);
         }
 
         [Test]
@@ -30,8 +30,8 @@ namespace Husky.Installer.Tests.InstallerTests
             // Arrange
             // Act
             // Assert
-            Assert.AreEqual(HuskyConstants.Workflows.PostInstallation.DefaultStageName, Workflow.Stages[^1].Name);
-            Assert.AreEqual(HuskyConstants.Workflows.PostInstallation.DefaultJobName, Workflow.Stages[^1].Jobs[0].Name);
+            Assert.AreEqual(HuskyConstants.WorkflowDefaults.PostInstallation.StageName, Workflow.Stages[^1].Name);
+            Assert.AreEqual(HuskyConstants.WorkflowDefaults.PostInstallation.JobName, Workflow.Stages[^1].Jobs[0].Name);
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace Husky.Installer.Tests.InstallerTests
             await installer.Execute();
 
             // Assert
-            var testTaskOptions = (TestHuskyTaskOptions) Workflow.Stages.First(f => f.Name != HuskyConstants.Workflows.PreInstallation.DefaultStageName).Jobs[0].Steps[0].HuskyTaskConfiguration;
+            var testTaskOptions = (TestHuskyTaskOptions) Workflow.Stages.First(f => f.Name != HuskyConstants.WorkflowDefaults.PreInstallation.StageName).Jobs[0].Steps[0].HuskyTaskConfiguration;
             Assert.True(testTaskOptions.HasValidated);
         }
 
@@ -61,7 +61,7 @@ namespace Husky.Installer.Tests.InstallerTests
             await Installer.Execute();
 
             // Assert
-            var testTaskOptions = (TestHuskyTaskOptions)Workflow.Stages.First(f => f.Name != HuskyConstants.Workflows.PreInstallation.DefaultStageName).Jobs[0].Steps[0].HuskyTaskConfiguration;
+            var testTaskOptions = (TestHuskyTaskOptions)Workflow.Stages.First(f => f.Name != HuskyConstants.WorkflowDefaults.PreInstallation.StageName).Jobs[0].Steps[0].HuskyTaskConfiguration;
             Assert.AreEqual(expectedTitle, testTaskOptions.Title);
         }
 
@@ -70,11 +70,11 @@ namespace Husky.Installer.Tests.InstallerTests
         public async ValueTask Installer_executes_only_tasks_with_correct_tag()
         {
             // Arrange
-            var tasksToExecute = HuskyConstants.Workflows.StepTags.Repair;
+            var tasksToExecute = HuskyConstants.StepTags.Repair;
             var additionalWorkflow = HuskyWorkflow.Create()
                                                   .WithDefaultStageAndJob(
                                                        job => job.AddStep<TestHuskyTaskOptions>("RepairStep", ConfigureTestTaskOptions,
-                                                           new HuskyStepConfiguration(CurrentPlatform.OS) { Tags = new[] { HuskyConstants.Workflows.StepTags.Repair } }))
+                                                           new HuskyStepConfiguration(CurrentPlatform.OS) { Tags = new[] { HuskyConstants.StepTags.Repair } }))
                                                   .Build();
 
             var repairStep = additionalWorkflow.Stages[0].Jobs[0].Steps[0];

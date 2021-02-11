@@ -1,7 +1,5 @@
 using Husky.Generator.WorkflowParser.YAML;
 using NUnit.Framework;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace Husky.Generator.Tests
 {

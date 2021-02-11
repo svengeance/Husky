@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-using static Husky.Core.HuskyConstants.Workflows;
+using static Husky.Core.HuskyConstants.StepTags;
 
 namespace Husky.Installer
 {
@@ -17,7 +17,7 @@ namespace Husky.Installer
         public IEnumerable<Assembly> ResolveModulesFromAssemblies { get; set; } = Array.Empty<Assembly>();
         public string TagToExecute { get; private set; } = string.Empty;
         // Todo: GH #18 - Make DryRun actually do something
-        public bool IsDryRun { get; private set; } = false;
+        public bool IsDryRun { get; private set; }
         public LogLevel LogLevel { get; private set; } = LogLevel.Information;
 
         public Task<int> LoadFromStartArgs(string[] args)
@@ -36,21 +36,21 @@ namespace Husky.Installer
 
             var rootCommand = new RootCommand
             {
-                new Command(StepTags.Install, $"Executes the Tasks within this Workflow tagged '{StepTags.Install}'")
+                new Command(Install, $"Executes the Tasks within this Workflow tagged '{Install}'")
                 {
-                    Handler = CreateHandler(StepTags.Install)
+                    Handler = CreateHandler(Install)
                 },
-                new Command(StepTags.Uninstall, $"Executes the Tasks within this Workflow tagged '{StepTags.Uninstall}'")
+                new Command(Uninstall, $"Executes the Tasks within this Workflow tagged '{Uninstall}'")
                 {
-                    Handler = CreateHandler(StepTags.Uninstall)
+                    Handler = CreateHandler(Uninstall)
                 },
-                new Command(StepTags.Modify, $"Executes the Tasks within this Workflow tagged '{StepTags.Modify}'")
+                new Command(Modify, $"Executes the Tasks within this Workflow tagged '{Modify}'")
                 {
-                    Handler = CreateHandler(StepTags.Modify)
+                    Handler = CreateHandler(Modify)
                 },
-                new Command(StepTags.Repair, $"Executes the Tasks within this Workflow tagged '{StepTags.Repair}'")
+                new Command(Repair, $"Executes the Tasks within this Workflow tagged '{Repair}'")
                 {
-                    Handler = CreateHandler(StepTags.Repair)
+                    Handler = CreateHandler(Repair)
                 },
                 new Command("validate", $"Executes no Tasks within this Workflow, but ensures all options are correctly configured.")
                 {
