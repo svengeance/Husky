@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Husky.Core\Husky.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="HuskyWorkflowTests\" />
+  </ItemGroup>
+
 </Project>

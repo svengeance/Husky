@@ -40,5 +40,16 @@ namespace Husky.Core.Workflow
             if (!string.IsNullOrEmpty(exceptionString))
                 throw new ValidationException(exceptionString);
         }
+
+        public void Reverse()
+        {
+            Stages.Reverse();
+            foreach (var stage in Stages)
+            {
+                stage.Jobs.Reverse();
+                foreach (var job in stage.Jobs)
+                    job.Steps.Reverse();
+            }
+        }
     }
 }

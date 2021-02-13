@@ -27,6 +27,9 @@ namespace Husky.Installer
             _workflow = workflow;
             _workflow.Stages.Insert(0, GeneratePreInstallationStage());
             _workflow.Stages.Add(GeneratePostInstallationStage());
+
+            if (_huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Uninstall)
+                _workflow.Reverse();
         }
 
         public async ValueTask Execute()
