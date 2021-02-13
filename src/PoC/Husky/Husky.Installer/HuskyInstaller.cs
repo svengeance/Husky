@@ -34,26 +34,8 @@ namespace Husky.Installer
             var serviceProvider = new ServiceCollection().AddHuskyInstaller(_huskyInstallerSettings, _workflow.Configuration);
             _workflow.Validate();
 
-            foreach (var dependency in _workflow.Dependencies)
-            {
-                var dependencyHandler = GetDependencyHandler(dependency, serviceProvider);
-                if (await dependencyHandler.IsAlreadyInstalled(dependency))
-                {
-                    // Todo: Log installed
-                }
-                else
-                {
-                    if (dependencyHandler.TrySatisfyDependency(dependency, out var acquisitionMethod))
-                    {
-                        await acquisitionMethod.AcquireDependency(serviceProvider);
-                        // Todo: Verify installed (maybe call IsAlreadyInstalled again? :D
-                    }
-                    else
-                    {
-                        throw new ApplicationException($"Unable to acquire dependency {dependency.GetType()}, installation will abort");
-                    }
-                }
-            }
+            if (_huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Install || _huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Repair)
+                await InstallDependencies(serviceProvider);
 
             foreach (var stage in _workflow.Stages)
             {
@@ -76,7 +58,7 @@ namespace Husky.Installer
 
         private async ValueTask ExecuteJob(HuskyJob job, InstallationContext installationContext, IServiceProvider services)
         {
-            var stepsToExecute = job.Steps.Where(w => w.HuskyStepConfiguration.Os == CurrentPlatform.OS && w.HuskyStepConfiguration.Tags.Any(a => a == _huskyInstallerSettings.TagToExecute));
+            var stepsToExecute = job.Steps.Where(w => w.HuskyStepConfiguration.Os == CurrentPlatform.OS && w.HuskyStepConfiguration.Tags.Contains(_huskyInstallerSettings.TagToExecute));
             foreach (var step in stepsToExecute)
             {
                 installationContext.CurrentStepName = step.Name;
@@ -134,6 +116,30 @@ namespace Husky.Installer
             var dependencyType = dependency.GetType();
             var dependencyHandlerType = typeof(IDependencyHandler<>).MakeGenericType(dependencyType);
             return (IDependencyHandler<HuskyDependency>)serviceProvider.GetRequiredService(dependencyHandlerType);
+        }
+
+        private async Task InstallDependencies(IServiceProvider serviceProvider)
+        {
+            foreach (var dependency in _workflow.Dependencies)
+            {
+                var dependencyHandler = GetDependencyHandler(dependency, serviceProvider);
+                if (await dependencyHandler.IsAlreadyInstalled(dependency))
+                {
+                    // Todo: Log installed
+                }
+                else
+                {
+                    if (dependencyHandler.TrySatisfyDependency(dependency, out var acquisitionMethod))
+                    {
+                        await acquisitionMethod.AcquireDependency(serviceProvider);
+                        // Todo: Verify installed (maybe call IsAlreadyInstalled again? :D
+                    }
+                    else
+                    {
+                        throw new ApplicationException($"Unable to acquire dependency {dependency.GetType()}, installation will abort");
+                    }
+                }
+            }
         }
 
         private static HuskyStage GeneratePreInstallationStage()
