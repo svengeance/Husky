@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.TaskOptions.Utilities;
 using Husky.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Husky.Tasks.Utilities
 {
@@ -15,12 +16,14 @@ namespace Husky.Tasks.Utilities
     {
         private string _windowsShortcutFileExtension = ".lnk";
         private string _unixShortcutFileExtension = ".desktop";
-        
+
+        private readonly ILogger _logger;
         private readonly IShellExecutionService _shellExecutionService;
         private readonly ApplicationConfiguration _applicationConfiguration;
 
-        public CreateShortcut(IShellExecutionService shellExecutionService, ApplicationConfiguration applicationConfiguration)
+        public CreateShortcut(ILogger<CreateShortcut> logger, IShellExecutionService shellExecutionService, ApplicationConfiguration applicationConfiguration)
         {
+            _logger = logger;
             _shellExecutionService = shellExecutionService;
             _applicationConfiguration = applicationConfiguration;
         }
@@ -37,6 +40,7 @@ namespace Husky.Tasks.Utilities
 
         private void CreateWindowsShortcut()
         {   // Lord forgive me for my sins.
+            _logger.LogInformation("Preparing to create a Windows shortcut");
             // ReSharper disable once SuspiciousTypeConversion.Global (cast is definitely sus)
             IShellLink link = (IShellLink) new ShellLink();
 
@@ -50,11 +54,14 @@ namespace Husky.Tasks.Utilities
             // ReSharper disable once SuspiciousTypeConversion.Global
             IPersistFile file = (IPersistFile) link;
             var pathToSave = Path.Combine(Configuration.ShortcutLocation, Configuration.ShortcutName + _windowsShortcutFileExtension);
+
+            _logger.LogInformation("Shortcut created at {shortcutPath} pointing to {target}", pathToSave, Configuration.Target);
             file.Save(pathToSave, false);
         }
 
         private async ValueTask CreateLinuxShortcut()
         {
+            _logger.LogInformation("Preparing to create a Linux shortcut");
             (string key, string value)[] desktopFileSettings =
             {
                 ("Version", _applicationConfiguration.Version),
@@ -74,6 +81,8 @@ namespace Husky.Tasks.Utilities
                 desktopStringBuilder.Append(key).Append('=').AppendLine(value);
 
             var path = Path.Combine(Configuration.ShortcutLocation, Configuration.ShortcutName + _unixShortcutFileExtension);
+
+            _logger.LogDebug("Saving linux desktop file to {path} with content:\n{content}", path, desktopStringBuilder.ToString());
             await File.WriteAllTextAsync(path, desktopStringBuilder.ToString());
         }
 
@@ -86,9 +95,11 @@ namespace Husky.Tasks.Utilities
             var fileExtension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? _windowsShortcutFileExtension
                 : _unixShortcutFileExtension
-                ?? throw new NotImplementedException($"Unable to rollback Shortcut for the OSPlatform: {RuntimeInformation.OSDescription}");
+               ?? throw new NotImplementedException($"Unable to rollback Shortcut for the OSPlatform: {RuntimeInformation.OSDescription}");
 
             var fileThatShouldExist = new FileInfo(Path.Combine(Configuration.ShortcutLocation, Configuration.ShortcutName + fileExtension));
+            _logger.LogDebug("Preparing to remove shortcut at {shortcutPath}", fileThatShouldExist);
+            
             if (fileThatShouldExist.Exists)
                 fileThatShouldExist.Delete();
 
