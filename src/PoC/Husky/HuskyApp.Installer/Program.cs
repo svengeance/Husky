@@ -140,7 +140,7 @@ pause";
 
             var (numStages, numJobs, numTasks) = CountWorkflowItems(workflow);
             logger.Information("Parsed HuskyWorkflow, found {numberOfStages} stages, {numberOfJobs} jobs, and {numberOfTasks} tasks", numStages, numJobs, numTasks);
-            logger.Verbose("Workflow{newline}{@workflow}", workflow);
+            logger.Verbose("Workflow\n{@workflow}", workflow);
 
             try
             {
@@ -149,8 +149,8 @@ pause";
             catch (Exception e)
             {
                 logger.Fatal(e, "HuskyInstaller encoutnered an exception and was unable to recover -- exiting");
-                logger.Fatal("Current platform:{newline}{currentPlatform}", CurrentPlatform.LongDescription);
-                logger.Fatal("Husky Workflow:{newline}{workFlow}", workflow);
+                logger.Fatal("Current platform:\n{currentPlatform}", CurrentPlatform.LongDescription);
+                logger.Fatal("Husky Workflow:\n{workFlow}", workflow);
                 throw;
             }
 
