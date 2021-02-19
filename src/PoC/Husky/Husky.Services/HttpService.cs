@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Husky.Services
 {
@@ -15,11 +16,13 @@ namespace Husky.Services
     
     public class HttpService: IHttpService
     {
+        private readonly ILogger _logger;
         private readonly IFileSystemService _fileSystemService;
         private readonly HttpClient _httpClient;
 
-        public HttpService(IHttpClientFactory httpClientFactory, IFileSystemService fileSystemService)
+        public HttpService(ILogger<HttpService> logger, IHttpClientFactory httpClientFactory, IFileSystemService fileSystemService)
         {
+            _logger = logger;
             _fileSystemService = fileSystemService;
             _httpClient = httpClientFactory.CreateClient();
         }
@@ -30,8 +33,9 @@ namespace Husky.Services
         public async ValueTask<FileInfo> DownloadFile(HttpRequestMessage httpRequestMessage, string? destination = null,
             IProgress<FileSystemService.FileWriteProgress>? progress = null)
         {
-            // Todo: Log successes & failures
+            _logger.LogInformation("Attempting to download file from {requestUrl} to path {destinationFilePath}", httpRequestMessage.RequestUri, destination);
             var response = await _httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseContentRead);
+            _logger.LogDebug("Got response from server, status code {response} - {reason}", response.StatusCode, response.ReasonPhrase);
             response.EnsureSuccessStatusCode();
 
             var contentLength = response.Content.Headers.ContentLength;

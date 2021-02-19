@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Dependencies;
@@ -10,6 +12,11 @@ using Husky.Core.TaskOptions.Scripting;
 using Husky.Core.TaskOptions.Utilities;
 using Husky.Core.Workflow;
 using Husky.Installer;
+using Serilog;
+using Serilog.Context;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace HuskyApp.Installer
 {   
@@ -18,8 +25,26 @@ namespace HuskyApp.Installer
         private static readonly HuskyStepConfiguration LunixConfiguration = new(OS.Linux);
         private static readonly HuskyStepConfiguration WindowsConfiguration = new(OS.Windows);
 
+        public static class LogConfiguration
+        {
+            public const string ConsoleTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}";
+            public const string FileTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}";
+            public static string FileDirectory = Path.GetTempPath();
+            public const string FileName = "HuskyApp_InstallLog.txt";
+
+            public static string LogPath => Path.Combine(FileDirectory, FileName);
+        }
+
         public static async Task Main(string[] args)
         {
+            var loggerConfiguration = new LoggerConfiguration()
+                                     .WriteTo.Console(LogEventLevel.Verbose, LogConfiguration.ConsoleTemplate, theme: SystemConsoleTheme.Colored)
+                                     .WriteTo.Async(a => a.File(LogConfiguration.LogPath, outputTemplate: LogConfiguration.FileTemplate, restrictedToMinimumLevel: LogEventLevel.Verbose));
+
+            var logger = loggerConfiguration.CreateLogger().ForContext(typeof(Program));
+            logger.Information("Husky & Logger Successfully Initialized");
+            logger.Debug("Husy started with args {args}", args);
+
             /*
              * Todo: When we fully flesh out the Source Generator pattern, we should likely remove this kind of thing from the users' visibility.
              *       Husky should elegantly manage its requisite startup _stuff_ (such as arg parsing) in generated classes,
@@ -28,10 +53,14 @@ namespace HuskyApp.Installer
              *       One possible solution is to find a way to give the user access to the ServiceProvider and possible allow some sort of Middleware
              *       that executes per-step, per-job, per-stage, etc..
              */
-            var installationSettings = new HuskyInstallerSettings();
+            var installationSettings = new HuskyInstallerSettings { LoggerConfiguration = loggerConfiguration };
             var argParsingResult = await installationSettings.LoadFromStartArgs(args);
+
+            logger.Information("Parsed installations settings with result {parseResult}", argParsingResult);
             if (argParsingResult != 0)
                 return;
+
+            logger.Debug("Finished parsing HuskyInstallerSettings: {@HuskyInstallerSettings}", installationSettings);
 
             //HelloWorldGenerated.HelloWorld.SayHello();
             const string linuxScript = @"
@@ -105,7 +134,27 @@ pause";
                                                                                      task => task.Target = "$variables.create-launch-file.create-launch-script.createdFileName"))
                                          ).Build();
 
-            await new HuskyInstaller(workflow, installationSettings).Execute();
+            var (numStages, numJobs, numTasks) = CountWorkflowItems(workflow);
+            logger.Information("Parsed HuskyWorkflow, found {numberOfStages} stages, {numberOfJobs} jobs, and {numberOfTasks} tasks.", numStages, numJobs, numTasks);
+            logger.Verbose("Workflow{newline}{@workflow}", workflow);
+
+            try
+            {
+                await new HuskyInstaller(workflow, installationSettings).Execute();
+            }
+            catch (Exception e)
+            {
+                logger.Fatal(e, "HuskyInstaller encoutnered an exception and was unable to recover -- exiting.");
+                logger.Fatal("Current platform:{newline}{currentPlatform}", CurrentPlatform.LongDescription);
+                logger.Fatal("Husky Workflow:{newline}{workFlow}", workflow);
+                throw;
+            }
+
+            // Todo: Wrap main in other method so app-wide concerns like this aren't messy
+            Log.CloseAndFlush();
         }
+
+        private static (int numStages, int numJobs, int numTasks) CountWorkflowItems(HuskyWorkflow workflow)
+            => (workflow.Stages.Count, workflow.Stages.Sum(s => s.Jobs.Count), workflow.Stages.Sum(s => s.Jobs.Sum(s2 => s2.Steps.Count)));
     }
 }

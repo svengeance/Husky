@@ -6,12 +6,14 @@ using Husky.Core.Dependencies;
 using Husky.Core.Enums;
 using Husky.Dependencies.DependencyAcquisitionMethods;
 using Husky.Services;
+using Microsoft.Extensions.Logging;
 using Version = SemVer.Version;
 
 namespace Husky.Dependencies.DependencyHandlers
 {
     public partial class DotNetDependencyHandler: DependencyHandler<DotNet>
     {
+        private readonly ILogger _logger;
         private readonly IShellExecutionService _shellExecutionService;
 
         /*
@@ -21,8 +23,9 @@ namespace Husky.Dependencies.DependencyHandlers
          *
          *       *sigh*. What did we sign up for. (:
          */
-        public DotNetDependencyHandler(IShellExecutionService shellExecutionService)
+        public DotNetDependencyHandler(ILogger<DotNetDependencyHandler> logger, IShellExecutionService shellExecutionService)
         {
+            _logger = logger;
             _shellExecutionService = shellExecutionService;
         }
 
@@ -46,6 +49,8 @@ namespace Husky.Dependencies.DependencyHandlers
                 : "--list-sdks";
 
             var (exitCode, stdOutput, _) = await _shellExecutionService.ExecuteShellCommand($"dotnet {command}");
+
+            _logger.LogDebug("Retrieved dotnet installation output using {command}{newline}{dotnetOutput}", command, stdOutput);
 
             return exitCode != 0
                 ? Array.Empty<string>()

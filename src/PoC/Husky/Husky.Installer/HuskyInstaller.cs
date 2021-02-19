@@ -12,6 +12,7 @@ using Husky.Installer.Extensions;
 using Husky.Services;
 using Husky.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Husky.Installer
 {
@@ -20,6 +21,8 @@ namespace Husky.Installer
         private readonly HuskyInstallerSettings _huskyInstallerSettings;
 
         private readonly HuskyWorkflow _workflow;
+
+        private ILogger _logger;
 
         public HuskyInstaller(HuskyWorkflow workflow, HuskyInstallerSettings installationSettings)
         {
@@ -34,8 +37,10 @@ namespace Husky.Installer
 
         public async ValueTask Execute()
         {
-            var serviceProvider = new ServiceCollection().AddHuskyInstaller(_huskyInstallerSettings, _workflow.Configuration);
             _workflow.Validate();
+
+            var serviceProvider = new ServiceCollection().AddHuskyInstaller(_huskyInstallerSettings, _workflow.Configuration);
+            _logger = serviceProvider.GetRequiredService<ILogger<HuskyInstaller>>();
 
             if (_huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Install || _huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Repair)
                 await InstallDependencies(serviceProvider);
@@ -103,6 +108,8 @@ namespace Husky.Installer
                 /*
                  * Todo: Best mechanism here to initiate a rollback? Most likely returning early and implementing logic in the root Install method
                  * That checks to determine if *any* step hasn't completed successfully, begin rollback
+                 *
+                 * Notes on rolling back: Reverse the current workflow, and rollback all tasks where executionstatus is error or completed.
                  */
                 throw;
             }
@@ -123,19 +130,22 @@ namespace Husky.Installer
 
         private async Task InstallDependencies(IServiceProvider serviceProvider)
         {
+            _logger.LogInformation("Analyzing {numberOfDependenciesToInstall} dependencies for potential installation", _workflow.Dependencies.Count);
             foreach (var dependency in _workflow.Dependencies)
             {
                 var dependencyHandler = GetDependencyHandler(dependency, serviceProvider);
                 if (await dependencyHandler.IsAlreadyInstalled(dependency))
                 {
-                    // Todo: Log installed
+                    _logger.LogInformation("Dependency {dependency} is already installed -- skipping", dependency.GetType().Name);
                 }
                 else
                 {
                     if (dependencyHandler.TrySatisfyDependency(dependency, out var acquisitionMethod))
                     {
+                        _logger.LogInformation("Successfully located a handler for {dependency}, attempting to install...", dependency.GetType().Name);
                         await acquisitionMethod.AcquireDependency(serviceProvider);
-                        // Todo: Verify installed (maybe call IsAlreadyInstalled again? :D
+                        _logger.LogDebug("Successfully installed dependency {dependency}", dependency.GetType().Name);
+                        // Todo: Verify installed (maybe call IsAlreadyInstalled again? :D)
                     }
                     else
                     {
