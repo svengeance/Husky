@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using FastMember;
+using Microsoft.Extensions.Logging;
 
 namespace Husky.Services
 {
@@ -20,13 +21,21 @@ namespace Husky.Services
     
     public class VariableResolverService: IVariableResolverService
     {
+        private readonly ILogger _logger;
         private static readonly Regex _varMatchingRegex = new(@"(?<!{){(\w|\.)+}");
-        
+
+        public VariableResolverService(ILogger<VariableResolverService> logger)
+        {
+            _logger = logger;
+        }
+
         /// <inheritdoc cref="IVariableResolverService"/>
         public void Resolve<T>(T obj, params IReadOnlyDictionary<string, string>[] variableSources)
         {
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
+
+            _logger.LogDebug("Attempting to resolve variables on object {object}", obj.GetType().Name);
 
             /*
              * Todo: We're not going to be able to use FastMember and
@@ -49,10 +58,12 @@ namespace Husky.Services
                                                           .Select(s => s.Value)
                                                           .ToArray();
 
+                _logger.LogDebug("Replacing variables {variables}", variablesToReplace);
                 var variableValues = variablesToReplace.Select(s => variableSources.Select(s2 => s2.TryGetValue(SanitizeVariableName(s), out var found) ? found : string.Empty)
                                                                                    .FirstOrDefault(f => f != string.Empty))
                                                        .ToList();
 
+                _logger.LogDebug("Loading values {values}", variableValues);
                 var sb = new StringBuilder(value);
                 for (var i = 0; i < variableValues.Count; i++)
                 {
@@ -64,6 +75,7 @@ namespace Husky.Services
                     sb.Replace(variablesToReplace[i], variableValue);
                 }
 
+                _logger.LogTrace("Setting {property} to {value}", property, sb.ToString());
                 accessor[obj, property] = sb.ToString();
             }
         }

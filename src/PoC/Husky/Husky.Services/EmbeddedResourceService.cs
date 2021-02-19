@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.Logging;
 
 namespace Husky.Services
 {
@@ -18,10 +19,18 @@ namespace Husky.Services
 
     public class EmbeddedResourceService : IEmbeddedResourceService
     {
+        private readonly ILogger _logger;
+
+        public EmbeddedResourceService(ILogger<EmbeddedResourceService> logger)
+        {
+            _logger = logger;
+        }
+
         public string[] ListResources(Assembly assembly) => assembly.GetManifestResourceNames();
         
         public IEnumerable<string> ListResources(Assembly assembly, string include)
         {
+            _logger.LogDebug("Locating resources in {assembly} that match pattern {includePattern}", assembly.FullName, include);
             var availableResources = ListResources(assembly);
 
             var matcher = new Matcher(StringComparison.InvariantCultureIgnoreCase);
