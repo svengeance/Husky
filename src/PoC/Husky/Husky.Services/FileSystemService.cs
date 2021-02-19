@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
+using Microsoft.Extensions.Logging;
 
 namespace Husky.Services
 {
@@ -20,15 +21,23 @@ namespace Husky.Services
 
     public class FileSystemService: IFileSystemService
     {
+        private readonly ILogger _logger;
         protected virtual string WindowsScriptFileExtension => ".cmd";
         protected virtual string LinuxScriptFileExtension => ".sh";
         protected virtual string OsxScriptFileExtension => ".sh";
 
+        public FileSystemService(ILogger<FileSystemService> logger)
+        {
+            _logger = logger;
+        }
+
         public DirectoryInfo CreateTempDirectory()
         {
+            _logger.LogDebug("Creating a temp directory");
             var directoryName = Path.GetRandomFileName();
             var directoryInfo = new DirectoryInfo(Path.Combine(Path.GetTempPath(), directoryName));
             directoryInfo.Create();
+            _logger.LogInformation("Temp directory created at {tempDirectoryPath}", directoryInfo.FullName);
 
             return directoryInfo;
         }
@@ -38,6 +47,8 @@ namespace Husky.Services
         {
             totalLength ??= 0L;
             filePath ??= Path.GetTempFileName();
+            _logger.LogInformation("Writing {totalLength} bytes to {filePath}", totalLength, filePath);
+
             var totalBytesRead = 0L;
             int bytesRead;
             var buffer = new byte[4 * 1024];

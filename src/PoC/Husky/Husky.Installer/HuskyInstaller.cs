@@ -139,10 +139,10 @@ namespace Husky.Installer
                     _logger.LogInformation("Dependency {dependency} is already installed -- skipping", dependency.GetType().Name);
                 }
                 else
-                {
+                {   // Todo: Introduce a service scope for each acquired dependency
                     if (dependencyHandler.TrySatisfyDependency(dependency, out var acquisitionMethod))
                     {
-                        _logger.LogInformation("Successfully located a handler for {dependency}, attempting to install...", dependency.GetType().Name);
+                        _logger.LogInformation("Successfully located a handler for {dependency}, attempting to install", dependency.GetType().Name);
                         await acquisitionMethod.AcquireDependency(serviceProvider);
                         _logger.LogDebug("Successfully installed dependency {dependency}", dependency.GetType().Name);
                         // Todo: Verify installed (maybe call IsAlreadyInstalled again? :D)
