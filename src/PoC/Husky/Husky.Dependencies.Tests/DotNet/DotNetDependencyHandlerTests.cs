@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Husky.Core.Enums;
 using Husky.Dependencies.DependencyHandlers;
 using Husky.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 
@@ -44,7 +45,7 @@ namespace Husky.Dependencies.Tests.DotNet
             _shellExecutionServiceMock.Setup(s => s.ExecuteShellCommand("dotnet --list-sdks"))
                                       .ReturnsAsync(new ShellExecutionService.ScriptExecutionResult(0, string.Join(Environment.NewLine, _sdkOutput), string.Empty));
 
-            _sut = new DotNetDependencyHandler(_shellExecutionServiceMock.Object);
+            _sut = new DotNetDependencyHandler(NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
         }
         
         [TestCase(FrameworkInstallationType.Runtime, "dotnet --list-runtimes")]

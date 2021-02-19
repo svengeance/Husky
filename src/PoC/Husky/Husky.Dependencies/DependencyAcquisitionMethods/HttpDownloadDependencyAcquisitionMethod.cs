@@ -6,6 +6,7 @@ using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
 using Husky.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 // ReSharper disable InconsistentNaming
 namespace Husky.Dependencies.DependencyAcquisitionMethods
@@ -44,10 +45,13 @@ namespace Husky.Dependencies.DependencyAcquisitionMethods
 
         public override async ValueTask AcquireDependency(IServiceProvider serviceProvider)
         {
+            var logger = serviceProvider.GetRequiredService<ILogger<HttpDownloadDependencyAcquisitionMethod<T>>>();
+            logger.LogInformation("Attempting to download dependency {dependency}", Dependency.GetType().Name);
+
             var httpService = serviceProvider.GetRequiredService<IHttpService>();
             var fileService = serviceProvider.GetRequiredService<IFileSystemService>();
             var shellExecutionService = serviceProvider.GetRequiredService<IShellExecutionService>();
-            
+
             var downloadFileDirectory = fileService.CreateTempDirectory();
             var downloadFileFullPath = Path.Combine(downloadFileDirectory.FullName, GetDownloadFileName());
             var downloadedFile = await httpService.DownloadFile(GetDownloadUrl(), downloadFileFullPath);

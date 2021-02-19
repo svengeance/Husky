@@ -7,7 +7,7 @@ using System.CommandLine.Parsing;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-
+using Serilog;
 using static Husky.Core.HuskyConstants.StepTags;
 
 namespace Husky.Installer
@@ -15,6 +15,7 @@ namespace Husky.Installer
     public class HuskyInstallerSettings
     {
         public IEnumerable<Assembly> ResolveModulesFromAssemblies { get; set; } = Array.Empty<Assembly>();
+        public LoggerConfiguration LoggerConfiguration { get; set; }
         public string TagToExecute { get; private set; } = string.Empty;
         // Todo: GH #18 - Make DryRun actually do something
         public bool IsDryRun { get; private set; }
