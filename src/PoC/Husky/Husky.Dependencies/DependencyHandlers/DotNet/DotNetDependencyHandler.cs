@@ -50,7 +50,7 @@ namespace Husky.Dependencies.DependencyHandlers
 
             var (exitCode, stdOutput, _) = await _shellExecutionService.ExecuteShellCommand($"dotnet {command}");
 
-            _logger.LogDebug("Retrieved dotnet installation output using {command}{newline}{dotnetOutput}", command, stdOutput);
+            _logger.LogDebug("Retrieved dotnet installation output using {command}\n{dotnetOutput}", command, stdOutput);
 
             return exitCode != 0
                 ? Array.Empty<string>()
