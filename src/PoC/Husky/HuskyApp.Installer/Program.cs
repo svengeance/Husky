@@ -16,6 +16,7 @@ using Serilog;
 using Serilog.Context;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Formatting.Json;
 using Serilog.Sinks.SystemConsole.Themes;
 
 namespace HuskyApp.Installer
@@ -30,19 +31,22 @@ namespace HuskyApp.Installer
             public const string ConsoleTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}";
             public const string FileTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}";
             public static string FileDirectory = Path.GetTempPath();
-            public const string FileName = "HuskyApp_InstallLog.txt";
+            public const string FileName = "HuskyApp_InstallLog";
 
-            public static string LogPath => Path.Combine(FileDirectory, FileName);
+            public static string JsonLogPath => Path.Combine(FileDirectory, FileName + ".json");
+            public static string FlatLogPath => Path.Combine(FileDirectory, FileName + ".txt");
         }
 
         public static async Task Main(string[] args)
         {
             var loggerConfiguration = new LoggerConfiguration()
                                      .WriteTo.Console(LogEventLevel.Verbose, LogConfiguration.ConsoleTemplate, theme: SystemConsoleTheme.Colored)
-                                     .WriteTo.Async(a => a.File(LogConfiguration.LogPath, outputTemplate: LogConfiguration.FileTemplate, restrictedToMinimumLevel: LogEventLevel.Verbose));
+                                     .WriteTo.Async(a => a.File(new JsonFormatter(), path: LogConfiguration.JsonLogPath, restrictedToMinimumLevel: LogEventLevel.Verbose))
+                                     .WriteTo.Async(a => a.File(path: LogConfiguration.FlatLogPath, outputTemplate: LogConfiguration.FileTemplate, restrictedToMinimumLevel: LogEventLevel.Verbose));
 
             var logger = loggerConfiguration.CreateLogger().ForContext(typeof(Program));
             logger.Information("Husky & Logger Successfully Initialized");
+            logger.Debug("Logging to {loggerFilePath}", LogConfiguration.JsonLogPath);
             logger.Debug("Husy started with args {args}", args);
 
             /*
@@ -135,7 +139,7 @@ pause";
                                          ).Build();
 
             var (numStages, numJobs, numTasks) = CountWorkflowItems(workflow);
-            logger.Information("Parsed HuskyWorkflow, found {numberOfStages} stages, {numberOfJobs} jobs, and {numberOfTasks} tasks.", numStages, numJobs, numTasks);
+            logger.Information("Parsed HuskyWorkflow, found {numberOfStages} stages, {numberOfJobs} jobs, and {numberOfTasks} tasks", numStages, numJobs, numTasks);
             logger.Verbose("Workflow{newline}{@workflow}", workflow);
 
             try
@@ -144,7 +148,7 @@ pause";
             }
             catch (Exception e)
             {
-                logger.Fatal(e, "HuskyInstaller encoutnered an exception and was unable to recover -- exiting.");
+                logger.Fatal(e, "HuskyInstaller encoutnered an exception and was unable to recover -- exiting");
                 logger.Fatal("Current platform:{newline}{currentPlatform}", CurrentPlatform.LongDescription);
                 logger.Fatal("Husky Workflow:{newline}{workFlow}", workflow);
                 throw;
