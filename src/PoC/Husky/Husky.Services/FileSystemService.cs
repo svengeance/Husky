@@ -54,6 +54,7 @@ namespace Husky.Services
             var buffer = new byte[4 * 1024];
 
             await using var fs = File.OpenWrite(filePath);
+            _logger.LogDebug($"Opened file {filePath} for writing", filePath);
 
             while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) != 0)
             {
@@ -62,7 +63,8 @@ namespace Husky.Services
                 bytesWrittenProgress?.Report(new FileWriteProgress((long) totalLength, totalBytesRead));
             }
 
-            // Todo: Verify file was written && log otherwise
+            _logger.LogInformation("Finished writing {totalBytesRead} bytes out of {totalLength} to file {filePath}", totalBytesRead, totalLength, filePath);
+
             return new FileInfo(filePath);
         }
 
@@ -71,16 +73,25 @@ namespace Husky.Services
          */
         public async ValueTask<string> CreateScriptFile(string destinationDirectory, string fileName, string script)
         {
+            _logger.LogInformation("Creating a script file at {destinationDirectory} with file name {fileName} writing script:\n{script}", destinationDirectory, fileName, script);
             var destFileInfo = new FileInfo(Path.Combine(destinationDirectory, fileName + GetScriptFileExtension()));
             var destDirInfo = new DirectoryInfo(destinationDirectory);
-
-            if (destDirInfo.Parent is not null && !destDirInfo.Exists) // If we're not a root directory..
+            
+            if (destDirInfo.Parent is not null && !destDirInfo.Exists) // If we're not a root directory.. 
+            {
+                _logger.LogDebug("Directory {destinationDirectory} did not exist, creating");
                 destDirInfo.Create();
+            }
 
+            _logger.LogTrace("Creating script file for writing");
             await using var fileWriter = new StreamWriter(destFileInfo.Create());
+
+            _logger.LogTrace("Writing script to file");
             await fileWriter.WriteAsync(script);
 
             destFileInfo.Refresh();
+
+            _logger.LogInformation("Created script file {scriptFile} of size {scriptFileSizeBytes}", destFileInfo.FullName, destFileInfo.Length);
             return destFileInfo.FullName;
         }
 

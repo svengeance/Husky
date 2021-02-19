@@ -4,6 +4,7 @@ using CliWrap.Buffered;
 using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
+using Microsoft.Extensions.Logging;
 
 namespace Husky.Services
 {
@@ -27,24 +28,38 @@ namespace Husky.Services
         private const string WindowsShellFileName = "cmd.exe";
         private const string LinuxShellFileName = "/bin/sh";
         private const string OsxShellFileName = "/bin/sh";
+        
+        private readonly ILogger _logger;
+
+        public ShellExecutionService(ILogger<ShellExecutionService> logger)
+        {
+            _logger = logger;
+        }
 
         public async ValueTask<ScriptExecutionResult> ExecuteShellCommand(string command)
         {
+            _logger.LogInformation("Executing shell command {command}", command);
             var commandResult = await Cli.Wrap(GetShellFileName())
                                          .WithArguments($"{GetShellExecuteAndTerminateArg()} {command}")
                                          .ExecuteBufferedAsync();
 
-            return new ScriptExecutionResult(commandResult.ExitCode, commandResult.StandardOutput, commandResult.StandardError);
+            var scriptExecutionResult = new ScriptExecutionResult(commandResult.ExitCode, commandResult.StandardOutput, commandResult.StandardError);
+            scriptExecutionResult.LogResult(_logger);
+            
+            return scriptExecutionResult;
         }
 
         public async ValueTask<ScriptExecutionResult> ExecuteFile(string filePath, string args)
         {
             // Todo: Going to need a non buffered version so we're not storing all of stdout in memory
+            _logger.LogInformation("Executing file {filePath} with args command {command}", filePath, args);
             var commandResult = await Cli.Wrap(filePath)
                                          .WithArguments(args)
                                          .ExecuteBufferedAsync();
 
-            return new ScriptExecutionResult(commandResult.ExitCode, commandResult.StandardOutput, commandResult.StandardError);
+            var scriptExecutionResult = new ScriptExecutionResult(commandResult.ExitCode, commandResult.StandardOutput, commandResult.StandardError);
+            scriptExecutionResult.LogResult(_logger);
+            return scriptExecutionResult;
         }
 
         public string GetShellExecuteAndTerminateArg()
@@ -66,6 +81,13 @@ namespace Husky.Services
         public record ScriptExecutionResult(int ExitCode, string StdOutput, string StdError)
         {
             public bool WasSuccessful => ExitCode == 0;
+
+            public void LogResult(ILogger logger)
+            {
+                logger.LogInformation("Executed shell command with exit code {exitCode}", ExitCode);
+                logger.LogDebug("Shell execution resulted in the following StdOutput:\n{standardOutput}", StdOutput);
+                logger.LogDebug("Shell execution resulted in the following StdError:\n{standardError}", StdError);
+            }
         }
     }
 }
