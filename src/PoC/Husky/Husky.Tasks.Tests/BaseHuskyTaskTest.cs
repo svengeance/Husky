@@ -7,6 +7,7 @@ using FluentValidation;
 using Husky.Core;
 using Husky.Core.Platform;
 using Husky.Core.Workflow;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 
@@ -43,7 +44,7 @@ namespace Husky.Tasks.Tests
 
         protected abstract void ConfigureHusky(HuskyConfiguration huskyConfiguration);
 
-        protected virtual InstallationContext CreateDefaultInstallationContext() => new(Assembly.GetExecutingAssembly());
+        protected virtual InstallationContext CreateDefaultInstallationContext() => new(NullLogger<InstallationContext>.Instance, Assembly.GetExecutingAssembly());
 
         protected abstract HuskyTaskConfiguration CreateDefaultTaskConfiguration();
 

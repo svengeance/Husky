@@ -6,6 +6,7 @@ using Husky.Services.Extensions;
 using Husky.Tasks;
 using Husky.Tasks.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace Husky.Installer.Extensions
@@ -18,7 +19,7 @@ namespace Husky.Installer.Extensions
                 HuskyTaskResolver.AddAssemblyForScanning(externalAssembly);
 
             serviceCollection.AddLogging(logging => logging.AddSerilog());
-            serviceCollection.AddScoped(svc => new InstallationContext(Assembly.GetEntryAssembly()!));
+            serviceCollection.AddScoped(svc => new InstallationContext(svc.GetRequiredService<ILogger<InstallationContext>>(), Assembly.GetEntryAssembly()!));
             serviceCollection.AddHuskyDependencies();
             serviceCollection.AddHuskyServices();
             serviceCollection.AddHuskyTasks();

@@ -28,8 +28,8 @@ namespace HuskyApp.Installer
 
         public static class LogConfiguration
         {
-            public const string ConsoleTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}";
-            public const string FileTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}";
+            public const string ConsoleTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Stage}{Job}{Task}({SourceContext}) {Message}{NewLine}{Exception}";
+            public const string FileTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Stage}{Job}{Task}({SourceContext}) {Message}{NewLine}{Exception}";
             public static string FileDirectory = Path.GetTempPath();
             public const string FileName = "HuskyApp_InstallLog";
 
