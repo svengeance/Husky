@@ -14,7 +14,7 @@ namespace Husky.Core
         public TimeSpan Duration => StartTime == null
             ? TimeSpan.Zero
             : StopTime == null
-                ? TimeSpan.MaxValue
+                ? DateTime.Now - StartTime.Value
                 : StartTime.Value - StopTime.Value;
 
         public void Start()
@@ -34,5 +34,15 @@ namespace Husky.Core
             StopTime = DateTime.Now;
             ExecutionStatus = ExecutionStatus.Error;
         }
+
+        public override string ToString()
+            => ExecutionStatus switch
+               {
+                   ExecutionStatus.NotStarted => "Awaiting execution",
+                   ExecutionStatus.Started    => $"Currently executing, {Duration:g} elapsed",
+                   ExecutionStatus.Completed  => $"Completed execution, {Duration:g} elapsed",
+                   ExecutionStatus.Error      => $"Errored during execution, {Duration:g} elapsed",
+                   _                          => "Unknown state"
+               };
     }
 }

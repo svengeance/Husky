@@ -13,6 +13,7 @@ using Husky.Services;
 using Husky.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog.Context;
 
 namespace Husky.Installer
 {
@@ -47,6 +48,8 @@ namespace Husky.Installer
 
             foreach (var stage in _workflow.Stages)
             {
+                using var stageScope = LogContext.PushProperty("Stage", stage.Name + ".");
+                _logger.LogInformation("Executing stage {stage}", stage.Name);
                 var scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
                 using var scope = scopeFactory.CreateScope();
                 await ExecuteStage(stage, scope.ServiceProvider);
@@ -57,6 +60,8 @@ namespace Husky.Installer
         {
             foreach (var job in stage.Jobs)
             {
+                _logger.LogInformation("Executing job {job}", job.Name);
+                using var jobScope = LogContext.PushProperty("Job", job.Name + ".");
                 var installationContext = services.GetRequiredService<InstallationContext>();
                 installationContext.CurrentJobName = job.Name;
 
@@ -69,6 +74,8 @@ namespace Husky.Installer
             var stepsToExecute = job.Steps.Where(w => w.HuskyStepConfiguration.Os == CurrentPlatform.OS && w.HuskyStepConfiguration.Tags.Contains(_huskyInstallerSettings.TagToExecute));
             foreach (var step in stepsToExecute)
             {
+                _logger.LogInformation("Executing step {step}", step.Name);
+                using var stepScope = LogContext.PushProperty("Step", step.Name + ":");
                 installationContext.CurrentStepName = step.Name;
 
                 await ExecuteStep(step, installationContext, services);
@@ -85,6 +92,7 @@ namespace Husky.Installer
             */
             var taskType = HuskyTaskResolver.GetTaskForConfiguration(step.HuskyTaskConfiguration);
             var task = Unsafe.As<HuskyTask<T>>(services.GetRequiredService(taskType));
+            _logger.LogDebug("Loaded task {task} for step {step}", taskType.Name, step.GetType().Name);
 
             var variableResolver = services.GetRequiredService<IVariableResolverService>();
             variableResolver.Resolve(step.HuskyTaskConfiguration, installationContext.Variables, _workflow.Variables, HuskyVariables.AsDictionary());
@@ -102,8 +110,9 @@ namespace Husky.Installer
             {
                 await ExecuteTask(task);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e, "Failed to execute {step}");
                 step.ExecutionInformation.Fail();
                 /*
                  * Todo: Best mechanism here to initiate a rollback? Most likely returning early and implementing logic in the root Install method
@@ -113,11 +122,16 @@ namespace Husky.Installer
                  */
                 throw;
             }
+            finally
+            {
+                _logger.LogInformation("Executed {step} with result: {executionResult}", step.Name, step.ExecutionInformation.ToString());
+            }
             step.ExecutionInformation.Finish();
         }
 
-        private static ValueTask ExecuteTask<T>(HuskyTask<T> task) where T : HuskyTaskConfiguration
+        private ValueTask ExecuteTask<T>(HuskyTask<T> task) where T : HuskyTaskConfiguration
         {
+            _logger.LogDebug("Beginning execution of {task}", task.GetType().Name);
             return task.Execute();
         }
 
