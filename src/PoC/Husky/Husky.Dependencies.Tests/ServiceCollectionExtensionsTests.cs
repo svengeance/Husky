@@ -18,7 +18,7 @@ namespace Husky.Dependencies.Test
             CollectionAssert.IsNotEmpty(serviceCollection);
             
             foreach (var descriptor in serviceCollection)
-                Console.WriteLine($"Registered {descriptor.ImplementationType} as {descriptor.ServiceType}");
+                Console.WriteLine($"Registered {descriptor.ServiceType} as {descriptor.ImplementationType}");
         }
     }
 }

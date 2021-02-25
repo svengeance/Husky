@@ -63,7 +63,7 @@ namespace Husky.Services
                 bytesWrittenProgress?.Report(new FileWriteProgress((long) totalLength, totalBytesRead));
             }
 
-            _logger.LogInformation("Finished writing {totalBytesRead} bytes out of {totalLength} to file {filePath}", totalBytesRead, totalLength, filePath);
+            _logger.LogInformation("Wrote {totalBytesRead}/{totalLength} bytes to file {filePath}", totalBytesRead, totalLength, filePath);
 
             return new FileInfo(filePath);
         }

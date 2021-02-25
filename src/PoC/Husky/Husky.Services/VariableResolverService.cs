@@ -22,7 +22,7 @@ namespace Husky.Services
     public class VariableResolverService: IVariableResolverService
     {
         private readonly ILogger _logger;
-        private static readonly Regex _varMatchingRegex = new(@"(?<!{){(\w|\.)+}");
+        private static readonly Regex _varMatchingRegex = new(@"(?<!{){(\w|\.|-)+}");
 
         public VariableResolverService(ILogger<VariableResolverService> logger)
         {
@@ -33,9 +33,14 @@ namespace Husky.Services
         public void Resolve<T>(T obj, params IReadOnlyDictionary<string, string>[] variableSources)
         {
             if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
+                throw new ArgumentNullException(nameof(obj));   
 
-            _logger.LogDebug("Attempting to resolve variables on object {object}", obj.GetType().Name);
+            _logger.LogDebug("Attempting to resolve variables on {object} with {sourcesCount} sources", obj.GetType().Name, variableSources.Length);
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                var variables = new StringBuilder().AppendJoin(Environment.NewLine, variableSources.SelectMany(s => s.Select(s2 => $"{s2.Key}:{s2.Value}"))).ToString();
+                _logger.LogTrace("Variable sources include {variables}", variables);
+            }
 
             /*
              * Todo: We're not going to be able to use FastMember and
@@ -57,6 +62,12 @@ namespace Husky.Services
                 var variablesToReplace = _varMatchingRegex.Matches(value)
                                                           .Select(s => s.Value)
                                                           .ToArray();
+
+                if (variablesToReplace.Length == 0)
+                {
+                    _logger.LogDebug("No variables to replace");
+                    return;
+                }
 
                 _logger.LogDebug("Replacing variables {variables}", variablesToReplace);
                 var variableValues = variablesToReplace.Select(s => variableSources.Select(s2 => s2.TryGetValue(SanitizeVariableName(s), out var found) ? found : string.Empty)
