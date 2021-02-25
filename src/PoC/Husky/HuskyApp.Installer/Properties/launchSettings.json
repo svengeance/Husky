@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "HuskyApp.Installer": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+version: "3"
+services:
+
+  installer:
+    command: 'install'
+    build:
+      context: .
+      dockerfile: ./HuskyApp.Installer/dockerfile
+    depends_on:
+      - "seq"
+
+  seq:
+    build:
+      context: ./Seq.Windows
+      args:
+        - SEQ_VERSION=2021.1.5307
+    ports:
+      - "80:80"
+      - "5341:5341"
+    environment:
+      - ACCEPT_EULA=Y
