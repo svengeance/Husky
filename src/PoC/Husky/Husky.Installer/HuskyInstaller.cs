@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Husky.Core;
@@ -42,9 +44,15 @@ namespace Husky.Installer
 
             var serviceProvider = new ServiceCollection().AddHuskyInstaller(_huskyInstallerSettings, _workflow.Configuration);
             _logger = serviceProvider.GetRequiredService<ILogger<HuskyInstaller>>();
+            _logger.LogDebug("Constructed ServiceProvider");
 
-            if (_huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Install || _huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Repair)
-                await InstallDependencies(serviceProvider);
+            if (_huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Install ||
+                _huskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Repair)
+            {
+                var scopeProvider = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+                using var scope = scopeProvider.CreateScope();
+                await InstallDependencies(scope.ServiceProvider);
+            }
 
             foreach (var stage in _workflow.Stages)
             {
@@ -112,7 +120,7 @@ namespace Husky.Installer
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to execute {step}");
+                _logger.LogError(e, "Failed to execute {step}", step.Name);
                 step.ExecutionInformation.Fail();
                 /*
                  * Todo: Best mechanism here to initiate a rollback? Most likely returning early and implementing logic in the root Install method
@@ -135,11 +143,10 @@ namespace Husky.Installer
             return task.Execute();
         }
 
-        private static IDependencyHandler<HuskyDependency> GetDependencyHandler(HuskyDependency dependency, IServiceProvider serviceProvider)
+        private static IDependencyHandler GetDependencyHandler(HuskyDependency dependency, IServiceProvider serviceProvider)
         {
-            var dependencyType = dependency.GetType();
-            var dependencyHandlerType = typeof(IDependencyHandler<>).MakeGenericType(dependencyType);
-            return (IDependencyHandler<HuskyDependency>)serviceProvider.GetRequiredService(dependencyHandlerType);
+            var dependencyHandlerResolver = serviceProvider.GetRequiredService<IDependencyHandlerResolver>();
+            return dependencyHandlerResolver.Resolve(dependency);
         }
 
         private async Task InstallDependencies(IServiceProvider serviceProvider)
@@ -148,17 +155,18 @@ namespace Husky.Installer
             foreach (var dependency in _workflow.Dependencies)
             {
                 var dependencyHandler = GetDependencyHandler(dependency, serviceProvider);
-                if (await dependencyHandler.IsAlreadyInstalled(dependency))
+                if (await dependencyHandler.IsAlreadyInstalled())
                 {
                     _logger.LogInformation("Dependency {dependency} is already installed -- skipping", dependency.GetType().Name);
                 }
                 else
-                {   // Todo: Introduce a service scope for each acquired dependency
-                    if (dependencyHandler.TrySatisfyDependency(dependency, out var acquisitionMethod))
+                {
+                    if (dependencyHandler.TrySatisfyDependency(out var acquisitionMethod))
                     {
                         _logger.LogInformation("Successfully located a handler for {dependency}, attempting to install", dependency.GetType().Name);
                         await acquisitionMethod.AcquireDependency(serviceProvider);
                         _logger.LogDebug("Successfully installed dependency {dependency}", dependency.GetType().Name);
+                        
                         // Todo: Verify installed (maybe call IsAlreadyInstalled again? :D)
                     }
                     else

@@ -27,12 +27,12 @@ namespace Husky.Dependencies.DependencyHandlers
                 DownloadedFileName_x86 = @"windowsdesktop-runtime-5.0.1-win-x86.exe",
                 InstallationArguments = PassiveInstallArgs
             },
-            new HttpDownloadDependencyAcquisitionMethod<DotNet>(new("5.0.1", FrameworkInstallationType.Runtime, DotNet.RuntimeKind.Desktop))
+            new HttpDownloadDependencyAcquisitionMethod<DotNet>(new("5.0.1", FrameworkInstallationType.Runtime, DotNet.RuntimeKind.AspNet))
             {
-                DownloadUrl_x64 = @"https://download.visualstudio.microsoft.com/download/pr/c6a74d6b-576c-4ab0-bf55-d46d45610730/f70d2252c9f452c2eb679b8041846466/windowsdesktop-runtime-5.0.1-win-x64.exe",
-                DownloadUrl_x86 = @"https://download.visualstudio.microsoft.com/download/pr/55bb1094-db40-411d-8a37-21186e9495ef/1a045e29541b7516527728b973f0fdef/windowsdesktop-runtime-5.0.1-win-x86.exe",
-                DownloadedFileName_x64 = @"windowsdesktop-runtime-5.0.1-win-x64.exe",
-                DownloadedFileName_x86 = @"windowsdesktop-runtime-5.0.1-win-x86.exe",
+                DownloadUrl_x64 = @"https://download.visualstudio.microsoft.com/download/pr/dff39ddb-b399-43c5-9af0-04875134ce04/1c449bb9ad4cf75ec616482854751069/dotnet-hosting-5.0.3-win.exe",
+                DownloadUrl_x86 = @"https://download.visualstudio.microsoft.com/download/pr/dff39ddb-b399-43c5-9af0-04875134ce04/1c449bb9ad4cf75ec616482854751069/dotnet-hosting-5.0.3-win.exe",
+                DownloadedFileName_x64 = @"dotnet-hosting-5.0.3-win.exe",
+                DownloadedFileName_x86 = @"dotnet-hosting-5.0.3-win.exe",
                 InstallationArguments = PassiveInstallArgs
             }
         };

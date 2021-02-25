@@ -10,11 +10,18 @@ using Husky.Core.Platform;
 
 namespace Husky.Dependencies
 {
-    public abstract class DependencyHandler<T>: IDependencyHandler<T> where T: HuskyDependency
+    public abstract class DependencyHandler<T>: IDependencyHandler where T: HuskyDependency
     {
-        public bool TrySatisfyDependency(T dependency, [NotNullWhen(true)] out DependencyAcquisitionMethod<T>? acquisitionMethod)
+        protected readonly T Dependency;
+
+        protected DependencyHandler(T dependency)
         {
-            acquisitionMethod = GetAvailableDependenciesForCurrentPlatform(dependency).FirstOrDefault(f => f.SatisfiesDependency(dependency));
+            Dependency = dependency;
+        }
+
+        public bool TrySatisfyDependency([NotNullWhen(true)] out IDependencyAcquisitionMethod<HuskyDependency>? acquisitionMethod)
+        {
+            acquisitionMethod = GetAvailableDependenciesForCurrentPlatform().FirstOrDefault(f => f.SatisfiesDependency(Dependency));
 
             return acquisitionMethod != null;
         }
@@ -23,15 +30,15 @@ namespace Husky.Dependencies
         protected abstract IEnumerable<DependencyAcquisitionMethod<T>> GetAvailableLinuxDependencies(T dependency);
         protected abstract IEnumerable<DependencyAcquisitionMethod<T>> GetAvailableOsxDependencies(T dependency);
 
-        private IEnumerable<DependencyAcquisitionMethod<T>> GetAvailableDependenciesForCurrentPlatform(T dependency)
+        private IEnumerable<DependencyAcquisitionMethod<T>> GetAvailableDependenciesForCurrentPlatform()
             => CurrentPlatform.OS switch
                {
-                   OS.Windows => GetAvailableWindowsDependencies(dependency),
-                   OS.Linux   => GetAvailableLinuxDependencies(dependency),
-                   OS.Osx     => GetAvailableOsxDependencies(dependency),
+                   OS.Windows => GetAvailableWindowsDependencies(Dependency),
+                   OS.Linux   => GetAvailableLinuxDependencies(Dependency),
+                   OS.Osx     => GetAvailableOsxDependencies(Dependency),
                    _          => throw new PlatformNotSupportedException($"Cannot install dependencies for unknown OS: {CurrentPlatform.LongDescription}")
                };
 
-        public abstract ValueTask<bool> IsAlreadyInstalled(T dependency);
+        public abstract ValueTask<bool> IsAlreadyInstalled();
     }
 }

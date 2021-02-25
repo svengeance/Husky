@@ -31,7 +31,6 @@ namespace Husky.Dependencies.Tests.DotNet
             @"3.1.405 [C:\Program Files\dotnet\sdk"
         };
 
-        private DotNetDependencyHandler _sut = null!;
         private Mock<IShellExecutionService> _shellExecutionServiceMock = null!;
 
         [SetUp]
@@ -45,7 +44,6 @@ namespace Husky.Dependencies.Tests.DotNet
             _shellExecutionServiceMock.Setup(s => s.ExecuteShellCommand("dotnet --list-sdks"))
                                       .ReturnsAsync(new ShellExecutionService.ScriptExecutionResult(0, string.Join(Environment.NewLine, _sdkOutput), string.Empty));
 
-            _sut = new DotNetDependencyHandler(NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
         }
         
         [TestCase(FrameworkInstallationType.Runtime, "dotnet --list-runtimes")]
@@ -61,8 +59,10 @@ namespace Husky.Dependencies.Tests.DotNet
                 ? Core.Dependencies.DotNet.RuntimeKind.AspNet
                 : Core.Dependencies.DotNet.RuntimeKind.Sdk);
             
+            var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
+            
             // Act
-            _ = _sut.IsAlreadyInstalled(dependency);
+            _ = sut.IsAlreadyInstalled();
             
             // Assert
             _shellExecutionServiceMock.Verify(v => v.ExecuteShellCommand(expectedCommand), Times.Once);
@@ -73,13 +73,14 @@ namespace Husky.Dependencies.Tests.DotNet
         [TestCase("<2.2.0", false)]
         [TestCase("3.1.x", true)]
         [Category("UnitTest")]
-        public async ValueTask Dotnet_handler_identifies_installed_sdk(string range, bool expectedIsInstalledResult)
+        public async Task Dotnet_handler_identifies_installed_sdk(string range, bool expectedIsInstalledResult)
         {
             // Arrange
             var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallationType.Sdk);
+            var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
 
             // Act
-            var isInstalled = await _sut.IsAlreadyInstalled(dependency);
+            var isInstalled = await sut.IsAlreadyInstalled();
 
             // Assert
             Assert.AreEqual(expectedIsInstalledResult, isInstalled);
@@ -89,16 +90,33 @@ namespace Husky.Dependencies.Tests.DotNet
         [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeKind.RuntimeOnly, true)]
         [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeKind.Desktop, false)]
         [Category("UnitTest")]
-        public async ValueTask Dotnet_handler_identifies_installed_runtime(string range, Core.Dependencies.DotNet.RuntimeKind runtimeKind, bool expectedIsInstalledResult)
+        public async Task Dotnet_handler_identifies_installed_runtime(string range, Core.Dependencies.DotNet.RuntimeKind runtimeKind, bool expectedIsInstalledResult)
         {
             // Arrange
             var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallationType.Runtime, runtimeKind);
+            var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
 
             // Act
-            var isInstalled = await _sut.IsAlreadyInstalled(dependency);
+            var isInstalled = await sut.IsAlreadyInstalled();
 
             // Assert
             Assert.AreEqual(expectedIsInstalledResult, isInstalled);
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        public void Dotnet_handler_sastisfies_dotnet_aspnet_runtime_v5_dependency()
+        {
+            // Arrange
+            var dependency = new Core.Dependencies.DotNet(">=5", FrameworkInstallationType.Runtime, Core.Dependencies.DotNet.RuntimeKind.AspNet);
+            var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
+
+            // Act
+            var satisfiesDependency = sut.TrySatisfyDependency(out var acquisitionMethod);
+
+            // Assert
+            Assert.True(satisfiesDependency);
+            Assert.NotNull(acquisitionMethod);
         }
     }
 }

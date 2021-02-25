@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.Dependencies;
@@ -23,7 +24,7 @@ namespace Husky.Dependencies.DependencyHandlers
          *
          *       *sigh*. What did we sign up for. (:
          */
-        public DotNetDependencyHandler(ILogger<DotNetDependencyHandler> logger, IShellExecutionService shellExecutionService)
+        public DotNetDependencyHandler(DotNet dependency, ILogger<DotNetDependencyHandler> logger, IShellExecutionService shellExecutionService): base(dependency)
         {
             _logger = logger;
             _shellExecutionService = shellExecutionService;
@@ -31,8 +32,8 @@ namespace Husky.Dependencies.DependencyHandlers
 
         protected override IEnumerable<DependencyAcquisitionMethod<DotNet>> GetAvailableOsxDependencies(DotNet dependency) => Array.Empty<DependencyAcquisitionMethod<DotNet>>();
 
-        public override async ValueTask<bool> IsAlreadyInstalled(DotNet dependency)
-            => IsAlreadyInstalled(dependency, await GetDotnetInstallationOutput(dependency.FrameworkType));
+        public override async ValueTask<bool> IsAlreadyInstalled()
+            => IsAlreadyInstalled(Dependency, await GetDotnetInstallationOutput(Dependency.FrameworkType));
 
         private bool IsAlreadyInstalled(DotNet dependency, string[] splitDotnetOutput)
             => dependency.FrameworkType switch
@@ -54,12 +55,12 @@ namespace Husky.Dependencies.DependencyHandlers
 
             return exitCode != 0
                 ? Array.Empty<string>()
-                : stdOutput.Split(Environment.NewLine);
+                : stdOutput.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         }
 
         // 5.0.100 [C:\Program Files\dotnet\sdk]
         private Version[] GetInstalledSdks(string[] dotnetSdksList)
-            => dotnetSdksList.Select(s => s.Substring(0, s.IndexOf(' ')))
+            => dotnetSdksList.Select(s => s[..s.IndexOf(' ')])
                              .Select(s => Version.Parse(s))
                              .ToArray();
 
@@ -67,7 +68,13 @@ namespace Husky.Dependencies.DependencyHandlers
         // Microsoft.NETCore.App 2.1.23 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
         private (DotNet.RuntimeKind runtimeKind, Version version)[] GetInstalledRuntimes(IEnumerable<string> dotnetRuntimesList)
             => dotnetRuntimesList.Select(s => s.Split(' '))
-                                 .Select(s => (DeriveRuntimeKindFromString(s[0].Split('.')[1]), Version.Parse(s[1])))
+                                 .Select(s =>
+                                  {
+                                      var kindString = s[0].Split('.')[1];
+                                      var version = Version.Parse(s[1]);
+                                      _logger.LogInformation("Kind {Kind}, Version {Version}", kindString, version);
+                                      return (DeriveRuntimeKindFromString(kindString), version);
+                                  })
                                  .ToArray();
 
         private DotNet.RuntimeKind DeriveRuntimeKindFromString(string dotnetRuntimeKindOutput)

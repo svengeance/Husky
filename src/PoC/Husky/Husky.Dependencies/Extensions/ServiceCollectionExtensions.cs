@@ -9,6 +9,8 @@ namespace Husky.Dependencies.Extensions
     {
         public static void AddHuskyDependencies(this IServiceCollection services)
         {
+            services.AddScoped<IDependencyHandlerResolver, DependencyHandlerResolver>();
+
             var huskyDependencies = Assembly.GetExecutingAssembly()
                                             .GetExportedTypes()
                                             .Where(w => w.BaseType?.IsGenericType == true &&
