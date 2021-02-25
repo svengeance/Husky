@@ -13,7 +13,7 @@ namespace Husky.Tasks
         public Assembly InstallationAssembly { get; }
 
         public IReadOnlyDictionary<string, string> Variables => _variables;
-        private readonly Dictionary<string, string> _variables = new();
+        private readonly Dictionary<string, string> _variables = new(StringComparer.OrdinalIgnoreCase);
 
         private readonly ILogger _logger;
 

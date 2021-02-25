@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Husky.Core
@@ -11,7 +12,7 @@ namespace Husky.Core
          */
         public static IReadOnlyDictionary<string, string> AsDictionary()
         {
-            return new Dictionary<string, string>
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
                 [$"{nameof(Folders)}.{nameof(Folders.ProgramFiles)}"] = Folders.ProgramFiles,
                 [$"{nameof(Folders)}.{nameof(Folders.Desktop)}"] = Folders.Desktop
