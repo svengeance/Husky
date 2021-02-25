@@ -20,7 +20,7 @@ namespace Husky.Tasks.Scripting
         protected override async ValueTask ExecuteTask()
         {
             var createdScriptFile = await _fileSystemService.CreateScriptFile(Configuration.Directory, Configuration.FileName, Configuration.Script);
-            InstallationContext.SetVariable("CreatedFileName", createdScriptFile);
+            InstallationContext.SetVariable("createdFileName", createdScriptFile);
         }
 
         protected override ValueTask RollbackTask()

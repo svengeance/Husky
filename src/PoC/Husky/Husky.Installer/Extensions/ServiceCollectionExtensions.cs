@@ -27,7 +27,13 @@ namespace Husky.Installer.Extensions
             foreach (var configurationBlock in huskyConfiguration.GetConfigurationBlocks())
                 serviceCollection.AddSingleton(configurationBlock.GetType(), configurationBlock);
 
-            return serviceCollection.BuildServiceProvider(validateScopes: true);
+            var serviceProvider = serviceCollection.BuildServiceProvider(validateScopes: true);
+
+            var logger = serviceProvider.GetRequiredService<ILogger<HuskyInstaller>>();
+            foreach (var service in serviceCollection)
+                logger.LogTrace("Registered {service} implemented by {implementation} as {lifetime}", service.ServiceType, service.ImplementationType?.ToString() ?? "Factory", service.Lifetime);
+
+            return serviceProvider;
         }
     }
 }
