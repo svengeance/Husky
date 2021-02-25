@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Dependencies;
@@ -33,21 +36,50 @@ namespace HuskyApp.Installer
             public static string FileDirectory = Path.GetTempPath();
             public const string FileName = "HuskyApp_InstallLog";
 
+            public const string SeqHttpUrl = "http://seq:5341";
+
             public static string JsonLogPath => Path.Combine(FileDirectory, FileName + ".json");
             public static string FlatLogPath => Path.Combine(FileDirectory, FileName + ".txt");
         }
 
         public static async Task Main(string[] args)
         {
+            // Todo: Implement LoggingLevelSwitch (https://stackoverflow.com/questions/25477415/how-can-i-reconfigure-serilog-without-restarting-the-application)
             var loggerConfiguration = new LoggerConfiguration()
+                                     .MinimumLevel.Verbose()
+                                     .Destructure.AsScalar<DirectoryInfo>()
+                                     .WriteTo.Seq(LogConfiguration.SeqHttpUrl) // Todo: Only Seq-by-default if debug, and configure URL from env vars
                                      .WriteTo.Console(LogEventLevel.Verbose, LogConfiguration.ConsoleTemplate, theme: SystemConsoleTheme.Colored)
                                      .WriteTo.Async(a => a.File(new JsonFormatter(), path: LogConfiguration.JsonLogPath, restrictedToMinimumLevel: LogEventLevel.Verbose))
                                      .WriteTo.Async(a => a.File(path: LogConfiguration.FlatLogPath, outputTemplate: LogConfiguration.FileTemplate, restrictedToMinimumLevel: LogEventLevel.Verbose));
-
-            var logger = loggerConfiguration.CreateLogger().ForContext(typeof(Program));
+            
+            using var rootLogger = loggerConfiguration.CreateLogger();
+            Log.Logger = rootLogger;
+            var logger = rootLogger.ForContext(typeof(Program));
+            Serilog.Debugging.SelfLog.Enable(logger.Error);
             logger.Information("Husky & Logger Successfully Initialized");
             logger.Debug("Logging to {loggerFilePath}", LogConfiguration.JsonLogPath);
             logger.Debug("Husy started with args {args}", args);
+            logger.Information("Waiting for Seq connection at {seqUrl}", LogConfiguration.SeqHttpUrl);
+
+            var client = new HttpClient();
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(TimeSpan.FromMinutes(1));
+            var ct = cts.Token;
+            int connectionAttempts = 0;
+            while (!ct.IsCancellationRequested)
+            {
+                logger.Debug("Awaiting connection to Seq, attempt #{connectionAttemptNumber}", ++connectionAttempts);
+
+                var request = await client.GetAsync(LogConfiguration.SeqHttpUrl + "/api", HttpCompletionOption.ResponseHeadersRead, ct);
+                if (request.IsSuccessStatusCode)
+                {
+                    logger.Information("Successfully connected to seq server");
+                    break;
+                }
+
+                await Task.Delay(1000, ct);
+            }
 
             /*
              * Todo: When we fully flesh out the Source Generator pattern, we should likely remove this kind of thing from the users' visibility.
@@ -95,7 +127,6 @@ pause";
                                              c.MemoryMb = 1024;
                                          })
                                         .AddDependency(new DotNet(Range: ">=5.0.0", FrameworkType: FrameworkInstallationType.Runtime, Kind: DotNet.RuntimeKind.RuntimeOnly))
-                                        .AddGlobalVariable("installDir", $"{HuskyVariables.Folders.ProgramFiles}")
                                         .WithDefaultStage(
                                              stage => stage
                                                            .AddJob(
@@ -120,8 +151,8 @@ pause";
                                                                     {
                                                                         task.CleanDirectories = true;
                                                                         task.CleanFiles = true;
-                                                                        task.Resources = "dist/program/**/*";
-                                                                        task.TargetDirectory = "$variables.installDir";
+                                                                        task.Resources = "**/*";
+                                                                        task.TargetDirectory = "{Folders.ProgramFiles}/HuskyApp";
                                                                     }))
                                                            .AddJob(
                                                                 "create-launch-file",
@@ -129,13 +160,18 @@ pause";
                                                                                      "create-launch-script",
                                                                                      task =>
                                                                                      {
-                                                                                         task.Directory = "$variables.installDir";
+                                                                                         task.Directory = "{Folders.ProgramFiles}/HuskyApp";
                                                                                          task.FileName = "launch";
-                                                                                         task.Script = "dotnet HuskyApp.dll";
+                                                                                         task.Script = "dotnet \"{Folders.ProgramFiles}/HuskyApp/HuskyApp.dll\"";
                                                                                      })
                                                                                 .AddStep<CreateShortcutOptions>(
                                                                                      "create-shortcut",
-                                                                                     task => task.Target = "$variables.create-launch-file.create-launch-script.createdFileName"))
+                                                                                     task =>
+                                                                                     {
+                                                                                         task.ShortcutName = "Husky App";
+                                                                                         task.ShortcutLocation = "{Folders.Desktop}";
+                                                                                         task.Target = "{create-launch-file.create-launch-script.createdFileName}";
+                                                                                     }))
                                          ).Build();
 
             var (numStages, numJobs, numTasks) = CountWorkflowItems(workflow);
@@ -148,14 +184,18 @@ pause";
             }
             catch (Exception e)
             {
-                logger.Fatal(e, "HuskyInstaller encoutnered an exception and was unable to recover -- exiting");
+                logger.Fatal(e, "HuskyInstaller encountered an exception and was unable to recover -- exiting");
                 logger.Fatal("Current platform:\n{currentPlatform}", CurrentPlatform.LongDescription);
-                logger.Fatal("Husky Workflow:\n{workFlow}", workflow);
-                throw;
+                logger.Fatal("Husky Workflow:\n{@workFlow}", workflow);
+            }
+            finally
+            {
+                logger.Information("Shutting down logger");
+                Log.CloseAndFlush();
             }
 
             // Todo: Wrap main in other method so app-wide concerns like this aren't messy
-            Log.CloseAndFlush();
+            Console.ReadLine();
         }
 
         private static (int numStages, int numJobs, int numTasks) CountWorkflowItems(HuskyWorkflow workflow)
