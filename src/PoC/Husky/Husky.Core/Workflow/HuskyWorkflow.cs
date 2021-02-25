@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FluentValidation;
@@ -10,7 +11,7 @@ namespace Husky.Core.Workflow
     public sealed class HuskyWorkflow
     {
         public HuskyConfiguration Configuration { get; }
-        public Dictionary<string, string> Variables { get; } = new();
+        public Dictionary<string, string> Variables { get; } = new(StringComparer.OrdinalIgnoreCase);
         public List<HuskyStage> Stages { get; } = new();
         public List<HuskyDependency> Dependencies { get; } = new();
 
