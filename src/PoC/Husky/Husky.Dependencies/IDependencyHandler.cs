@@ -4,10 +4,10 @@ using Husky.Core.HuskyConfiguration;
 
 namespace Husky.Dependencies
 {
-    public interface IDependencyHandler<T> where T: HuskyDependency
+    public interface IDependencyHandler
     {
-        bool TrySatisfyDependency(T dependency, [NotNullWhen(true)] out DependencyAcquisitionMethod<T>? acquisitionMethod);
+        bool TrySatisfyDependency([NotNullWhen(true)] out IDependencyAcquisitionMethod<HuskyDependency>? acquisitionMethod);
 
-        ValueTask<bool> IsAlreadyInstalled(T dependency);
+        ValueTask<bool> IsAlreadyInstalled();
     }
 }
