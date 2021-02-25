@@ -68,13 +68,7 @@ namespace Husky.Dependencies.DependencyHandlers
         // Microsoft.NETCore.App 2.1.23 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
         private (DotNet.RuntimeKind runtimeKind, Version version)[] GetInstalledRuntimes(IEnumerable<string> dotnetRuntimesList)
             => dotnetRuntimesList.Select(s => s.Split(' '))
-                                 .Select(s =>
-                                  {
-                                      var kindString = s[0].Split('.')[1];
-                                      var version = Version.Parse(s[1]);
-                                      _logger.LogInformation("Kind {Kind}, Version {Version}", kindString, version);
-                                      return (DeriveRuntimeKindFromString(kindString), version);
-                                  })
+                                 .Select(s => (DeriveRuntimeKindFromString(s[0].Split('.')[1]), Version.Parse(s[1])))
                                  .ToArray();
 
         private DotNet.RuntimeKind DeriveRuntimeKindFromString(string dotnetRuntimeKindOutput)
