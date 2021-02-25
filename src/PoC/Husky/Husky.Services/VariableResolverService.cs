@@ -65,8 +65,8 @@ namespace Husky.Services
 
                 if (variablesToReplace.Length == 0)
                 {
-                    _logger.LogDebug("No variables to replace");
-                    return;
+                    _logger.LogDebug("No variables to replace on property {property}", property);
+                    continue;
                 }
 
                 _logger.LogDebug("Replacing variables {variables}", variablesToReplace);
