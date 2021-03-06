@@ -28,7 +28,7 @@ namespace Husky.Tasks.Tests.Installation
             PlatformInformationMock.Setup(s => s.OSVersion).Returns(new Version(5, 1, 0));
             PlatformInformationMock.Setup(s => s.OSArchitecture).Returns(Architecture.X64);
 
-            _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
+            Fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 100,
                 DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 200 } }
@@ -40,7 +40,7 @@ namespace Husky.Tasks.Tests.Installation
         public void Verification_ensures_client_os_is_supported()
         {
             // Arrange
-            _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation());
+            Fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation());
             PlatformInformationMock.Setup(s => s.OS).Returns(OS.Osx);
 
             // Act
@@ -83,7 +83,7 @@ namespace Husky.Tasks.Tests.Installation
         public void Verification_ensures_client_has_enough_ram()
         {
             // Arrange
-            _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
+            Fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 2,
                 DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 200 } }
@@ -101,7 +101,7 @@ namespace Husky.Tasks.Tests.Installation
         public void Verification_ensures_client_has_enough_hard_drive_space()
         {
             // Arrange
-            _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
+            Fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 200,
                 DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 2 } }

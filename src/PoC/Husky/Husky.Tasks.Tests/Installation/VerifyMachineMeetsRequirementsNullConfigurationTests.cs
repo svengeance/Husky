@@ -28,7 +28,7 @@ namespace Husky.Tasks.Tests.Installation
             PlatformInformationMock.Setup(s => s.OSVersion).Returns(new Version(5, 1, 0));
             PlatformInformationMock.Setup(s => s.OSArchitecture).Returns(Architecture.X64);
 
-            _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
+            Fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 100,
                 DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 200 } }
@@ -40,7 +40,7 @@ namespace Husky.Tasks.Tests.Installation
         public void Verification_does_nothing_when_requires_configuration_is_null()
         {
             // Arrange
-            _fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
+            Fixture.Create<Mock<ISystemService>>().Setup(s => s.GetSystemInformation()).ReturnsAsync(new SystemInformation
             {
                 TotalMemoryMb = 1,
                 DriveInformation = new[] { new SystemDriveInformation(new DirectoryInfo(@"C:\")) { FreeSpaceMb = 2 } }

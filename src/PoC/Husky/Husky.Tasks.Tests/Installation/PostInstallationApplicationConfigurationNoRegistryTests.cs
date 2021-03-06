@@ -20,7 +20,7 @@ namespace Husky.Tasks.Tests.Installation
         public async ValueTask Post_installation_does_not_write_to_registry_when_specified_not_to()
         {
             // Arrange
-            var registryMock = _fixture.Create<Mock<IRegistryService>>();
+            var registryMock = Fixture.Create<Mock<IRegistryService>>();
 
             // Act
             await Sut.Execute();

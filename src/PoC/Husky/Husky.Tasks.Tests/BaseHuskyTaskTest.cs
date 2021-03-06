@@ -47,7 +47,7 @@ namespace Husky.Tasks.Tests
 
         protected abstract void ConfigureHusky(HuskyConfiguration huskyConfiguration);
 
-        protected virtual HuskyContext CreateDefaultInstallationContext() => new(NullLogger<HuskyContext>.Instance, UninstallOperationsMock.Object, Assembly.GetExecutingAssembly());
+        protected virtual HuskyContext CreateDefaultHuskyContext() => new(NullLogger<HuskyContext>.Instance, UninstallOperationsMock.Object, Assembly.GetExecutingAssembly());
 
         protected abstract HuskyTaskConfiguration CreateDefaultTaskConfiguration();
 
@@ -62,7 +62,7 @@ namespace Husky.Tasks.Tests
 
             BeforeSetup(); // Allows our unit tests to properly setup Mocks 
             var task = CreateInstanceOfType();
-            var installationContext = CreateDefaultInstallationContext();
+            var installationContext = CreateDefaultHuskyContext();
             var defaultExecutionInformation = new ExecutionInformation();
             Unsafe.As<HuskyTask<HuskyTaskConfiguration>>(task)!.SetExecutionContext(taskConfiguration, installationContext, defaultExecutionInformation);
             ValidateConfiguration();

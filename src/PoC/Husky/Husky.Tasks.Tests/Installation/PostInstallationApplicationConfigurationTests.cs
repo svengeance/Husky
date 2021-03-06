@@ -27,7 +27,7 @@ namespace Husky.Tasks.Tests.Installation
         public async ValueTask Post_installation_calls_registry_write_with_subset_of_properties()
         {
             // Arrange
-            var registryMock = _fixture.Create<Mock<IRegistryService>>();
+            var registryMock = Fixture.Create<Mock<IRegistryService>>();
             var appUninstallRootKey = $@"{AppUninstalls.RootKey}\Jawbreakers_Husky";
 
             // Act
@@ -47,7 +47,7 @@ namespace Husky.Tasks.Tests.Installation
         public async ValueTask Post_installation_does_not_use_the_registry_when_not_on_windows()
         {
             // Arrange
-            var registryMock = _fixture.Create<Mock<IRegistryService>>();
+            var registryMock = Fixture.Create<Mock<IRegistryService>>();
             PlatformInformationMock.Setup(s => s.OS).Returns(OS.Linux);
 
             // Act
