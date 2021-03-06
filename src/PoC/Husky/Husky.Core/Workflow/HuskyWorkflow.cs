@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FluentValidation;
+using FluentValidation.Results;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Workflow.Builder;
 
@@ -24,22 +25,26 @@ namespace Husky.Core.Workflow
 
         public void Validate()
         {
-            var validations = Stages.SelectMany(stage => stage.Jobs.SelectMany(job => job.Steps.Select(step => new
-            {
-                Validation = step.HuskyTaskConfiguration.Validate(),
-                TaskName = step.HuskyTaskConfiguration.GetType().Name,
-                StepName = step.Name,
-                JobName = job.Name,
-                StageName = stage.Name          
-            })));
+            static void AppendExceptions(StringBuilder sb, IEnumerable<(string title, ValidationResult validation)> items)
+                => items.Where(w => !w.validation.IsValid).Aggregate(sb, (prev, next) => prev.AppendLine(next.title).AppendLine(next.validation.ToString()));
 
-            var exceptionString = validations.Where(w => !w.Validation.IsValid)
-                                             .Aggregate(new StringBuilder(), (sb, next) => sb.AppendLine($"{next.StageName}.{next.JobName}.{next.StepName}.{next.TaskName}")
-                                                                                             .Append(next.Validation))
-                                             .ToString();
+            // Todo: Tasks which contain variables that are only computable at runtime may indeed be valid.
+            var taskValidations = Stages.SelectMany(stage => stage.Jobs.SelectMany(job => job.Steps.Select(step =>
+            (
+                $"{step.Name}.{step.HuskyTaskConfiguration.GetType().Name} is not appropriately configured",
+                step.HuskyTaskConfiguration.Validate()
+            ))));
 
-            if (!string.IsNullOrEmpty(exceptionString))
-                throw new ValidationException(exceptionString);
+            // Todo: Configuration Blocks should have their variables resolved before they get here.
+            var configurationValidations = Configuration.GetConfigurationBlocks()
+                                                        .Select(s => ($"{s.GetType().Name} is not appropriately configured", s.Validate()));
+
+            var exceptions = new StringBuilder();
+            AppendExceptions(exceptions, taskValidations);
+            AppendExceptions(exceptions, configurationValidations);
+
+            if (exceptions.Length > 0)
+                throw new ValidationException(exceptions.ToString());
         }
 
         public void Reverse()

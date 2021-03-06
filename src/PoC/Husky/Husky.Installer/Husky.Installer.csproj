@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Husky.Tasks\Husky.Tasks.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\" />
-  </ItemGroup>
-
 </Project>

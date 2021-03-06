@@ -15,7 +15,7 @@ namespace Husky.Installer
     public class HuskyInstallerSettings
     {
         public IEnumerable<Assembly> ResolveModulesFromAssemblies { get; set; } = Array.Empty<Assembly>();
-        public LoggerConfiguration LoggerConfiguration { get; set; }
+        public LoggerConfiguration LoggerConfiguration { get; init; }
         public string TagToExecute { get; private set; } = string.Empty;
         // Todo: GH #18 - Make DryRun actually do something
         public bool IsDryRun { get; private set; }

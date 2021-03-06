@@ -78,6 +78,8 @@ namespace Husky.Core
 
         public static class WorkflowDefaults
         {
+            public const string DefaultUninstallFileName = "UninstallData.husky";
+
             public const string DefaultStageName = "default-stage";
             public const string DefaultJobName = "default-job";
 
@@ -100,6 +102,17 @@ namespace Husky.Core
                 public static class Steps
                 {
                     public const string PostInstallationApplicationRegistration = "post-installation-application-registration";
+                }
+            }
+
+            public static class PreUninstallation
+            {
+                public const string StageName = "husky-post-uninstallation-operations-stage";
+                public const string JobName = "husky-post-uninstallation-operations-job";
+
+                public static class Steps
+                {
+                    public const string ExecuteUninstallationOperations = "execute-uninstallation-operations";
                 }
             }
         }

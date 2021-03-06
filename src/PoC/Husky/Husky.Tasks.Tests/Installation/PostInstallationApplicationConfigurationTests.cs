@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using AutoFixture;
 using Husky.Core;
@@ -21,6 +22,8 @@ namespace Husky.Tasks.Tests.Installation
     {
         [Test]
         [Category("UnitTest")]
+        [Platform("Win")]
+        [SupportedOSPlatform("windows")]
         public async ValueTask Post_installation_calls_registry_write_with_subset_of_properties()
         {
             // Arrange
@@ -52,23 +55,6 @@ namespace Husky.Tasks.Tests.Installation
 
             // Assert
             registryMock.VerifyNoOtherCalls();
-        }
-
-
-        [Test]
-        [Category("UnitTest")]
-        public async ValueTask Post_installation_uninstall_removes_created_application_regkey()
-        {
-            // Arrange
-            var registryMock = _fixture.Create<Mock<IRegistryService>>();
-            var appUninstallRootKey = $@"{AppUninstalls.RootKey}\Jawbreakers_Husky";
-            PlatformInformationMock.Setup(s => s.OS).Returns(OS.Windows);
-
-            // Act
-            await Sut.Rollback();
-
-            // Assert
-            registryMock.Verify(v => v.RemoveSubKey(RegistryHive.LocalMachine, appUninstallRootKey), Times.Once);
         }
 
         protected override void ConfigureHusky(HuskyConfiguration huskyConfiguration)

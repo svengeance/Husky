@@ -23,7 +23,7 @@ namespace Husky.Tasks.Resources
 
         protected override async ValueTask ExecuteTask()
         {
-            var availableFiles = _embeddedResourceService.ListResources(InstallationContext.InstallationAssembly, Configuration.Resources).ToArray();
+            var availableFiles = _embeddedResourceService.ListResources(HuskyContext.InstallationAssembly, Configuration.Resources).ToArray();
             _logger.LogDebug("Located {numberOfFilteredEmbeddedFiles} files for copying", availableFiles.Length);
 
             if (Directory.Exists(Configuration.TargetDirectory))
@@ -67,15 +67,9 @@ namespace Husky.Tasks.Resources
                     Directory.CreateDirectory(destDir);
                 }
                 
-                await using var resourceStream = _embeddedResourceService.RetrieveResource(InstallationContext.InstallationAssembly, file);
+                await using var resourceStream = _embeddedResourceService.RetrieveResource(HuskyContext.InstallationAssembly, file);
                 await _fileSystemService.WriteToFile(resourceStream, destPath, resourceStream.Length);
             }
-        }
-
-        protected override ValueTask RollbackTask()
-        {
-            // Todo: There should be nothing stopping us from writing this
-            throw new NotImplementedException();
         }
     }
 }

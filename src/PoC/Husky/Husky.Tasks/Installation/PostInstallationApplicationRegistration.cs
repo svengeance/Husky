@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Enums;
@@ -13,6 +14,7 @@ using static Husky.Core.HuskyConstants.RegistryKeys;
 
 namespace Husky.Tasks.Installation
 {
+    [SupportedOSPlatform("windows")]
     public class PostInstallationApplicationRegistration: HuskyTask<PostInstallationApplicationRegistrationOptions>
     {
         private readonly ApplicationConfiguration _applicationConfiguration;
@@ -64,12 +66,6 @@ namespace Husky.Tasks.Installation
             // Todo: GH #17 && GH #12 Uninstaller and dynamic resolution of variables (such as "What directory did I install to?")
             //WriteUninstallKey(UninstallKeyNames.UninstallString, !ImplementMe);
             //WriteUninstallKey(UninstallKeyNames.QuietUninstallString, !ImplementMe);
-            return ValueTask.CompletedTask;
-        }
-
-        protected override ValueTask RollbackTask()
-        {
-            _registryService.RemoveSubKey(RegistryHive.LocalMachine, GetApplicationUninstallationRootKey());
             return ValueTask.CompletedTask;
         }
 

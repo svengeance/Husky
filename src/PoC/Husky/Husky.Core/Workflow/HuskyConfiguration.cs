@@ -18,6 +18,8 @@ namespace Husky.Core.Workflow
 
         private HuskyConfiguration(Dictionary<Type, HuskyConfigurationBlock> configurations) => _configurations = configurations;
 
+        public T GetConfigurationBlock<T>() where T: HuskyConfigurationBlock => (T) _configurations[typeof(T)];
+
         public void Configure<T>(Action<T> configuration) where T : HuskyConfigurationBlock
             => configuration.Invoke((T) _configurations[typeof(T)]);
 

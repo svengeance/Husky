@@ -31,21 +31,6 @@ namespace Husky.Tasks.Tests.Scripting
             Assert.AreEqual(_script, fileContents);
         }
 
-        [Test]
-        [Category("IntegrationTest")]
-        public async Task Rollback_create_script_file_deletes_file()
-        {
-            // Arrange
-            // Act
-            await Sut.Execute();
-            var foundFile = TempDirectory.EnumerateFiles().First(s => s.Name.StartsWith(_scriptFileName));
-            await Sut.Rollback();
-
-            // Assert
-            foundFile.Refresh();
-            FileAssert.DoesNotExist(foundFile);
-        }
-
         protected override void ConfigureHusky(HuskyConfiguration huskyConfiguration) { }
 
         protected override HuskyTaskConfiguration CreateDefaultTaskConfiguration() => new CreateScriptFileOptions

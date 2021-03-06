@@ -82,7 +82,7 @@ namespace Husky.Services.Tests.FileSystemTests
             var reportedLengths = new List<long>();
             var reportedPercent = string.Empty;
 
-            var progress = new SequentialBlockingProgressHandler<FileSystemService.FileWriteProgress>(p =>
+            var progress = new SequentialBlockingProgressHandler<IFileSystemService.FileWriteProgress>(p =>
             {
                 progressCount++;
                 bytesWritten = p.BytesWritten;

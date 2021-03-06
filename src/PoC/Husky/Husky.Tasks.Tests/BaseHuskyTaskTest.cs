@@ -7,6 +7,7 @@ using FluentValidation;
 using Husky.Core;
 using Husky.Core.Platform;
 using Husky.Core.Workflow;
+using Husky.Core.Workflow.Uninstallation;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -19,7 +20,9 @@ namespace Husky.Tasks.Tests
         protected T Sut { get; private set; } = default!;
 
         protected Mock<IPlatformInformation> PlatformInformationMock { get; } = new();
-            
+
+        protected Mock<IUninstallOperationsList> UninstallOperationsMock { get; } = new();
+
         private HuskyTaskConfiguration DefaultTaskConfiguration { get; set; } = null!;
         
         private HashSet<Type> HuskyTaskTypes { get; } = HuskyTaskResolver.GetAvailableTasks().ToHashSet();
@@ -44,7 +47,7 @@ namespace Husky.Tasks.Tests
 
         protected abstract void ConfigureHusky(HuskyConfiguration huskyConfiguration);
 
-        protected virtual InstallationContext CreateDefaultInstallationContext() => new(NullLogger<InstallationContext>.Instance, Assembly.GetExecutingAssembly());
+        protected virtual HuskyContext CreateDefaultInstallationContext() => new(NullLogger<HuskyContext>.Instance, UninstallOperationsMock.Object, Assembly.GetExecutingAssembly());
 
         protected abstract HuskyTaskConfiguration CreateDefaultTaskConfiguration();
 
