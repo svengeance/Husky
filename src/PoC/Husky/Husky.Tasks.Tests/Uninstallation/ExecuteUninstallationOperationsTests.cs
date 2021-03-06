@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using AutoFixture;
 using Husky.Core.TaskOptions.Uninstallation;
@@ -10,16 +11,18 @@ using Husky.Tasks.Uninstallation;
 using Moq;
 using NUnit.Framework;
 
+using EntryKind = Husky.Core.Workflow.Uninstallation.UninstallOperationsList.EntryKind;
+
 namespace Husky.Tasks.Tests.Uninstallation
 {
     public class ExecuteUninstallationOperationsTests: BaseHuskyTaskUnitTest<ExecuteUninstallationOperations>
     {
-        private readonly Dictionary<UninstallOperationsList.EntryKind, string[]> _uninstallEntriesByEntryKind = new()
+        private readonly Dictionary<EntryKind, string[]> _uninstallEntriesByEntryKind = new()
         {
-            [UninstallOperationsList.EntryKind.File] = new[] { "File1", "File2" },
-            [UninstallOperationsList.EntryKind.Directory] = new[] { "Dir1", "Dir2" },
-            [UninstallOperationsList.EntryKind.RegistryKey] = new[] { "RegKey1", "RegKey2" },
-            [UninstallOperationsList.EntryKind.RegistryValue] = new[] { "Regvalue1", "RegValue2" }
+            [EntryKind.File] = new[] { "File1", "File2" },
+            [EntryKind.Directory] = new[] { "Dir1", "Dir2" },
+            [EntryKind.RegistryKey] = new[] { "RegKey1", "RegKey2" },
+            [EntryKind.RegistryValue] = new[] { "Regvalue1", "RegValue2" }
         };
 
         private Mock<IFileSystemService> _fileSystemServiceMock = null!;
@@ -28,32 +31,35 @@ namespace Husky.Tasks.Tests.Uninstallation
         [SetUp]
         public void Setup()
         {
-            _fileSystemServiceMock = _fixture.Create<Mock<IFileSystemService>>();
-            _registryServiceMock = _fixture.Create<Mock<IRegistryService>>();
+            _fileSystemServiceMock = Fixture.Create<Mock<IFileSystemService>>();
+            _registryServiceMock = Fixture.Create<Mock<IRegistryService>>();
 
-            foreach (var entryKind in Enum.GetValues<UninstallOperationsList.EntryKind>())
+            foreach (var entryKind in Enum.GetValues<EntryKind>())
                 UninstallOperationsMock.Setup(s => s.ReadEntries(entryKind)).Returns(_uninstallEntriesByEntryKind[entryKind]);
         }
         [Test]
         [Category("UnitTest")]
-        public async ValueTask Execute_uninstallation_operation_removes_alL_entries_from_operations_file()
+        public async ValueTask Execute_uninstallation_operation_removes_all_entries_from_operations_file()
         {
             // Arrange
-            var numFileCalls = 0;
-            var numDirCalls = 0;
-            var numRegistryKeyCalls = 0;
-            var numRegistryValueCalls = 0;
+            var fileCalls = new List<string>();
+            var dirCalls = new List<string>();
+            var regValueCalls = new List<string>();
+            var regKeyCalls = new List<string>();
 
-            _fileSystemServiceMock.Setup(s => s.DeleteFile(_uninstallEntriesByEntryKind[UninstallOperationsList.EntryKind.File][numFileCalls++]))
-                                  .ca
-
-            _fileSystemServiceMock.Setup(s => s.DeleteDirectory(It.IsAny<string>()));
+            _fileSystemServiceMock.Setup(s => s.DeleteFile(Capture.In(fileCalls)));
+            _fileSystemServiceMock.Setup(s => s.DeleteDirectory(Capture.In(dirCalls)));
+            _registryServiceMock.Setup(s => s.RemoveKeyValue(Capture.In(regValueCalls)));
+            _registryServiceMock.Setup(s => s.RemoveKey(Capture.In(regKeyCalls)));
 
             // Act
             await Sut.Execute();
 
             // Assert
-            _fileSystemServiceMock.Verify(f => f.);
+            CollectionAssert.AreEqual(_uninstallEntriesByEntryKind[EntryKind.File], fileCalls);
+            CollectionAssert.AreEqual(_uninstallEntriesByEntryKind[EntryKind.Directory], dirCalls);
+            CollectionAssert.AreEqual(_uninstallEntriesByEntryKind[EntryKind.RegistryValue], regValueCalls);
+            CollectionAssert.AreEqual(_uninstallEntriesByEntryKind[EntryKind.RegistryKey], regKeyCalls);
         }
 
         [Test]

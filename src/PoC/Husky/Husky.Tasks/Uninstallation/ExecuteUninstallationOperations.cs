@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.TaskOptions.Uninstallation;
 using Husky.Core.Workflow.Uninstallation;
 using Husky.Services;

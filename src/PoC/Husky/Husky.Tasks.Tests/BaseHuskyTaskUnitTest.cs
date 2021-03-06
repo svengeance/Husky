@@ -10,13 +10,14 @@ namespace Husky.Tasks.Tests
 {
     public abstract class BaseHuskyTaskUnitTest<T>: BaseHuskyTaskTest<T> where T: class
     {
-        protected IFixture _fixture = null!;
+        protected IFixture Fixture = null!;
         
         protected override void BeforeSetup()
         {
-            _fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
-            _fixture.Inject(new SemVer.Version("0.1.2"));
-            
+            Fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
+            Fixture.Inject(new SemVer.Version("0.1.2"));
+            Fixture.Inject(UninstallOperationsMock);
+
             var sutConstructorTypes = typeof(T).GetConstructors(BindingFlags.Public | BindingFlags.Instance)
                                                .Single()
                                                .GetParameters()
@@ -26,17 +27,17 @@ namespace Husky.Tasks.Tests
             foreach (var type in sutConstructorTypes)
             {
                 var mock = GetMockForType(type);
-                InjectFromTypeAndInstance(_fixture, mock.GetType(), mock);
+                InjectFromTypeAndInstance(Fixture, mock.GetType(), mock);
             }
 
             var huskyConfiguration = HuskyConfiguration.Create();
             ConfigureHusky(huskyConfiguration);
             
             foreach (var configuration in huskyConfiguration.GetConfigurationBlocks())
-                InjectFromTypeAndInstance(_fixture, configuration.GetType(), configuration);
+                InjectFromTypeAndInstance(Fixture, configuration.GetType(), configuration);
         }
         
-        protected override T CreateInstanceOfType() => _fixture.Create<T>();
+        protected override T CreateInstanceOfType() => Fixture.Create<T>();
         
         private static object GetMockForType(Type type) => Activator.CreateInstance(typeof(Mock<>).MakeGenericType(type))!;
 
