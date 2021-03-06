@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Husky.Services\Husky.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Uninstallation\" />
+  </ItemGroup>
+
 </Project>

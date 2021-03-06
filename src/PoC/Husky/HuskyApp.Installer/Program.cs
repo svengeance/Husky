@@ -15,6 +15,7 @@ using Husky.Core.TaskOptions.Scripting;
 using Husky.Core.TaskOptions.Utilities;
 using Husky.Core.Workflow;
 using Husky.Installer;
+using Husky.Installer.Lifecycle;
 using Serilog;
 using Serilog.Context;
 using Serilog.Core;
@@ -180,7 +181,15 @@ pause";
 
             try
             {
-                await new HuskyInstaller(workflow, installationSettings).Execute();
+                LifecycleBase lifecycleOperation =
+                    installationSettings.TagToExecute switch
+                    {
+                        HuskyConstants.StepTags.Install => new HuskyInstaller(workflow, installationSettings),
+                        HuskyConstants.StepTags.Uninstall => new HuskyUninstaller(workflow, installationSettings),
+                        _ => throw new InvalidOperationException($"Unable to execute Husky with step tag {installationSettings.TagToExecute}")
+                    };
+
+                await lifecycleOperation.Execute();
             }
             catch (Exception e)
             {

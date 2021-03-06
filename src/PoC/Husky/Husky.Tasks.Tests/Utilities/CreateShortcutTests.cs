@@ -24,21 +24,6 @@ namespace Husky.Tasks.Tests.Utilities
             FileAssert.Exists(expectedShortcut);
         }
 
-        [Test]
-        [Category("IntegrationTest")]
-        public async Task Rollback_create_shortcut_deletes_created_file()
-        {
-            // Arrange
-            // Act
-            await Sut.Execute();
-            var expectedShortcut = new FileInfo(Path.Combine(TempDirectory.FullName, "Shortcut.lnk"));
-            await Sut.Rollback();
-
-            // Assert
-            expectedShortcut.Refresh();
-            FileAssert.DoesNotExist(expectedShortcut);
-        }
-
         protected override HuskyTaskConfiguration CreateDefaultTaskConfiguration()
             => new CreateShortcutOptions
             {

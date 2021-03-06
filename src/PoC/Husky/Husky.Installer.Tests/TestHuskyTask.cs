@@ -14,11 +14,5 @@ namespace Husky.Installer.Tests
             HasRan = true;
             return ValueTask.CompletedTask;
         }
-
-        protected override ValueTask RollbackTask()
-        {
-            HasRolledBack = true;
-            return ValueTask.CompletedTask;
-        }
     }
 }

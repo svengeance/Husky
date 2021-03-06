@@ -1,4 +1,9 @@
-﻿namespace Husky.Core.HuskyConfiguration
+﻿using FluentValidation.Results;
+
+namespace Husky.Core.HuskyConfiguration
 {
-    public record HuskyConfigurationBlock { }
+    public abstract record HuskyConfigurationBlock
+    {
+        public abstract ValidationResult Validate();
+    }
 }

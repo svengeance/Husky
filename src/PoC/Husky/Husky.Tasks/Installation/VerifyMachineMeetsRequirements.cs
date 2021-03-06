@@ -59,7 +59,5 @@ namespace Husky.Tasks.Installation
             else
                 throw new ApplicationException($"Failed to meet requirements: {message}");
         }
-
-        protected override ValueTask RollbackTask() => ValueTask.CompletedTask;
     }
 }

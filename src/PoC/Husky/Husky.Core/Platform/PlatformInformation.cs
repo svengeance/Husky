@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Husky.Core.Enums;
 using Husky.Internal.Shared;
 using Microsoft.Win32;
@@ -27,6 +28,7 @@ namespace Husky.Core.Platform
                     ? LoadLinuxPlatformInformation()
                     : throw new NotSupportedException($"Unidentified/Not supported platform detected: {RuntimeInformation.OSDescription}");
 
+        [SupportedOSPlatform("windows")]
         private static IPlatformInformation LoadWindowsPlatformInformation()
         {
             Version? osVersion = null;

@@ -5,6 +5,7 @@ using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
 using Husky.Core.Workflow;
+using Husky.Installer.Lifecycle;
 using Moq;
 using NUnit.Framework;
 
@@ -13,22 +14,26 @@ namespace Husky.Installer.Tests.InstallerTests
     public class HuskyInstallerTests: BaseInstallerTest
     {
         [Test]
-        [Category("UnitTest")]
-        public void Created_workflow_has_preinstallation_stage_and_job()
+        [Category("IntegrationTest")]
+        public async ValueTask Executed_workflow_has_preinstallation_stage_and_job()
         {
             // Arrange
             // Act
+            await Installer.Execute();
+
             // Assert
             Assert.AreEqual(HuskyConstants.WorkflowDefaults.PreInstallation.StageName, Workflow.Stages[0].Name);
             Assert.AreEqual(HuskyConstants.WorkflowDefaults.PreInstallation.JobName, Workflow.Stages[0].Jobs[0].Name);
         }
 
         [Test]
-        [Category("UnitTest")]
-        public void Created_workflow_has_postinstallation_stage_and_job()
+        [Category("IntegrationTest")]
+        public async ValueTask Executed_workflow_has_postinstallation_stage_and_job()
         {
             // Arrange
             // Act
+            await Installer.Execute();
+
             // Assert
             Assert.AreEqual(HuskyConstants.WorkflowDefaults.PostInstallation.StageName, Workflow.Stages[^1].Name);
             Assert.AreEqual(HuskyConstants.WorkflowDefaults.PostInstallation.JobName, Workflow.Stages[^1].Jobs[0].Name);
@@ -70,7 +75,6 @@ namespace Husky.Installer.Tests.InstallerTests
         public async ValueTask Installer_executes_only_tasks_with_correct_tag()
         {
             // Arrange
-            var tasksToExecute = HuskyConstants.StepTags.Repair;
             var additionalWorkflow = HuskyWorkflow.Create()
                                                   .WithDefaultStageAndJob(
                                                        job => job.AddStep<TestHuskyTaskOptions>("RepairStep", ConfigureTestTaskOptions,

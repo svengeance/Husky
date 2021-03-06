@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
 using Microsoft.Extensions.Logging;
@@ -10,13 +10,32 @@ namespace Husky.Services
 {
     public interface IFileSystemService
     {
-        ValueTask<FileInfo> WriteToFile(Stream stream, string? filePath = null, long? totalLength = null, IProgress<FileSystemService.FileWriteProgress>? bytesWrittenProgress = null);
-
         DirectoryInfo CreateTempDirectory();
-        
+
+        ValueTask<FileInfo> WriteToFile(Stream stream, string? filePath = null, long? totalLength = null,
+            IProgress<FileWriteProgress>? bytesWrittenProgress = null);
+
         ValueTask<string> CreateScriptFile(string destinationDirectory, string fileName, string script);
-        
+
+        ValueTask DeleteFile(string filePath);
+
+        ValueTask DeleteDirectory(string directoryPath);
+
         string GetScriptFileExtension();
+
+        readonly struct FileWriteProgress
+        {
+            public readonly long BytesLength;
+            public readonly long BytesWritten;
+
+            public string ProgressPercent => $"{BytesWritten / BytesLength:P0}";
+
+            public FileWriteProgress(long bytesLength, long bytesWritten)
+            {
+                BytesLength = bytesLength;
+                BytesWritten = bytesWritten;
+            }
+        }
     }
 
     public class FileSystemService: IFileSystemService
@@ -43,7 +62,7 @@ namespace Husky.Services
         }
 
         public async ValueTask<FileInfo> WriteToFile(Stream stream, string? filePath = null, long? totalLength = null,
-            IProgress<FileWriteProgress>? bytesWrittenProgress = null)
+            IProgress<IFileSystemService.FileWriteProgress>? bytesWrittenProgress = null)
         {
             totalLength ??= 0L;
             filePath ??= Path.GetTempFileName();
@@ -60,7 +79,7 @@ namespace Husky.Services
             {
                 await fs.WriteAsync(buffer.AsMemory(0, bytesRead));
                 totalBytesRead += bytesRead;
-                bytesWrittenProgress?.Report(new FileWriteProgress((long) totalLength, totalBytesRead));
+                bytesWrittenProgress?.Report(new IFileSystemService.FileWriteProgress((long) totalLength, totalBytesRead));
             }
 
             _logger.LogInformation("Wrote {totalBytesRead}/{totalLength} bytes to file {filePath}", totalBytesRead, totalLength, filePath);
@@ -95,6 +114,38 @@ namespace Husky.Services
             return destFileInfo.FullName;
         }
 
+        public ValueTask DeleteFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                _logger.LogWarning("Attempted to delete file at {filePath}, but the file did not exist", filePath);
+                return ValueTask.CompletedTask;
+            }
+
+            _logger.LogDebug("Removing file {filePath", filePath);
+            File.Delete(filePath);
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask DeleteDirectory(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+            {
+                _logger.LogWarning("Attempted to delete directory at {directoryPath}, but the directory did not exist", directoryPath);
+                return ValueTask.CompletedTask;
+            }
+
+            if (Directory.EnumerateFileSystemEntries(directoryPath).Any())
+            {
+                _logger.LogWarning("Attempted to delete directory at {directoryPath}, but the directory was not empty", directoryPath);
+                return ValueTask.CompletedTask;
+            }
+
+            _logger.LogDebug("Removing directory {directoryPath", directoryPath);
+            Directory.Delete(directoryPath);
+            return ValueTask.CompletedTask;
+        }
+
         public string GetScriptFileExtension()
             => CurrentPlatform.OS switch
                {
@@ -102,20 +153,5 @@ namespace Husky.Services
                    OS.Osx     => OsxScriptFileExtension,
                    _          => LinuxScriptFileExtension,
                };
-
-
-        public readonly struct FileWriteProgress
-        {
-            public readonly long BytesLength;
-            public readonly long BytesWritten;
-
-            public string ProgressPercent => $"{BytesWritten / BytesLength:P0}";
-
-            public FileWriteProgress(long bytesLength, long bytesWritten)
-            {
-                BytesLength = bytesLength;
-                BytesWritten = bytesWritten;
-            }
-        }
     }
 }

@@ -21,7 +21,5 @@ namespace Husky.Tasks.Scripting
             if (scriptExecutionResult.ExitCode != 0)
                 throw new ApplicationException("Script execution resulted in non-0 exit code");
         }
-
-        protected override ValueTask RollbackTask() => ValueTask.CompletedTask;
     }
 }

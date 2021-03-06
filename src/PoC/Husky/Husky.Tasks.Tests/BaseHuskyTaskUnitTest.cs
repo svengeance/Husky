@@ -2,11 +2,8 @@
 using System.Linq;
 using AutoFixture;
 using AutoFixture.AutoMoq;
-using AutoFixture.Kernel;
 using Husky.Core.Workflow;
 using Moq;
-using NUnit.Framework;
-using SemVer;
 using BindingFlags = System.Reflection.BindingFlags;
 
 namespace Husky.Tasks.Tests
@@ -41,9 +38,9 @@ namespace Husky.Tasks.Tests
         
         protected override T CreateInstanceOfType() => _fixture.Create<T>();
         
-        private object GetMockForType(Type type) => Activator.CreateInstance(typeof(Mock<>).MakeGenericType(type))!;
+        private static object GetMockForType(Type type) => Activator.CreateInstance(typeof(Mock<>).MakeGenericType(type))!;
 
-        private void InjectFromTypeAndInstance(IFixture fixture, Type type, object instance)
+        private static void InjectFromTypeAndInstance(IFixture fixture, Type type, object instance)
             => typeof(FixtureRegistrar).GetMethod(nameof(FixtureRegistrar.Inject))!.MakeGenericMethod(type).Invoke(null, new[] { fixture, instance });
     }
 }

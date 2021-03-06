@@ -86,26 +86,6 @@ namespace Husky.Tasks.Utilities
             await File.WriteAllTextAsync(path, desktopStringBuilder.ToString());
         }
 
-        protected override ValueTask RollbackTask()
-        {
-            /*
-             * Todo: We should probably have a comprehensive HuskyNotSupportException that encapsulates the current operation,
-             *       the current operating system etc..
-             */
-            var fileExtension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? _windowsShortcutFileExtension
-                : _unixShortcutFileExtension
-               ?? throw new NotImplementedException($"Unable to rollback Shortcut for the OSPlatform: {RuntimeInformation.OSDescription}");
-
-            var fileThatShouldExist = new FileInfo(Path.Combine(Configuration.ShortcutLocation, Configuration.ShortcutName + fileExtension));
-            _logger.LogDebug("Preparing to remove shortcut at {shortcutPath}", fileThatShouldExist);
-            
-            if (fileThatShouldExist.Exists)
-                fileThatShouldExist.Delete();
-
-            return ValueTask.CompletedTask;
-        }
-
         /*
          * Stolen shamelessly from https://stackoverflow.com/questions/4897655/create-a-shortcut-on-desktop
          * Todo: We need to test functionality in both 64/32bit contexts

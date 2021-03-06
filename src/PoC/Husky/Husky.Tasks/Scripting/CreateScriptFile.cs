@@ -20,20 +20,7 @@ namespace Husky.Tasks.Scripting
         protected override async ValueTask ExecuteTask()
         {
             var createdScriptFile = await _fileSystemService.CreateScriptFile(Configuration.Directory, Configuration.FileName, Configuration.Script);
-            InstallationContext.SetVariable("createdFileName", createdScriptFile);
-        }
-
-        protected override ValueTask RollbackTask()
-        {
-            var createdExtension = _fileSystemService.GetScriptFileExtension();
-            var createdScriptFile = Path.Combine(Configuration.Directory, Configuration.FileName + createdExtension);
-            _logger.LogDebug("Removing script file if exists at {scriptFilePath}", createdScriptFile);
-
-            var existingScriptFile = new FileInfo(createdScriptFile);
-            if (existingScriptFile.Exists)
-                existingScriptFile.Delete();
-
-            return ValueTask.CompletedTask;
+            HuskyContext.SetVariable("createdFileName", createdScriptFile);
         }
     }
 }

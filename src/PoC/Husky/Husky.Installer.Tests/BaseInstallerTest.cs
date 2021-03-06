@@ -1,9 +1,11 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using Husky.Core;
 using Husky.Core.Workflow;
 using NUnit.Framework;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
+using Husky.Installer.Lifecycle;
 
 namespace Husky.Installer.Tests
 {
@@ -21,16 +23,27 @@ namespace Husky.Installer.Tests
 
         protected HuskyInstaller Installer { get; private set; } = null!;
 
+        protected HuskyUninstaller Uninstaller { get; private set; } = null!;
+
         protected HuskyInstallerSettings InstallerSettings { get; private set; } = null!;
 
         protected abstract void ConfigureTestTaskOptions(TestHuskyTaskOptions options);
 
+        private string _installPath = null!;
+
         [SetUp]
         public void BaseSetup()
         {
+            _installPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
             Workflow = HuskyWorkflow.Create()
                                     .AddGlobalVariable("random.RandomNumber", "4")
                                     .Configure<InstallationConfiguration>(install => install.AddToRegistry = false)
+                                    .Configure<ApplicationConfiguration>(app =>
+                                     {
+                                         app.Name = "TestApp";
+                                         app.InstallDirectory = _installPath;
+                                     })
                                     .WithDefaultStageAndJob(job =>
                                          job.AddStep<TestHuskyTaskOptions>("TestStep", ConfigureTestTaskOptions))
                                     .Build();
@@ -39,6 +52,14 @@ namespace Husky.Installer.Tests
             InstallerSettings.LoadFromStartArgs(new[] { "install" });
 
             Installer = new HuskyInstaller(Workflow, InstallerSettings);
+            Uninstaller = new HuskyUninstaller(Workflow, InstallerSettings);
+        }
+
+        [TearDown]
+        public void BaseTearDown()
+        {
+            if (File.Exists(_installPath))
+                File.Delete(_installPath);
         }
     }
 }

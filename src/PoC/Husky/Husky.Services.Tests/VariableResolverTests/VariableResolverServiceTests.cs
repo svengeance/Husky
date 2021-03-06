@@ -100,7 +100,9 @@ namespace Husky.Services.Tests.VariableResolverTests
             void Resolve() => Sut.Resolve(testObject, varSource);
 
             // Assert
-            var exception = Assert.Catch<ArgumentException>(Resolve);
+            var exception = Assert.Catch<ArgumentException>(Resolve)!;
+
+            Assert.NotNull(exception);
             Assert.True(exception.Message.Contains("she.loves.me.not"));
             Assert.True(exception.Message.Contains(nameof(Cat)));
             Assert.True(exception.Message.Contains(nameof(Cat.Name)));

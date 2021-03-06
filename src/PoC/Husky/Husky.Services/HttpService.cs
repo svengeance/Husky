@@ -8,10 +8,10 @@ namespace Husky.Services
 {
     public interface IHttpService
     {
-        ValueTask<FileInfo> DownloadFile(string url, string? destination = null, IProgress<FileSystemService.FileWriteProgress>? progress = null);
+        ValueTask<FileInfo> DownloadFile(string url, string? destination = null, IProgress<IFileSystemService.FileWriteProgress>? progress = null);
         
         ValueTask<FileInfo> DownloadFile(HttpRequestMessage httpRequestMessage, string? destination = null,
-            IProgress<FileSystemService.FileWriteProgress>? progress = null);
+            IProgress<IFileSystemService.FileWriteProgress>? progress = null);
     }
     
     public class HttpService: IHttpService
@@ -27,11 +27,11 @@ namespace Husky.Services
             _httpClient = httpClientFactory.CreateClient();
         }
 
-        public ValueTask<FileInfo> DownloadFile(string url, string? destination = null, IProgress<FileSystemService.FileWriteProgress>? progress = null)
+        public ValueTask<FileInfo> DownloadFile(string url, string? destination = null, IProgress<IFileSystemService.FileWriteProgress>? progress = null)
             => DownloadFile(new HttpRequestMessage(HttpMethod.Get, url), destination, progress);
 
         public async ValueTask<FileInfo> DownloadFile(HttpRequestMessage httpRequestMessage, string? destination = null,
-            IProgress<FileSystemService.FileWriteProgress>? progress = null)
+            IProgress<IFileSystemService.FileWriteProgress>? progress = null)
         {
             _logger.LogInformation("Attempting to download file from {requestUrl} to path {destinationFilePath}", httpRequestMessage.RequestUri, destination);
             var response = await _httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseContentRead);
