@@ -1,17 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Platform;
 using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
-using Husky.Services;
-using Husky.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Serilog.Context;
 
 namespace Husky.Installer.Lifecycle
 {

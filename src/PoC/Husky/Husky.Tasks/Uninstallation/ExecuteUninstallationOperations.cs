@@ -36,8 +36,7 @@ namespace Husky.Tasks.Uninstallation
 
             _logger.LogInformation("Executing registry value uninstallation operations");
             foreach (var regKeyValuePath in operations.ReadEntries(UninstallOperationsList.EntryKind.RegistryValue))
-                _registryService.RemoveKeyValue(regKeyValuePath
-);
+                _registryService.RemoveKeyValue(regKeyValuePath);
 
             _logger.LogInformation("Executing registry key uninstallation operations");
             foreach (var regKeyPath in operations.ReadEntries(UninstallOperationsList.EntryKind.RegistryKey))

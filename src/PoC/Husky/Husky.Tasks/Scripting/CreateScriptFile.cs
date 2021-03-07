@@ -1,22 +1,15 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Husky.Core.TaskOptions.Scripting;
 using Husky.Core.Workflow.Uninstallation;
 using Husky.Services;
-using Microsoft.Extensions.Logging;
 
 namespace Husky.Tasks.Scripting
 {
     public class CreateScriptFile : HuskyTask<CreateScriptFileOptions>
     {
-        private readonly ILogger _logger;
         private readonly IFileSystemService _fileSystemService;
 
-        public CreateScriptFile(ILogger<CreateScriptFile> logger, IFileSystemService fileSystemService)
-        {
-            _logger = logger;
-            _fileSystemService = fileSystemService;
-        }
+        public CreateScriptFile(IFileSystemService fileSystemService) => _fileSystemService = fileSystemService;
 
         protected override async ValueTask ExecuteTask()
         {

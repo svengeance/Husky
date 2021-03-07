@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CliWrap;
 using CliWrap.Buffered;
-using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
 using Microsoft.Extensions.Logging;

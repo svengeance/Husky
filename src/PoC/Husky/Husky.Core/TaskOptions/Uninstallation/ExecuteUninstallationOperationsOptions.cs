@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
-using FluentValidation.Validators;
 using Husky.Core.Workflow;
 
 namespace Husky.Core.TaskOptions.Uninstallation

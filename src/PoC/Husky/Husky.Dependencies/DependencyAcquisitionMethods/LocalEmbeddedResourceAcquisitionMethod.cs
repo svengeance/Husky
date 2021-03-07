@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Husky.Dependencies.DependencyAcquisitionMethods
+﻿namespace Husky.Dependencies.DependencyAcquisitionMethods
 {
     //public class LocalEmbeddedResourceAcquisitionMethod: DependencyAcquisitionMethod
     //{

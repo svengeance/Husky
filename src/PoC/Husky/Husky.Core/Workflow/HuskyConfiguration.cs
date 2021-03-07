@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Husky.Core.HuskyConfiguration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Husky.Core.Workflow
 {

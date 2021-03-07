@@ -1,12 +1,9 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Core.Platform;
-using Husky.Core.TaskOptions.Installation;
 using Husky.Core.TaskOptions.Uninstallation;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
-using Husky.Tasks;
 
 namespace Husky.Installer.Lifecycle
 {

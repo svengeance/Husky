@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using Husky.Services.Extensions;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Husky.Services.Tests.ReflectionTests
 {

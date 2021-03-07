@@ -1,7 +1,4 @@
-﻿using System;
-using Husky.Core.Enums;
-
-namespace Husky.Core.Workflow
+﻿namespace Husky.Core.Workflow
 {
     public class HuskyStep<TTaskConfiguration> where TTaskConfiguration : HuskyTaskConfiguration
     {

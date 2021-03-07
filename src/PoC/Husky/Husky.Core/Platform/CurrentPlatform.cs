@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Husky.Core.Enums;
-using Husky.Internal.Shared;
-using Microsoft.Win32;
 using Version = SemVer.Version;
 
 namespace Husky.Core.Platform

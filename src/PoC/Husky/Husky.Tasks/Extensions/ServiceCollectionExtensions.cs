@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
-using Husky.Core.Workflow;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Husky.Tasks.Extensions
 {

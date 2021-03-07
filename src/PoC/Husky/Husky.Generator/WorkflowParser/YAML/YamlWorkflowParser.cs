@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Microsoft.CodeAnalysis.Text;
-using YamlDotNet.Serialization;
+﻿using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace Husky.Generator.WorkflowParser.YAML

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.Workflow.Uninstallation;
 using Microsoft.Extensions.Logging;
 

@@ -40,7 +40,7 @@ namespace Husky.Core.Workflow.Uninstallation
             if (File.Exists(filePath))
                 return await ReadFromJson(filePath);
 
-            var newUninstallOpsList = new UninstallOperationsList(filePath, OperationsListVersion.v1);
+            var newUninstallOpsList = new UninstallOperationsList(filePath, OperationsListVersion.V1);
             var parentDirectory = new FileInfo(filePath).DirectoryName ?? throw new ArgumentException($"Unable to locate directory for uninstall file at {filePath}");
 
             Directory.CreateDirectory(parentDirectory);
@@ -81,13 +81,13 @@ namespace Husky.Core.Workflow.Uninstallation
             using var json = await JsonDocument.ParseAsync(fs);
             return version switch
                    {
-                       OperationsListVersion.v1 => ReadListV1(json, filePath),
+                       OperationsListVersion.V1 => ReadListV1(json, filePath),
                        _ => throw new InvalidOperationException($"Attempted to read Uninstall file at {filePath} which had version {version}")
                    };
         }
 
         private static UninstallOperationsList ReadListV1(JsonDocument json, string filePath)
-            => new(filePath, OperationsListVersion.v1)
+            => new(filePath, OperationsListVersion.V1)
             {
                 FilesToRemove = ReadAsStringArray(json.RootElement.GetProperty(nameof(FilesToRemove))),
                 DirectoriesToRemove = ReadAsStringArray(json.RootElement.GetProperty(nameof(DirectoriesToRemove))),
@@ -116,7 +116,7 @@ namespace Husky.Core.Workflow.Uninstallation
 
         private enum OperationsListVersion: byte
         {
-            v1
+            V1
         }
     }
 }
