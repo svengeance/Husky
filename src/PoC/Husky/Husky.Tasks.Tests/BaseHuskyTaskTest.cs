@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using FluentValidation;
 using Husky.Core;
 using Husky.Core.Platform;
@@ -21,17 +22,15 @@ namespace Husky.Tasks.Tests
 
         protected Mock<IPlatformInformation> PlatformInformationMock { get; } = new();
 
-        protected Mock<IUninstallOperationsList> UninstallOperationsMock { get; } = new();
-
         private HuskyTaskConfiguration DefaultTaskConfiguration { get; set; } = null!;
         
         private HashSet<Type> HuskyTaskTypes { get; } = HuskyTaskResolver.GetAvailableTasks().ToHashSet();
         
         [SetUp]
-        public void SetupBaseHuskyTaskTest()
+        public async ValueTask SetupBaseHuskyTaskTest()
         {
             DefaultTaskConfiguration = CreateDefaultTaskConfiguration();
-            Sut = CreateAndConfigureTask(DefaultTaskConfiguration);
+            Sut = await CreateAndConfigureTask(DefaultTaskConfiguration);
             CurrentPlatform.LoadPlatformInformation(PlatformInformationMock.Object);
         }
         
@@ -47,26 +46,29 @@ namespace Husky.Tasks.Tests
 
         protected abstract void ConfigureHusky(HuskyConfiguration huskyConfiguration);
 
-        protected virtual HuskyContext CreateDefaultHuskyContext() => new(NullLogger<HuskyContext>.Instance, UninstallOperationsMock.Object, Assembly.GetExecutingAssembly());
+        protected abstract ValueTask<IUninstallOperationsList> CreateUninstallOperationsList();
 
         protected abstract HuskyTaskConfiguration CreateDefaultTaskConfiguration();
 
         protected abstract void BeforeSetup();
-        
+
         protected abstract T CreateInstanceOfType();
+
+        private async ValueTask<HuskyContext> CreateDefaultHuskyContext()
+            => await ValueTask.FromResult<HuskyContext>(new(NullLogger<HuskyContext>.Instance, await CreateUninstallOperationsList(), Assembly.GetExecutingAssembly()));
         
-        private T CreateAndConfigureTask(HuskyTaskConfiguration taskConfiguration)
+        private async ValueTask<T> CreateAndConfigureTask(HuskyTaskConfiguration taskConfiguration)
         {
             if (!HuskyTaskTypes.Contains(typeof(T)))
                 Assert.Fail($"Unable to locate Type {typeof(T)} for testing");
 
             BeforeSetup(); // Allows our unit tests to properly setup Mocks 
-            var task = CreateInstanceOfType();
-            var installationContext = CreateDefaultHuskyContext();
+            var huskyTask = CreateInstanceOfType();
+            var installationContext = await CreateDefaultHuskyContext();
             var defaultExecutionInformation = new ExecutionInformation();
-            Unsafe.As<HuskyTask<HuskyTaskConfiguration>>(task)!.SetExecutionContext(taskConfiguration, installationContext, defaultExecutionInformation);
+            Unsafe.As<HuskyTask<HuskyTaskConfiguration>>(huskyTask)!.SetExecutionContext(taskConfiguration, installationContext, defaultExecutionInformation);
             ValidateConfiguration();
-            return task;
+            return huskyTask;
         }
 
         private void ValidateConfiguration()
