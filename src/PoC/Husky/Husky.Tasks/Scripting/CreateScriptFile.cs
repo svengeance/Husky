@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Husky.Core.TaskOptions.Scripting;
+using Husky.Core.Workflow.Uninstallation;
 using Husky.Services;
 using Microsoft.Extensions.Logging;
 
@@ -21,6 +22,7 @@ namespace Husky.Tasks.Scripting
         {
             var createdScriptFile = await _fileSystemService.CreateScriptFile(Configuration.Directory, Configuration.FileName, Configuration.Script);
             HuskyContext.SetVariable("createdFileName", createdScriptFile);
+            HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.File, createdScriptFile);
         }
     }
 }

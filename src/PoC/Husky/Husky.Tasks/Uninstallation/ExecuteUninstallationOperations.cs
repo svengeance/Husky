@@ -32,7 +32,7 @@ namespace Husky.Tasks.Uninstallation
 
             _logger.LogInformation("Executing directory uninstallation operations");
             foreach (var directory in operations.ReadEntries(UninstallOperationsList.EntryKind.Directory))
-                await _fileSystemService.DeleteDirectory(directory);
+                await _fileSystemService.DeleteDirectory(directory, skipIfNotEmpty: true);
 
             _logger.LogInformation("Executing registry value uninstallation operations");
             foreach (var regKeyValuePath in operations.ReadEntries(UninstallOperationsList.EntryKind.RegistryValue))

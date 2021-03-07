@@ -32,7 +32,7 @@ namespace Husky.Tasks.Tests.Resources
             foreach (var resource in availableResources)
             {
                 var matchingNewFile = newFilePaths.Single(s => s.EndsWith(resource));
-                var newFileRelativeDir = matchingNewFile.Substring(TempDirectory.FullName.Length + 1); // Remove the trailing slash (c:\temp -> c:\temp\)
+                var newFileRelativeDir = matchingNewFile[(TempDirectory.FullName.Length + 1)..]; // Remove the trailing slash (c:\temp -> c:\temp\)
                 Assert.AreEqual(resource, newFileRelativeDir);
             }
         }

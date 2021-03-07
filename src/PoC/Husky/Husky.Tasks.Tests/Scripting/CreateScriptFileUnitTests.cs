@@ -1,40 +1,44 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
 using Husky.Core.TaskOptions.Scripting;
 using Husky.Core.Workflow;
+using Husky.Core.Workflow.Uninstallation;
+using Husky.Services;
 using Husky.Tasks.Scripting;
+using Moq;
 using NUnit.Framework;
 
 namespace Husky.Tasks.Tests.Scripting
 {
-    public class CreateScriptFileTests: BaseFileSystemTest<CreateScriptFile>
+    public class CreateScriptFileUnitTests: BaseHuskyTaskUnitTest<CreateScriptFile>
     {
-        private string _scriptFileName = "Howler";
+        private string _scriptDirectory = "Puppies";
+        private string _scriptFileName = "Puppies";
         private string _script = "echo Woof!";
 
         [Test]
-        [Category("IntegrationTest")]
+        [Category("UnitTest")]
         public async Task Create_script_file_creates_file_with_extension_and_exact_contents()
         {
             // Arrange
+            var scriptCreatedMockReturn = "A puppy!";
+            var fileSystemServiceMock = Fixture.Create<Mock<IFileSystemService>>();
+            fileSystemServiceMock.Setup(s => s.CreateScriptFile(_scriptDirectory, _scriptFileName, _script)).ReturnsAsync(scriptCreatedMockReturn);
+
             // Act
             await Sut.Execute();
 
             // Assert
-            var foundFile = TempDirectory.EnumerateFiles("*.*", SearchOption.AllDirectories).FirstOrDefault(s => s.Name.StartsWith(_scriptFileName));
-
-            FileAssert.Exists(foundFile);
-
-            var fileContents = await File.ReadAllTextAsync(foundFile!.FullName);
-            Assert.AreEqual(_script, fileContents);
+            UninstallOperationsMock.Verify(f => f.AddEntry(UninstallOperationsList.EntryKind.File, scriptCreatedMockReturn), Times.Once);
         }
 
         protected override void ConfigureHusky(HuskyConfiguration huskyConfiguration) { }
 
         protected override HuskyTaskConfiguration CreateDefaultTaskConfiguration() => new CreateScriptFileOptions
         {
-            Directory = Path.Combine(TempDirectory.FullName, "TestFolder"),
+            Directory = _scriptDirectory,
             FileName = _scriptFileName,
             Script = _script
         };

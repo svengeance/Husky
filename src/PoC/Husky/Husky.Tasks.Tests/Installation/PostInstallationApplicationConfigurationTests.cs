@@ -8,6 +8,7 @@ using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
 using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
+using Husky.Core.Workflow.Uninstallation;
 using Husky.Services;
 using Husky.Tasks.Installation;
 using Microsoft.Win32;
@@ -40,6 +41,38 @@ namespace Husky.Tasks.Tests.Installation
             registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.NoRemove, 1), Times.Once());
             registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.Comments, "Every Ed's dream"), Times.Once());
             registryMock.Verify(s => s.WriteKey(RegistryHive.LocalMachine, appUninstallRootKey, AppUninstalls.InstallDate, DateTime.Today.ToString("yyyyMMdd")), Times.Once());
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        [Platform("Win")]
+        [SupportedOSPlatform("windows")]
+        public async ValueTask Post_installation_writes_values_into_uninstallation_operations_list()
+        {
+            // Arrange
+            var appUninstallRootKey = $@"{AppUninstalls.RootKey}\Jawbreakers_Husky";
+
+            // Act
+            await Sut.Execute();
+            
+            // Assert
+            var expectedKeysToBeWritten = new[]
+            {
+                AppUninstalls.DisplayName,
+                AppUninstalls.DisplayVersion,
+                AppUninstalls.Publisher,
+                AppUninstalls.NoRemove,
+                AppUninstalls.Comments,
+                AppUninstalls.InstallDate
+            };
+
+            foreach (var key in expectedKeysToBeWritten)
+            {
+                var fullRegPath = string.Join('\\', RegistryHive.LocalMachine.ToString(), appUninstallRootKey, key);
+                UninstallOperationsMock.Verify(v => v.AddEntry(UninstallOperationsList.EntryKind.RegistryValue, fullRegPath), Times.Once);
+            }
+
+            UninstallOperationsMock.Verify(v => v.AddEntry(UninstallOperationsList.EntryKind.RegistryKey, appUninstallRootKey), Times.Once);
         }
 
         [Test]

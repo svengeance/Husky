@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using AutoFixture;
 using Husky.Core.TaskOptions.Uninstallation;
 using Husky.Core.Workflow;
-using Husky.Core.Workflow.Uninstallation;
 using Husky.Services;
 using Husky.Tasks.Uninstallation;
 using Moq;
@@ -48,7 +46,7 @@ namespace Husky.Tasks.Tests.Uninstallation
             var regKeyCalls = new List<string>();
 
             _fileSystemServiceMock.Setup(s => s.DeleteFile(Capture.In(fileCalls)));
-            _fileSystemServiceMock.Setup(s => s.DeleteDirectory(Capture.In(dirCalls)));
+            _fileSystemServiceMock.Setup(s => s.DeleteDirectory(Capture.In(dirCalls), true));
             _registryServiceMock.Setup(s => s.RemoveKeyValue(Capture.In(regValueCalls)));
             _registryServiceMock.Setup(s => s.RemoveKey(Capture.In(regKeyCalls)));
 
@@ -71,7 +69,7 @@ namespace Husky.Tasks.Tests.Uninstallation
             var deleteFolderWasCalledAfterFiles = false;
 
             _fileSystemServiceMock.Setup(s => s.DeleteFile(It.IsAny<string>())).Callback(() => deleteFilesCalled = true);
-            _fileSystemServiceMock.Setup(s => s.DeleteDirectory(It.IsAny<string>()))
+            _fileSystemServiceMock.Setup(s => s.DeleteDirectory(It.IsAny<string>(), true))
                                   .Callback(() => deleteFolderWasCalledAfterFiles = deleteFilesCalled);
 
             // Act
