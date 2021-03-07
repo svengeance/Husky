@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.TaskOptions.Utilities;
+using Husky.Core.Workflow.Uninstallation;
 using Husky.Services;
 using Microsoft.Extensions.Logging;
 
@@ -57,6 +58,7 @@ namespace Husky.Tasks.Utilities
 
             _logger.LogInformation("Shortcut created at {shortcutPath} pointing to {target}", pathToSave, Configuration.Target);
             file.Save(pathToSave, false);
+            HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.File, pathToSave);
         }
 
         private async ValueTask CreateLinuxShortcut()
@@ -84,6 +86,7 @@ namespace Husky.Tasks.Utilities
 
             _logger.LogDebug("Saving linux desktop file to {path} with content:\n{content}", path, desktopStringBuilder.ToString());
             await File.WriteAllTextAsync(path, desktopStringBuilder.ToString());
+            HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.File, path);
         }
 
         /*
