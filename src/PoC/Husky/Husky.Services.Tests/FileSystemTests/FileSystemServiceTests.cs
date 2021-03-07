@@ -105,6 +105,36 @@ namespace Husky.Services.Tests.FileSystemTests
 
         [Test]
         [Category("IntegrationTest")]
+        public async ValueTask Create_directory_creates_directory()
+        {
+            // Arrange
+            var newDirectoryName = Guid.NewGuid().ToString();
+
+            // Act
+            var createdDir = await Sut.CreateDirectory(Path.Combine(Path.GetTempPath(), newDirectoryName));
+
+            // Assert
+            DirectoryAssert.Exists(createdDir);
+        }
+
+        [Test]
+        [Category("IntegrationTest")]
+        public async ValueTask Create_directory_returns_directory_if_it_already_exists()
+        {
+            // Arrange
+            var newDirectoryName = Guid.NewGuid().ToString();
+            var newDirectoryPath = Path.Combine(Path.GetTempPath(), newDirectoryName);
+            Directory.CreateDirectory(newDirectoryPath);
+
+            // Act
+            var createdDir = await Sut.CreateDirectory(newDirectoryPath);
+
+            // Assert
+            DirectoryAssert.Exists(createdDir);
+        }
+
+        [Test]
+        [Category("IntegrationTest")]
         public async ValueTask Delete_file_deletes_file()
         {
             // Arrange
@@ -151,19 +181,19 @@ namespace Husky.Services.Tests.FileSystemTests
         public void Delete_directory_does_not_throw_when_directory_does_not_exist()
         {
             // Arrange
-            var sneakyNonExistantDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".realFile");
+            var sneakyNonExistentDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".realFile");
 
             // Act
-            Task DeleteDirectory() => Sut.DeleteDirectory(sneakyNonExistantDirectory).AsTask();
+            Task DeleteDirectory() => Sut.DeleteDirectory(sneakyNonExistentDirectory).AsTask();
 
             // Assert
-            DirectoryAssert.DoesNotExist(sneakyNonExistantDirectory); // "There's a chance"
+            DirectoryAssert.DoesNotExist(sneakyNonExistentDirectory); // "There's a chance"
             Assert.DoesNotThrowAsync(DeleteDirectory);
         }
 
         [Test]
         [Category("IntegrationTest")]
-        public async ValueTask Delete_directory_does_not_delete_directory_or_throw_when_directory_is_not_empty()
+        public async ValueTask Delete_directory_does_not_delete_directory_or_throw_when_directory_is_not_empty_when_skip_parameter_is_specified()
         {
             // Arrange
             var directoryWithData = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
@@ -171,11 +201,47 @@ namespace Husky.Services.Tests.FileSystemTests
             await File.WriteAllTextAsync(filePreventingDirectoryFromBeingDeleted.FullName, "You'll never delete me alive!");
 
             // Act
-            await Sut.DeleteDirectory(directoryWithData.FullName);
+            await Sut.DeleteDirectory(directoryWithData.FullName, skipIfNotEmpty: true);
 
             // Assert
             DirectoryAssert.Exists(directoryWithData);
             FileAssert.Exists(filePreventingDirectoryFromBeingDeleted);
+        }
+
+        [Test]
+        [Category("IntegrationTest")]
+        public async ValueTask Delete_directory_recursive_removes_all_files_and_folders()
+        {
+            // Arrange
+            var directoryWithData = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+            var helplessFile = new FileInfo(Path.Combine(directoryWithData.FullName, "blockAttempt.txt"));
+            var helplessDirectory = Directory.CreateDirectory(Path.Combine(directoryWithData.FullName, "SpanishInquisition"));
+            var anotherHelplessFile = new FileInfo(Path.Combine(helplessDirectory.FullName, "anotherFutileBlockAttempt.txt"));
+            await File.WriteAllTextAsync(helplessFile.FullName, "Any last words?");
+            await File.WriteAllTextAsync(anotherHelplessFile.FullName, "Fergulous");
+
+            // Act
+            await Sut.DeleteDirectoryRecursive(directoryWithData.FullName);
+
+            // Assert
+            DirectoryAssert.DoesNotExist(directoryWithData);
+            FileAssert.DoesNotExist(helplessFile);
+            FileAssert.DoesNotExist(anotherHelplessFile);
+        }
+
+        [Test]
+        [Category("IntegrationTest")]
+        public void Delete_directory_recursive_does_not_throw_when_directory_does_not_exist()
+        {
+            // Arrange
+            var sneakyNonExistentDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".realFile");
+
+            // Act
+            Task DeleteDirectoryRecursive() => Sut.DeleteDirectoryRecursive(sneakyNonExistentDirectory).AsTask();
+
+            // Assert
+            DirectoryAssert.DoesNotExist(sneakyNonExistentDirectory); // "There's a chance"
+            Assert.DoesNotThrowAsync(DeleteDirectoryRecursive);
         }
     }
 }
