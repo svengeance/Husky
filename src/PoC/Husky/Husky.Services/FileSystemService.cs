@@ -11,17 +11,13 @@ namespace Husky.Services
     public interface IFileSystemService
     {
         DirectoryInfo CreateTempDirectory();
-
-        ValueTask<FileInfo> WriteToFile(Stream stream, string? filePath = null, long? totalLength = null,
-            IProgress<FileWriteProgress>? bytesWrittenProgress = null);
-
         ValueTask<string> CreateScriptFile(string destinationDirectory, string fileName, string script);
-
+        ValueTask<DirectoryInfo> CreateDirectory(string directoryPath);
         ValueTask DeleteFile(string filePath);
-
-        ValueTask DeleteDirectory(string directoryPath);
-
+        ValueTask DeleteDirectoryRecursive(string directoryPath);
+        ValueTask DeleteDirectory(string directoryPath, bool skipIfNotEmpty = false);
         string GetScriptFileExtension();
+        ValueTask<FileInfo> WriteToFile(Stream stream, string? filePath = null, long? totalLength = null, IProgress<FileWriteProgress>? bytesWrittenProgress = null);
 
         readonly struct FileWriteProgress
         {
@@ -114,6 +110,18 @@ namespace Husky.Services
             return destFileInfo.FullName;
         }
 
+        public ValueTask<DirectoryInfo> CreateDirectory(string directoryPath)
+        {
+            if (Directory.Exists(directoryPath))
+            {
+                _logger.LogDebug("Attempted to create directory at {directoryPath}, but the directory already exists", directoryPath);
+                return ValueTask.FromResult(new DirectoryInfo(directoryPath));
+            }
+
+            _logger.LogDebug("Creating directory {directory}", directoryPath);
+            return ValueTask.FromResult(Directory.CreateDirectory(directoryPath));
+        }
+
         public ValueTask DeleteFile(string filePath)
         {
             if (!File.Exists(filePath))
@@ -122,12 +130,13 @@ namespace Husky.Services
                 return ValueTask.CompletedTask;
             }
 
-            _logger.LogDebug("Removing file {filePath", filePath);
+            _logger.LogDebug("Removing file {filePath}", filePath);
             File.Delete(filePath);
+
             return ValueTask.CompletedTask;
         }
 
-        public ValueTask DeleteDirectory(string directoryPath)
+        public ValueTask DeleteDirectoryRecursive(string directoryPath)
         {
             if (!Directory.Exists(directoryPath))
             {
@@ -135,9 +144,22 @@ namespace Husky.Services
                 return ValueTask.CompletedTask;
             }
 
-            if (Directory.EnumerateFileSystemEntries(directoryPath).Any())
+            _logger.LogDebug("Recursively removing directory {directoryPath}", directoryPath);
+            Directory.Delete(directoryPath, true);
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask DeleteDirectory(string directoryPath, bool skipIfNotEmpty = false)
+        {
+            if (!Directory.Exists(directoryPath))
             {
-                _logger.LogWarning("Attempted to delete directory at {directoryPath}, but the directory was not empty", directoryPath);
+                _logger.LogWarning("Attempted to delete directory at {directoryPath}, but the directory did not exist", directoryPath);
+                return ValueTask.CompletedTask;
+            }
+
+            if (skipIfNotEmpty && Directory.EnumerateFileSystemEntries(directoryPath).Any())
+            {
+                _logger.LogDebug("Attempted to delete directory at {directoryPath}, but the directory was not empty -- skipping", directoryPath);
                 return ValueTask.CompletedTask;
             }
 
