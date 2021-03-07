@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.TaskOptions.Resources;
+using Husky.Core.Workflow.Uninstallation;
 using Husky.Services;
 using Microsoft.Extensions.Logging;
 
@@ -33,26 +33,20 @@ namespace Husky.Tasks.Resources
                 {
                     _logger.LogTrace("Preparing to clean files");
                     foreach (var file in Directory.EnumerateFiles(Configuration.TargetDirectory))
-                    {
-                        _logger.LogTrace("Removing file {fileToDelete}", file);
-                        File.Delete(file);
-                    }
+                        await _fileSystemService.DeleteFile(file);
                 }
 
                 if (Configuration.CleanDirectories)
                 {
                     _logger.LogTrace("Preparing to clean directories");
                     foreach (var dir in Directory.EnumerateDirectories(Configuration.TargetDirectory))
-                    {
-                        _logger.LogTrace("Removing directory {directoryToDelete}", dir);
-                        Directory.Delete(dir, true);
-                    }
+                        await _fileSystemService.DeleteDirectoryRecursive(dir);
                 }
             }
             else
             {
-                _logger.LogDebug("Creating destination directory {destinationDirectory}", Configuration.TargetDirectory);
-                Directory.CreateDirectory(Configuration.TargetDirectory);
+                await _fileSystemService.CreateDirectory(Configuration.TargetDirectory);
+                HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.Directory, Configuration.TargetDirectory);
             }
 
             foreach (var file in availableFiles)
@@ -61,14 +55,15 @@ namespace Husky.Tasks.Resources
                 var destPath = Path.Combine(Configuration.TargetDirectory, file);
                 var destDir = Path.GetDirectoryName(destPath);
 
-                if (destDir != null)
+                if (!string.IsNullOrWhiteSpace(destDir) && !Directory.Exists(destDir))
                 {
-                    _logger.LogDebug("Creating directory {directory}", destDir);
-                    Directory.CreateDirectory(destDir);
+                    await _fileSystemService.CreateDirectory(destDir);
+                    HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.Directory, destDir);
                 }
-                
+
                 await using var resourceStream = _embeddedResourceService.RetrieveResource(HuskyContext.InstallationAssembly, file);
                 await _fileSystemService.WriteToFile(resourceStream, destPath, resourceStream.Length);
+                HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.File, destPath);
             }
         }
     }

@@ -6,6 +6,7 @@ using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
 using Husky.Core.TaskOptions.Installation;
+using Husky.Core.Workflow.Uninstallation;
 using Husky.Internal.Shared;
 using Husky.Services;
 using Microsoft.Win32;
@@ -22,6 +23,8 @@ namespace Husky.Tasks.Installation
         private readonly InstallationConfiguration _installationConfiguration;
         private readonly IRegistryService _registryService;
 
+        private readonly string _applicationRootKey;
+
         public PostInstallationApplicationRegistration(ApplicationConfiguration applicationConfiguration,
             AuthorConfiguration authorConfiguration,
             InstallationConfiguration installationConfiguration,
@@ -31,6 +34,8 @@ namespace Husky.Tasks.Installation
             _authorConfiguration = authorConfiguration;
             _installationConfiguration = installationConfiguration;
             _registryService = registryService;
+            
+            _applicationRootKey = @$"{AppUninstalls.RootKey}\{_applicationConfiguration.Name}_Husky";
         }
         
         protected override ValueTask ExecuteTask()
@@ -66,13 +71,17 @@ namespace Husky.Tasks.Installation
             // Todo: GH #17 && GH #12 Uninstaller and dynamic resolution of variables (such as "What directory did I install to?")
             //WriteUninstallKey(UninstallKeyNames.UninstallString, !ImplementMe);
             //WriteUninstallKey(UninstallKeyNames.QuietUninstallString, !ImplementMe);
+
+            HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.RegistryKey, _applicationRootKey);
             return ValueTask.CompletedTask;
         }
 
-        private string GetApplicationUninstallationRootKey() => @$"{AppUninstalls.RootKey}\{_applicationConfiguration.Name}_Husky";
-
         // Todo: GH #11 - Support HKCU and HKLM
         private void WriteUninstallKey(string key, object value)
-            => _registryService.WriteKey(RegistryHive.LocalMachine, GetApplicationUninstallationRootKey(), key, value);
+        {
+            _registryService.WriteKey(RegistryHive.LocalMachine, _applicationRootKey, key, value);
+            var fullRegPath = string.Join('\\', RegistryHive.LocalMachine.ToString(), _applicationRootKey, key);
+            HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.RegistryValue, fullRegPath);
+        }
     }
 }
