@@ -163,7 +163,7 @@ namespace Husky.Services
                 return ValueTask.CompletedTask;
             }
 
-            _logger.LogDebug("Removing directory {directoryPath", directoryPath);
+            _logger.LogDebug("Removing directory {directoryPath}", directoryPath);
             Directory.Delete(directoryPath);
             return ValueTask.CompletedTask;
         }
