@@ -1,10 +1,8 @@
 ﻿using System.IO;
 using System.Reflection;
-using Husky.Core;
 using Husky.Core.Workflow;
 using NUnit.Framework;
 using Husky.Core.HuskyConfiguration;
-using Husky.Core.Platform;
 using Husky.Installer.Lifecycle;
 
 namespace Husky.Installer.Tests

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;

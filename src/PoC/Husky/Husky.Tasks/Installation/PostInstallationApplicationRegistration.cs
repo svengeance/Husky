@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
 using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow.Uninstallation;
-using Husky.Internal.Shared;
 using Husky.Services;
 using Microsoft.Win32;
 

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
 using Microsoft.Extensions.Logging;

@@ -2,10 +2,8 @@
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using AutoFixture;
-using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
-using Husky.Core.Platform;
 using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
@@ -14,7 +12,6 @@ using Husky.Tasks.Installation;
 using Microsoft.Win32;
 using Moq;
 using NUnit.Framework;
-using SemVer;
 using static Husky.Core.HuskyConstants.RegistryKeys;
 
 namespace Husky.Tasks.Tests.Installation

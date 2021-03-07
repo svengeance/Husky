@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using FluentValidation;
 using FluentValidation.Results;
-using Husky.Internal.Shared;
 
 namespace Husky.Core.HuskyConfiguration
 {

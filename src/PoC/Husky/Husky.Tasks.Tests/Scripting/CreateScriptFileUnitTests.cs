@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoFixture;
 using Husky.Core.TaskOptions.Scripting;
 using Husky.Core.Workflow;

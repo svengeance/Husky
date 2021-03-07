@@ -1,15 +1,12 @@
 ﻿using System.Threading.Tasks;
 using AutoFixture;
-using Husky.Core;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Services;
 using Husky.Tasks.Installation;
-using Microsoft.Win32;
 using Moq;
 using NUnit.Framework;
-using static Husky.Core.HuskyConstants.RegistryKeys;
 
 namespace Husky.Tasks.Tests.Installation
 {

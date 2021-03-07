@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reflection;
-using Husky.Core;
 using Husky.Core.Workflow;
 using Husky.Dependencies.Extensions;
 using Husky.Installer.Lifecycle;

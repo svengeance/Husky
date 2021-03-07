@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Husky.Core;
@@ -17,8 +16,6 @@ using Husky.Core.Workflow;
 using Husky.Installer;
 using Husky.Installer.Lifecycle;
 using Serilog;
-using Serilog.Context;
-using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.SystemConsole.Themes;

@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Husky.Core.Workflow;
 using Husky.Tasks;
 
 namespace Husky.Installer.Tests

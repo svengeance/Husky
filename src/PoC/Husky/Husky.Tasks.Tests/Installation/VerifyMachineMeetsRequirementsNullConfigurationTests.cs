@@ -5,15 +5,12 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
-using Husky.Core.Platform;
 using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Services;
 using Husky.Tasks.Installation;
 using Moq;
 using NUnit.Framework;
-using SemVer;
-using Range = SemVer.Range;
 using Version = SemVer.Version;
 
 namespace Husky.Tasks.Tests.Installation

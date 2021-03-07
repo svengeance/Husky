@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Husky.Core.Enums
+﻿namespace Husky.Core.Enums
 {
     public enum OS
     {

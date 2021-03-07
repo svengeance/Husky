@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.TaskOptions.Resources;
 using Husky.Core.Workflow;
 using Husky.Tasks.Resources;
