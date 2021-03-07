@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.TaskOptions.Utilities;
 using Husky.Core.Workflow;
@@ -13,7 +14,7 @@ namespace Husky.Tasks.Tests.Utilities
 
         [Test]
         [Category("IntegrationTest")]
-        public async Task Create_shortcut_creates_file()
+        public async Task Create_shortcut_creates_file_and_writes_to_uninstall_operations_list()
         {
             // Arrange
             // Act
@@ -22,6 +23,9 @@ namespace Husky.Tasks.Tests.Utilities
             // Assert
             var expectedShortcut = new FileInfo(Path.Combine(TempDirectory.FullName, "Shortcut.lnk"));
             FileAssert.Exists(expectedShortcut);
+
+            var operationsListEntry = UninstallOperationsList.ReadEntries(Core.Workflow.Uninstallation.UninstallOperationsList.EntryKind.File).FirstOrDefault();
+            Assert.AreEqual(expectedShortcut.FullName, operationsListEntry);
         }
 
         protected override HuskyTaskConfiguration CreateDefaultTaskConfiguration()
