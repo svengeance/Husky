@@ -69,7 +69,8 @@ namespace Husky.Tasks.Tests.Installation
                 UninstallOperationsMock.Verify(v => v.AddEntry(UninstallOperationsList.EntryKind.RegistryValue, fullRegPath), Times.Once);
             }
 
-            UninstallOperationsMock.Verify(v => v.AddEntry(UninstallOperationsList.EntryKind.RegistryKey, appUninstallRootKey), Times.Once);
+            var applicationRootKeyWithHive = @$"{RegistryHive.LocalMachine}\{appUninstallRootKey}";
+            UninstallOperationsMock.Verify(v => v.AddEntry(UninstallOperationsList.EntryKind.RegistryKey, applicationRootKeyWithHive), Times.Once);
         }
 
         [Test]
