@@ -29,7 +29,10 @@ namespace Husky.Core.HuskyConfiguration
                 RuleFor(r => r.Description).NotNull();
                 RuleFor(r => r.Version).NotNull();
                 RuleFor(r => r.IconFile).NotNull();
-                RuleFor(r => r.InstallDirectory).NotEmpty().Must(m => new DirectoryInfo(m).Parent != null).WithMessage("Can not install into root directory");
+                RuleFor(r => r.InstallDirectory).NotEmpty();
+
+                // Todo: GH #12 Need to have variable resolutions for these Configuration blocks
+                //RuleFor(r => r.InstallDirectory).NotEmpty().Must(m => new DirectoryInfo(m).Parent != null).WithMessage("Can not install into root directory");
             }
         }
     }
