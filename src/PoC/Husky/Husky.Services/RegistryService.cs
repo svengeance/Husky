@@ -50,7 +50,7 @@ namespace Husky.Services
             _logger.LogInformation("Preparing to delete registry subkey {registryHive}/{registryPath}", root, path);
             _logger.LogTrace("Opening base key {registryHive}", root);
             using var regRoot = RegistryKey.OpenBaseKey(root, RegistryView.Default);
-            
+
             _logger.LogTrace("Deleting subkey tree {subKey}", path);
             regRoot.DeleteSubKeyTree(path, throwOnMissingSubKey: false);
             
@@ -67,9 +67,9 @@ namespace Husky.Services
         {
             _logger.LogInformation("Preparing to delete registry keyvalue {registryHive}/{registryPath}/{keyName}", root, path, keyName);
             _logger.LogTrace("Opening base key {registryHive}", root);
+            
             using var regRoot = RegistryKey.OpenBaseKey(root, RegistryView.Default);
-
-            using var regKey = regRoot.OpenSubKey(path, RegistryRights.SetValue);
+            using var regKey = regRoot.OpenSubKey(path, writable: true);
             if (regKey is null)
             {
                 _logger.LogWarning("Tried to delete registry keyvalue {registryHive}/{registryPath}/{keyName}, but the path did not exist", root, path, keyName);
