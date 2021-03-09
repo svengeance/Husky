@@ -70,7 +70,8 @@ namespace Husky.Tasks.Installation
             //WriteUninstallKey(UninstallKeyNames.UninstallString, !ImplementMe);
             //WriteUninstallKey(UninstallKeyNames.QuietUninstallString, !ImplementMe);
 
-            HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.RegistryKey, _applicationRootKey);
+            var applicationRootKeyWithHive = @$"{RegistryHive.LocalMachine}\{_applicationRootKey}";
+            HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.RegistryKey, applicationRootKeyWithHive);
             return ValueTask.CompletedTask;
         }
 
