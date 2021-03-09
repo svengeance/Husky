@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.Workflow.Uninstallation;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
 namespace Husky.Core.Tests.UninstallationOperationsTests
 {
-    public class ReadonlyUninstallOPerationListTests
+    public class ReadonlyUninstallOperationListTests
     {
         private readonly string _kittenString = "So many kittens.";
 
@@ -16,12 +17,12 @@ namespace Husky.Core.Tests.UninstallationOperationsTests
 
         private ReadonlyUninstallOperationsList _sut = null!;
 
-        private IUninstallOperationsList? _uninstallOperationsList;
+        private IUninstallOperationsList _uninstallOperationsList = null!;
 
         [SetUp]
         public async ValueTask Setup()
         {
-            _uninstallOperationsList = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath);
+            _uninstallOperationsList = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath, NullLogger.Instance);
             _uninstallOperationsList.AddEntry(UninstallOperationsList.EntryKind.File, _kittenString);
             await _uninstallOperationsList.Flush();
 
@@ -45,7 +46,7 @@ namespace Husky.Core.Tests.UninstallationOperationsTests
             await _sut.Flush();
 
             // Act
-            var newOperationsList = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath);
+            var newOperationsList = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath, NullLogger.Instance);
             var readRegistryKeyOperations = newOperationsList.ReadEntries(UninstallOperationsList.EntryKind.RegistryKey);
             var readFileOperation = newOperationsList.ReadEntries(UninstallOperationsList.EntryKind.File).First();
 
@@ -56,7 +57,7 @@ namespace Husky.Core.Tests.UninstallationOperationsTests
 
         [Test]
         [Category("UnitTest")]
-        public async ValueTask Adding_entry_to_read_only_operations_list_does_not_modify_in_memory_list()
+        public void Adding_entry_to_read_only_operations_list_does_not_modify_in_memory_list()
         {
             // Arrange
             _sut.AddEntry(UninstallOperationsList.EntryKind.RegistryKey, "So many puppies");

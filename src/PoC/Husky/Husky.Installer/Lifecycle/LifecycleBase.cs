@@ -27,7 +27,8 @@ namespace Husky.Installer.Lifecycle
 
         protected ILogger Logger { get; private set; }
 
-        protected string UninstallOperationsFile { get; }
+        protected readonly string UninstallOperationsFile;
+        protected readonly ILoggerFactory LoggerFactory;
 
         private readonly IServiceProvider _serviceProvider;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -40,8 +41,8 @@ namespace Husky.Installer.Lifecycle
             _serviceProvider = new ServiceCollection().AddHuskyInstaller(HuskyInstallerSettings, Workflow.Configuration);
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
-            Logger = loggerFactory.CreateLogger(this.GetType().FullName);
+            LoggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
+            Logger = LoggerFactory.CreateLogger(this.GetType().FullName);
             Logger.LogDebug("Constructed ServiceProvider");
 
             var installPath = Workflow.Configuration.GetConfigurationBlock<ApplicationConfiguration>().InstallDirectory;
@@ -107,18 +108,18 @@ namespace Husky.Installer.Lifecycle
 
             await InstallDependencies();
             
-            foreach (var stage in Workflow.Stages)
+            foreach (var stageToExecute in Workflow.Stages)
             {
                 if (!(Workflow.Stages.Any(stage => stage.Jobs.Any(job => job.Steps.Any(ShouldExecuteStep)))))
                 {
-                    Logger.LogInformation("No steps can be executed for stage {stage} -- skipping", stage.Name);
+                    Logger.LogInformation("No steps can be executed for stage {stage} -- skipping", stageToExecute.Name);
                     continue;
                 }
 
-                using var stageScope = LogContext.PushProperty("Stage", stage.Name + ".");
-                Logger.LogInformation("Executing stage {stage}", stage.Name);
+                using var stageScope = LogContext.PushProperty("Stage", stageToExecute.Name + ".");
+                Logger.LogInformation("Executing stage {stage}", stageToExecute.Name);
                 using var scope = CreateServiceScope();
-                await ExecuteStage(stage, scope.ServiceProvider, huskyContext);
+                await ExecuteStage(stageToExecute, scope.ServiceProvider, huskyContext);
             }
         }
 
@@ -194,6 +195,7 @@ namespace Husky.Installer.Lifecycle
             }
             finally
             {
+                await huskyContext.UninstallOperations.Flush();
                 Logger.LogInformation("Executed {step} with result: {executionResult}", step.Name, step.ExecutionInformation.ToString());
             }
             step.ExecutionInformation.Finish();
@@ -204,7 +206,6 @@ namespace Husky.Installer.Lifecycle
             Logger.LogDebug("Beginning execution of {task}", task.GetType().Name);
             return task.Execute();
         }
-
 
         private static IDependencyHandler GetDependencyHandler(HuskyDependency dependency, IServiceProvider serviceProvider)
         {

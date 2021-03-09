@@ -9,22 +9,19 @@ namespace Husky.Tasks.Uninstallation
     public class ExecuteUninstallationOperations: HuskyTask<ExecuteUninstallationOperationsOptions>
     {
         private readonly ILogger _logger;
-        private readonly HuskyContext _huskyContext;
         private readonly IFileSystemService _fileSystemService;
         private readonly IRegistryService _registryService;
 
-        public ExecuteUninstallationOperations(ILogger<ExecuteUninstallationOperations> logger, HuskyContext huskyContext,
-            IFileSystemService fileSystemService, IRegistryService registryService)
+        public ExecuteUninstallationOperations(ILogger<ExecuteUninstallationOperations> logger, IFileSystemService fileSystemService, IRegistryService registryService)
         {
             _logger = logger;
-            _huskyContext = huskyContext;
             _fileSystemService = fileSystemService;
             _registryService = registryService;
         }
 
         protected override async ValueTask ExecuteTask()
         {
-            var operations = _huskyContext.UninstallOperations;
+            var operations = HuskyContext.UninstallOperations;
 
             _logger.LogInformation("Executing file uninstallation operations");
             foreach (var file in operations.ReadEntries(UninstallOperationsList.EntryKind.File))
