@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Husky.Core.Workflow.Uninstallation
 {
+    // A shim during uninstall operations such that executing user-defined uninstall operations do not themselves append to the file
     public sealed class ReadonlyUninstallOperationsList : IUninstallOperationsList
     {
         private readonly IUninstallOperationsList _operationsList;
