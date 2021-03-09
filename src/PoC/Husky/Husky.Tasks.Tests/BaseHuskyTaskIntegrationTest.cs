@@ -6,6 +6,7 @@ using Husky.Core.Workflow.Uninstallation;
 using Husky.Installer;
 using Husky.Installer.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
 namespace Husky.Tasks.Tests
@@ -32,7 +33,9 @@ namespace Husky.Tasks.Tests
         protected override T CreateInstanceOfType() => ScopedServiceProvider.GetRequiredService<T>();
 
         protected override async ValueTask<IUninstallOperationsList> CreateUninstallOperationsList()
-            => (UninstallOperationsList = await new ValueTask<IUninstallOperationsList>(await Core.Workflow.Uninstallation.UninstallOperationsList.CreateOrRead(_uninstallOperationsListFile)));
+            => UninstallOperationsList =
+                await new ValueTask<IUninstallOperationsList>(
+                    await Core.Workflow.Uninstallation.UninstallOperationsList.CreateOrRead(_uninstallOperationsListFile, NullLogger.Instance));
 
         protected override void BeforeSetup()
         {

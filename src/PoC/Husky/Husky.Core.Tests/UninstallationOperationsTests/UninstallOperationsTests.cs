@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.Workflow.Uninstallation;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
 namespace Husky.Core.Tests.UninstallationOperationsTests
@@ -11,8 +12,16 @@ namespace Husky.Core.Tests.UninstallationOperationsTests
     public class UninstallOperationsTests
     {
         private readonly string _uninstallOperationsFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-
+        private UninstallOperationsList _sut = null!;
+        
         private FileInfo UninstallOperationsFileInfo => new(_uninstallOperationsFilePath);
+
+
+        [SetUp]
+        public async ValueTask Setup()
+        {
+            _sut = (UninstallOperationsList) await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath, NullLogger.Instance);
+        }
 
         [TearDown]
         public void TearDown()
@@ -24,14 +33,12 @@ namespace Husky.Core.Tests.UninstallationOperationsTests
 
         [Test]
         [Category("IntegrationTest")]
-        public async ValueTask Uninstall_operations_can_create_a_new_file()
+        public void Uninstall_operations_can_create_a_new_file()
         {
             // Arrange
             // Act
-            var operations = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath);
-
             // Assert
-            Assert.NotNull(operations);
+            Assert.NotNull(_sut);
             FileAssert.Exists(UninstallOperationsFileInfo);
         }
 
@@ -42,52 +49,50 @@ namespace Husky.Core.Tests.UninstallationOperationsTests
             // Arrange
             HashSet<string> GenerateRandomEntries() => Enumerable.Range(0, 10).Select(_ => Guid.NewGuid().ToString()).ToHashSet();
 
-            var operations = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath);
-            var writeableContent = Enum.GetValues<UninstallOperationsList.EntryKind>()
+            var writableContent = Enum.GetValues<UninstallOperationsList.EntryKind>()
                                        .Select(s => (kind: s, entries: GenerateRandomEntries()))
                                        .ToArray();
 
             // Act
-            foreach (var content in writeableContent)
+            foreach (var content in writableContent)
             foreach (var entry in content.entries)
-                operations.AddEntry(content.kind, entry);
+                _sut.AddEntry(content.kind, entry);
 
-            await operations.Flush();
+            await _sut.Flush();
 
-            var parsedOperations = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath);
+            var parsedOperations = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath, NullLogger.Instance);
 
             // Assert
             foreach (var entryKind in Enum.GetValues<UninstallOperationsList.EntryKind>())
             {
                 var entries = parsedOperations.ReadEntries(entryKind).ToHashSet();
-                var expectedEntries = writeableContent.First(f => f.kind == entryKind).entries;
+                var expectedEntries = writableContent.First(f => f.kind == entryKind).entries;
                 CollectionAssert.AreEqual(expectedEntries, entries);
             }
         }
 
         [Test]
-        [Category("UnitTest")]
-        public async ValueTask Uninstall_operations_can_write_and_subsequently_read_all_entry_kinds_in_memory()
+        [Category("IntegrationTest")]
+        public void Uninstall_operations_can_write_and_subsequently_read_all_entry_kinds_in_memory()
         {
             // Arrange 
             static HashSet<string> GenerateRandomEntries()
                 => Enumerable.Range(0, 10).Select(_ => Guid.NewGuid().ToString()).ToHashSet();
 
-            var operations = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath);
-            var writeableContent = Enum.GetValues<UninstallOperationsList.EntryKind>()
-                                       .Select(s => (kind: s, entries: GenerateRandomEntries()))
-                                       .ToArray();
+            var writableContent = Enum.GetValues<UninstallOperationsList.EntryKind>()
+                                      .Select(s => (kind: s, entries: GenerateRandomEntries()))
+                                      .ToArray();
 
             // Act
-            foreach (var content in writeableContent)
+            foreach (var content in writableContent)
             foreach (var entry in content.entries)
-                operations.AddEntry(content.kind, entry);
+                _sut.AddEntry(content.kind, entry);
 
             // Assert
             foreach (var entryKind in Enum.GetValues<UninstallOperationsList.EntryKind>())
             {
-                var entries = operations.ReadEntries(entryKind).ToHashSet();
-                var expectedEntries = writeableContent.First(f => f.kind == entryKind).entries;
+                var entries = _sut.ReadEntries(entryKind).ToHashSet();
+                var expectedEntries = writableContent.First(f => f.kind == entryKind).entries;
                 CollectionAssert.AreEqual(expectedEntries, entries);
             }
         }
