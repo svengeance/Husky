@@ -117,6 +117,8 @@ pause";
                                          {
                                              a.Name = "HuskyApp";
                                              a.Version = "1.0.0";
+                                             // Todo: GH #12 - Allow this to be resolved from a variable
+                                             a.InstallDirectory = HuskyVariables.Folders.ProgramFiles + "/HuskyApp";
                                          })
                                         .Configure<ClientMachineRequirementsConfiguration>(c =>
                                          {
@@ -147,8 +149,6 @@ pause";
                                                                     "extract-files",
                                                                     task =>
                                                                     {
-                                                                        task.CleanDirectories = true;
-                                                                        task.CleanFiles = true;
                                                                         task.Resources = "**/*";
                                                                         task.TargetDirectory = "{Folders.ProgramFiles}/HuskyApp";
                                                                     }))
