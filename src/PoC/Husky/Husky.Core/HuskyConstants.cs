@@ -42,7 +42,7 @@ namespace Husky.Core
         public static class StepTags
         {
             // All tasks by default should be able executable on Install and Uninstall
-            public static readonly string[] DefaultStepTags = { Install, Uninstall };
+            public static readonly string[] DefaultStepTags = { Install };
             public const string Install = "install";
             public const string Repair = "repair";
             public const string Modify = "modify";
