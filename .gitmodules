@@ -1,0 +1,3 @@
+[submodule "src/PoC/Husky/Husky.Tests.Adapter"]
+	path = src/PoC/Husky/Husky.Tests.Adapter
+	url = https://github.com/svengeance/nunit3-vs-adapter.git
