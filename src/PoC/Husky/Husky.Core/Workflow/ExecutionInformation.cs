@@ -1,7 +1,7 @@
 ﻿using System;
 using Husky.Core.Enums;
 
-namespace Husky.Core
+namespace Husky.Core.Workflow
 {
     public class ExecutionInformation
     {
