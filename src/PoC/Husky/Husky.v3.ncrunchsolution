@@ -2,5 +2,6 @@
   <Settings>
     <AllowParallelTestExecution>True</AllowParallelTestExecution>
     <SolutionConfigured>True</SolutionConfigured>
+    <TestFilter>DoesNotHaveCategory 'e2e'</TestFilter>
   </Settings>
 </SolutionConfiguration>

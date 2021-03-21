@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>Enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.13.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Husky.Core\Husky.Core.csproj" />
+    <ProjectReference Include="..\Husky.Tests.Adapter\src\NUnitTestAdapter\Husky.Tests.Adapter.csproj" />
+  </ItemGroup>
+
+</Project>
