@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Husky.Core;
+using Husky.Core.Attributes;
 using Husky.Core.Dependencies;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
@@ -34,12 +36,13 @@ namespace HuskyApp.Installer
             public static string FileDirectory = Path.GetTempPath();
             public const string FileName = "HuskyApp_InstallLog";
 
-            public const string SeqHttpUrl = "http://seq:5341";
+            public const string SeqHttpUrl = "http://husky-test-seq:5341";
 
             public static string JsonLogPath => Path.Combine(FileDirectory, FileName + ".json");
             public static string FlatLogPath => Path.Combine(FileDirectory, FileName + ".txt");
         }
 
+        [HuskyEntryPoint]
         public static async Task Main(string[] args)
         {
             // Todo: Implement LoggingLevelSwitch (https://stackoverflow.com/questions/25477415/how-can-i-reconfigure-serilog-without-restarting-the-application)
@@ -57,7 +60,7 @@ namespace HuskyApp.Installer
             Serilog.Debugging.SelfLog.Enable(logger.Error);
             logger.Information("Husky & Logger Successfully Initialized");
             logger.Debug("Logging to {loggerFilePath}", LogConfiguration.JsonLogPath);
-            logger.Debug("Husy started with args {args}", args);
+            logger.Debug("Husky started with args {args}", args);
             logger.Information("Waiting for Seq connection at {seqUrl}", LogConfiguration.SeqHttpUrl);
 
             var client = new HttpClient();
@@ -199,9 +202,6 @@ pause";
                 logger.Information("Shutting down logger");
                 Log.CloseAndFlush();
             }
-
-            // Todo: Wrap main in other method so app-wide concerns like this aren't messy
-            Console.ReadLine();
         }
 
         private static (int numStages, int numJobs, int numTasks) CountWorkflowItems(HuskyWorkflow workflow)
