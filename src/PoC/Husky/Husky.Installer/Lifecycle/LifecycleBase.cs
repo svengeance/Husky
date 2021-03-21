@@ -19,6 +19,7 @@ using Serilog.Context;
 
 namespace Husky.Installer.Lifecycle
 {
+    // Todo: Not in love with this name.
     public abstract class LifecycleBase
     {
         protected HuskyWorkflow Workflow { get; }
@@ -57,6 +58,7 @@ namespace Husky.Installer.Lifecycle
             var huskyContext = ActivatorUtilities.CreateInstance<HuskyContext>(_serviceProvider, operationsList, Assembly.GetEntryAssembly()!);
 
             await ExecuteWorkflow(huskyContext);
+            Logger.LogInformation("Husky has successfully executed {tag}", HuskyInstallerSettings.TagToExecute);
         }
 
         protected virtual bool ShouldExecuteStep<T>(HuskyStep<T> step) where T: HuskyTaskConfiguration
@@ -106,7 +108,8 @@ namespace Husky.Installer.Lifecycle
             // Todo: Replace variables here first before validation
             Workflow.Validate();
 
-            await InstallDependencies();
+            if (HuskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Install)
+                await InstallDependencies();
             
             foreach (var stageToExecute in Workflow.Stages)
             {
