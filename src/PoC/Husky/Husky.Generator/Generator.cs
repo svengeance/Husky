@@ -66,7 +66,7 @@ namespace Husky.Generator
 
         // This isn't sexy, but consider that there aren't many parsers, it won't change much over time, and that this is running frequently as the user edits their files.
         // Is assembly scanning the right call?
-        private IWorkflowParser<ParsedWorkflow> GetParser(string fileExtension)
+        private IWorkflowParser GetParser(string fileExtension)
             => fileExtension switch
                {
                    ".yml"  => new YamlWorkflowParser(),

@@ -12,13 +12,7 @@
 		<PackageReference Include="YamlDotNet" Version="9.1.4" PrivateAssets="all" GeneratePathProperty="true" />
 	</ItemGroup>
 
-	<Target Name="TestMessage" AfterTargets="Build">
-
-		<!-- Use $(Property Name) to reference a property -->
-		<Message Text="$(PkgYamlDotNet)" Importance="high" />
-	</Target>
-
-	<PropertyGroup>
+  <PropertyGroup>
 		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
 	</PropertyGroup>
 
