@@ -5,17 +5,16 @@
   application:
     name: Husky App # Initial app metadata is set at the top
     version: 0.1
-    installDirectory: '{folders.ProgramFiles}/HuskyApp'
+    installDirectory: HuskyVariables.Folders.ProgramFiles + "/HuskyApp";
   clientMachineRequirements:
     supportedOperatingSystems: [Windows, Linux]
     freeSpaceMb: 128
     memoryMb: 1024
   dependencies: # Dependencies that Husky can track are explicitly stated
       - DotNet:
-          Version: '>=5.0.0'
+          Range: '>=5.0.0'
           FrameworkType: Runtime
           Kind: RuntimeOnly
-  variables: # Global constant values the user can set up top
 
   jobs: # A single job can exist without an explicitly declared stage
       show-splash:
@@ -29,10 +28,9 @@
                 task: Scripting.ExecuteInlineScript
                 with:
                   script: | # Unix-specific script
-                    clear &&
+                    cls &&
                     echo Welcome to Husky-App! &&
-                    sleep 10 &&
-                    exit 0
+                    read -n 1 -r -s -p $'Press any key to continue installation...\n'
 
               show-windows-splash:
                 platforms:
@@ -42,30 +40,28 @@
                   script: | # Windows (cmd) specific script
                     cls &&
                     echo Welcome to Husky-App! &&
-                    timeout 10 /NOBREAK &&
-                    exit
+                    pause
                 
       extract-husky-app:
           steps:
               extract-files:
                 task: Resources.ExtractBundledResource
                 with:
-                  resources: dist/program/**/* # standard file globbing pattern
-                  targetDirectory: '{variables.installDir}'
-                  clean: true # Clean the destination directory 
+                  resources: '**/*' # standard file globbing pattern
+                  targetDirectory: '{Folders.ProgramFiles}/HuskyApp'
 
       create-launch-file:
           steps:
               create-launch-script:
                 task: Scripting.CreateScriptFile # Create a platform-independent script file (.sh on linux, .bat on windows)
                 with:
-                  directory: '{variables.installDir}'
+                  directory: '{Folders.ProgramFiles}/HuskyApp'
                   fileName: launch
-                  script: dotnet Huskyapp.dll
+                  script: dotnet "{Folders.ProgramFiles}/HuskyApp/HuskyApp.dll"
 
               create-shortcut:
                 task: Utilities.CreateShortcut # Create a platform-independent shortcut 
                 with:
                   shortcutLocation: '{folders.Desktop}'
                   shortcutName: 'HuskyApp'
-                  target: '{variables.create-launch-file.create-launch-script.createdFileName}' # Retrieve variable from prior step
+                  target: '{create-launch-file.create-launch-script.createdFileName}' # Retrieve variable from prior step

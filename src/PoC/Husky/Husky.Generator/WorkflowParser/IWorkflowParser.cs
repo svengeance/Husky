@@ -1,7 +1,7 @@
 ﻿namespace Husky.Generator.WorkflowParser
 {
-    internal interface IWorkflowParser<out T> where T: ParsedWorkflow
+    internal interface IWorkflowParser
     {
-        T ParseWorkflow(string yamlWorkflow);
+        ParsedWorkflow ParseWorkflow(string workflowText);
     }
 }

@@ -1,5 +1,9 @@
+using System;
+using System.Text.Json;
 using Husky.Generator.WorkflowParser.YAML;
+using Newtonsoft.Json;
 using NUnit.Framework;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace Husky.Generator.Tests
 {
@@ -14,18 +18,28 @@ namespace Husky.Generator.Tests
         }
 
         [TestCase(@"---
-  name: Husky App # Initial app metadata is set at the top
-  version: 0.1
-  publisher: Svengeance
-  dependencies: # Dependencies that Husky can't track are explicitly stated
-      - DotNetCore>=5.0
-  variables: # Global constant values the user can set up top
-      installDir: $folders.ProgramFiles + /HuskyApp
+  author:
+    publisher: Svengeance
+    publisherUrl: https://sven.ai
+  application:
+    name: Husky App # Initial app metadata is set at the top
+    version: 0.1
+    installDirectory: HuskyVariables.Folders.ProgramFiles + ""/HuskyApp"";
+  clientMachineRequirements:
+    supportedOperatingSystems: [Windows, Linux]
+    freeSpaceMb: 128
+    memoryMb: 1024
+  dependencies: # Dependencies that Husky can track are explicitly stated
+      - DotNet:
+          Range: '>=5.0.0'
+          FrameworkType: Runtime
+          Kind: RuntimeOnly
 
   jobs: # A single job can exist without an explicitly declared stage
       show-splash:
-          steps:
-              - name: Display Unix Splash Screen
+        tags: [Install]
+        steps:
+              show-unix-splash:
                 platforms:
                   - Linux
                   - OSX
@@ -35,42 +49,42 @@ namespace Husky.Generator.Tests
                   script: | # Unix-specific script
                     cls &&
                     echo Welcome to Husky-App! &&
-                    read -n 1 -r -s -p $'Press any key to continue installation...\n'              
+                    read -n 1 -r -s -p $'Press any key to continue installation...\n'
 
-              - name: Display Windows Splash Screen
+              show-windows-splash:
                 platforms:
                   - Windows
                 task: Scripting.ExecuteInlineScript
                 with:
                   script: | # Windows (cmd) specific script
-                    clear &&
+                    cls &&
                     echo Welcome to Husky-App! &&
                     pause
-                
+
+
       extract-husky-app:
           steps:
-              - name: Extract App Files
+              extract-files:
                 task: Resources.ExtractBundledResource
                 with:
-                  resources: dist/program/**/* # standard file globbing pattern
-                  targetDirectory: $variables.installDir
-                  clean: true # Clean the destination directory 
+                  resources: '**/*' # standard file globbing pattern
+                  targetDirectory: '{Folders.ProgramFiles}/HuskyApp'
 
-      create-shortcut:
+      create-launch-file:
           steps:
-              - name: Create Launch Shortcut
+              create-launch-script:
                 task: Scripting.CreateScriptFile # Create a platform-independent script file (.sh on linux, .bat on windows)
                 with:
-                  directory: $variables.installDir
+                  directory: '{Folders.ProgramFiles}/HuskyApp'
                   fileName: launch
-                  script: dotnet Huskyapp.dll
-                output: # assign output variables FROM the step into inter-job variables
-                  app-launch-file: createdFileName
+                  script: dotnet ""{Folders.ProgramFiles}/HuskyApp/HuskyApp.dll""
 
-              - name: Create Desktop Shortcut
+              create-shortcut:
                 task: Utilities.CreateShortcut # Create a platform-independent shortcut 
                 with:
-                  target: $jobs.create-shortcut.variables.app-launch-file # Variables are scoped at the job level")]
+                  shortcutLocation: '{folders.Desktop}'
+                  shortcutName: 'HuskyApp'
+                  target: '{create-launch-file.create-launch-script.createdFileName}' # Retrieve variable from prior step")]
         [Category("UnitTest")]
         public void Test1(string yaml)
         {
@@ -81,6 +95,7 @@ namespace Husky.Generator.Tests
 
             // Assert
             Assert.IsNotNull(yamlWorkflow);
+            JsonSerializer.Create().Serialize(Console.Out, yamlWorkflow);
         }
     }
 }
