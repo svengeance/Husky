@@ -73,7 +73,8 @@ namespace Husky.Generator.WorkflowParser.YAML
             {
                 AssertNodeIs(stage.Key, out YamlScalarNode scalarNode);
                 AssertNodeIs(stage.Value, out YamlMappingNode jobsNode);
-                var parsedStage = new ParsedStage { Jobs = ParseJobs(jobsNode) };
+                AssertNodeIs(jobsNode.Children[0].Value, out YamlMappingNode nestedJobsNode);
+                var parsedStage = new ParsedStage { Jobs = ParseJobs(nestedJobsNode) };
                 workflow.Stages.Add(scalarNode.Value!, parsedStage);
             }
         }
@@ -103,12 +104,12 @@ namespace Husky.Generator.WorkflowParser.YAML
         private Dictionary<string, ParsedJob> ParseJobs(YamlMappingNode jobsNode)
         {
             var parsedJobs = new Dictionary<string, ParsedJob>(jobsNode.Children.Count);
-            foreach (var job in jobsNode)
+            foreach (var job in jobsNode.Children)
             {
                 AssertNodeIs(job.Key, out YamlScalarNode scalarNode);
                 AssertNodeIs(job.Value, out YamlMappingNode jobPropertiesMappingNode);
                 ParsedJob parsedJob = new();
-
+                
                 foreach (var jobProperty in jobPropertiesMappingNode.Children)
                 {
                     AssertNodeIs(jobProperty.Key, out YamlScalarNode jobPropertyNode);
@@ -119,7 +120,7 @@ namespace Husky.Generator.WorkflowParser.YAML
                     } else if (jobPropertyNode.Value == YamlBlocks.Steps)
                     {
                         AssertNodeIs(jobProperty.Value, out YamlMappingNode stepsNode);
-                        parsedJob = new ParsedJob { Steps = ParseSteps(stepsNode) };
+                        parsedJob.Steps = ParseSteps(stepsNode);
                         parsedJobs.Add(scalarNode.Value!, parsedJob);
                     }
                 }
@@ -184,7 +185,5 @@ namespace Husky.Generator.WorkflowParser.YAML
 
         private void AssertNodeIs<T>(YamlNode node, out T outputNode) where T: class
             => outputNode = node as T ?? throw new InvalidOperationException($"Expected {node} to be of type {typeof(T).Name}");
-
-        private void ThrowParseException(string message) => throw new InvalidOperationException(message);
     }
 }
