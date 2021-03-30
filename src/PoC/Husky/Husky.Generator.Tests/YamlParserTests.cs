@@ -234,11 +234,11 @@ namespace Husky.Generator.Tests
         [TestCase(@"
 ---
   jobs:
-    show-splash:
+    talk-about-puppies:
       tags:
         - Install
       steps:
-        show-windows-splash:
+        describe-puppies:
           platforms:
             - Windows
           task: Scripting.ExecuteInlineScript
@@ -254,12 +254,12 @@ namespace Husky.Generator.Tests
                 {
                     Jobs = new()
                     {
-                        ["show-splash"] = new ParsedJob
+                        ["talk-about-puppies"] = new ParsedJob
                         {
                             Tags = new() { "Install" },
                             Steps = new()
                             {
-                                ["show-windows-splash"] = new ParsedStep
+                                ["describe-puppies"] = new ParsedStep
                                 {
                                     Platforms = new() { "Windows" },
                                     Task = "Scripting.ExecuteInlineScript",
@@ -284,7 +284,7 @@ namespace Husky.Generator.Tests
         [TestCase(@"
 ---
   steps:
-    show-windows-splash:
+    describe-kittens:
       platforms:
         - Windows
       task: Scripting.ExecuteInlineScript
@@ -304,7 +304,7 @@ namespace Husky.Generator.Tests
                         {
                             Steps = new()
                             {
-                                ["show-windows-splash"] = new ParsedStep
+                                ["describe-kittens"] = new ParsedStep
                                 {
                                     Platforms = new() { "Windows" },
                                     Task = "Scripting.ExecuteInlineScript",
