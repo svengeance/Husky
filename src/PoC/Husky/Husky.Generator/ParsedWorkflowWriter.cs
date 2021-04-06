@@ -214,12 +214,13 @@ namespace Husky.Generator
                };
 
         private static bool TryHandleSpecialCase(object? property, string path, out string? parsedValue)
-            => (parsedValue = path switch
-                              {
-                                  _ when property is null => "null",
-                                  "application.version"                                 => WriteObjectValue(property.ToString()),
-                                  "clientMachineRequirements.supportedOperatingSystems" =>$"new[] {{ {string.Join(", ", ((string[]) property).Select(s => $"global::Husky.Core.Enums.OS.{s}"))} }}",
-                                  _                                                     => null
-                              }) != null;
+            => (parsedValue = 
+                path switch
+                {
+                    _ when property is null => "null",
+                    "application.version"                                 => WriteObjectValue(property.ToString()), // This is always a string that "may" look like a number e.x. 0.1
+                    "clientMachineRequirements.supportedOperatingSystems" =>$"new[] {{ {string.Join(", ", ((string[]) property).Select(s => $"global::Husky.Core.Enums.OS.{s}"))} }}", // these are enum values, not strings
+                    _                                                     => null
+                }) != null;
     }
 }
