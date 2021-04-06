@@ -32,13 +32,15 @@ namespace Husky.Core.Workflow.Builder
          * Intention here is that clients will never explicitly add steps with zero configuration, however steps managed by the system may
          * be automatically added as a result of specific client configuration
          */
-        internal IHuskyJobBuilder AddStep<TTaskConfiguration>(string name) where TTaskConfiguration : HuskyTaskConfiguration => AddStep<TTaskConfiguration>(name, _ => { });
+        internal IHuskyJobBuilder AddStep<TTaskConfiguration>(string name) where TTaskConfiguration : HuskyTaskConfiguration
+            => AddStep<TTaskConfiguration>(name, _ => { });
+
+        internal IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration
+            => AddStep<TTaskConfiguration>(name, _ => { }, stepConfiguration);
 
         IHuskyJobBuilder SetDefaultStepConfiguration(HuskyStepConfiguration defaultStepConfiguration);
 
         IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
-
-        IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
 
         IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration;
     }

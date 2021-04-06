@@ -6,6 +6,7 @@ using System.Text;
 using Husky.Generator.WorkflowParser;
 using Husky.Generator.WorkflowParser.YAML;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Husky.Generator
 {
@@ -14,8 +15,6 @@ namespace Husky.Generator
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            return;
-
             var source = new StringBuilder();
             try
             {
@@ -33,9 +32,14 @@ namespace Husky.Generator
                     return;
                 }
 
-                var parser = GetParser(Path.GetExtension(workflowConfiguration.Path));
+                var workflowText = workflowConfiguration.GetText()?.ToString();
+                
+                if (string.IsNullOrEmpty(workflowText))
+                    return;
 
-                var huskyWorkflow = parser.ParseWorkflow(workflowConfiguration.GetText().ToString());
+                var parser = GetParser(Path.GetExtension(workflowConfiguration.Path));
+                var parsedWorkflow = parser.ParseWorkflow(workflowText!);
+                context.AddSource(GeneratorConstants.GeneratedWorkflowFileName, ParsedWorkflowWriter.Write(parsedWorkflow));
             }
             catch (Exception e)
             {
@@ -51,10 +55,7 @@ namespace Husky.Generator
 
                 source.Insert(0, exceptionString.ToString());
 
-
-                context.AddSource("EXCEPTION", source.ToString());
-
-                Console.WriteLine("HEHOIWAUSEHROSADRBNOFSBDNOF");
+                context.AddSource(GeneratorConstants.GeneratedWorkflowFileName, source.ToString());
                 throw new ApplicationException(source.ToString());
             }
         }

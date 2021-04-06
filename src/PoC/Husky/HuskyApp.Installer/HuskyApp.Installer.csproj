@@ -5,6 +5,11 @@
     <TargetFramework>net5.0</TargetFramework>
     <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
 
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+
+    <IsNCrunch>false</IsNCrunch>
+
     <!--<TrimMode>link</TrimMode>
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>-->
     
@@ -32,7 +37,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Husky.Core\Husky.Core.csproj" />
     <ProjectReference Include="..\Husky.Installer\Husky.Installer.csproj" />
-    <!--<ProjectReference Include="..\Husky.Generator\Husky.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />-->
+    <ProjectReference Include="..\Husky.Generator\Husky.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\Husky.Tasks\Husky.Tasks.csproj" />
   </ItemGroup>
 
@@ -41,6 +46,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Condition="$(IsNCrunch)" Include="obj\GeneratedFiles\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="3.9.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
   </ItemGroup>
 

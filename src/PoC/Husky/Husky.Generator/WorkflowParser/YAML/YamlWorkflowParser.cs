@@ -117,6 +117,10 @@ namespace Husky.Generator.WorkflowParser.YAML
                     {
                         AssertNodeIs(jobProperty.Value, out YamlSequenceNode jobTags);
                         parsedJob.Tags = jobTags.Children.Select(s => ((YamlScalarNode) s).Value!).ToList();
+                    } else if (jobPropertyNode.Value == YamlBlocks.JobProperties.Os)
+                    {
+                        AssertNodeIs(jobProperty.Value, out YamlScalarNode jobOs);
+                        parsedJob.Os = jobOs.Value!;
                     } else if (jobPropertyNode.Value == YamlBlocks.Steps)
                     {
                         AssertNodeIs(jobProperty.Value, out YamlMappingNode stepsNode);
@@ -152,9 +156,13 @@ namespace Husky.Generator.WorkflowParser.YAML
 
                 switch (key)
                 {
-                    case YamlBlocks.StepProperties.Platforms:
-                        AssertNodeIs(property.Value, out YamlSequenceNode platformNodes);
-                        parsedStep.Platforms = platformNodes.Children.Select(s => ((YamlScalarNode) s).Value!).ToList();
+                    case YamlBlocks.StepProperties.Os:
+                        AssertNodeIs(property.Value, out YamlScalarNode osNode);
+                        parsedStep.Os = osNode.Value!;
+                        break;
+                    case YamlBlocks.StepProperties.Tags:
+                        AssertNodeIs(property.Value, out YamlSequenceNode tagsNode);
+                        parsedStep.Tags = tagsNode.Children.Select(s => ((YamlScalarNode) s).Value!).ToList();
                         break;
                     case YamlBlocks.StepProperties.Task:
                         AssertNodeIs(property.Value, out YamlScalarNode taskNode);
@@ -178,10 +186,18 @@ namespace Husky.Generator.WorkflowParser.YAML
         private object? MapNodeAsScalarOrSequence(YamlNode node)
             => node switch
                {
-                   YamlScalarNode scalar     => scalar.Value,
+                   YamlScalarNode scalar     => DeserializeScalarObject(scalar.Value),
                    YamlSequenceNode sequence => sequence.Children.Cast<YamlScalarNode>().Select(s => s.Value).ToArray(),
                    _                         => throw new InvalidOperationException($"Unable to map node as scalar or sequence: {node}")
                };
+
+        private object? DeserializeScalarObject(string? s) =>
+            s switch
+            {
+                _ when int.TryParse(s, out var i)    => i,
+                _ when double.TryParse(s, out var d) => d,
+                _                                    => s?.Replace("\n", Environment.NewLine)
+            };
 
         private void AssertNodeIs<T>(YamlNode node, out T outputNode) where T: class
             => outputNode = node as T ?? throw new InvalidOperationException($"Expected {node} to be of type {typeof(T).Name}");

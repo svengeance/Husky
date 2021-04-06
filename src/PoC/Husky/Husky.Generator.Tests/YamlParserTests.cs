@@ -45,14 +45,14 @@ namespace Husky.Generator.Tests
                 ["application"] = new()
                 {
                     ["name"] = "Husky App",
-                    ["version"] = "0.1",
+                    ["version"] = 0.1,
                     ["installDirectory"] = @"HuskyVariables.Folders.ProgramFiles + ""/HuskyApp""",
                 },
                 ["clientMachineRequirements"] = new()
                 {
                     ["supportedOperatingSystems"] = new[] { "Windows", "Linux" },
-                    ["freeSpaceMb"] = "128",
-                    ["memoryMb"] = "1024"
+                    ["freeSpaceMb"] = 128,
+                    ["memoryMb"] = 1024
                 },
             };
 
@@ -147,7 +147,7 @@ namespace Husky.Generator.Tests
               with:
                 script: echo Even more puppies and kittens!")]
         [Category("UnitTest")]
-        public void Yaml_parser_parser_stages_jobs_and_steps(string yaml)
+        public void Yaml_parser_parses_stages_jobs_and_steps(string yaml)
         {
             // Arrange
             var expectedWorkflowBlocks = new Dictionary<string, ParsedStage>()
@@ -235,12 +235,12 @@ namespace Husky.Generator.Tests
 ---
   jobs:
     talk-about-puppies:
+      os: AniOs
       tags:
         - Install
       steps:
         describe-puppies:
-          platforms:
-            - Windows
+          os: Windows
           task: Scripting.ExecuteInlineScript
           with:
             script: echo Puppies with jobs!")]
@@ -256,12 +256,13 @@ namespace Husky.Generator.Tests
                     {
                         ["talk-about-puppies"] = new ParsedJob
                         {
+                            Os = "AniOs",
                             Tags = new() { "Install" },
                             Steps = new()
                             {
                                 ["describe-puppies"] = new ParsedStep
                                 {
-                                    Platforms = new() { "Windows" },
+                                    Os = "Windows" ,
                                     Task = "Scripting.ExecuteInlineScript",
                                     With = new()
                                     {
@@ -285,8 +286,8 @@ namespace Husky.Generator.Tests
 ---
   steps:
     describe-kittens:
-      platforms:
-        - Windows
+      os: Windows
+      tags: ['Klassy', 'Kats']
       task: Scripting.ExecuteInlineScript
       with:
         script: echo Kittens with Steps!")]
@@ -306,8 +307,9 @@ namespace Husky.Generator.Tests
                             {
                                 ["describe-kittens"] = new ParsedStep
                                 {
-                                    Platforms = new() { "Windows" },
+                                    Os = "Windows",
                                     Task = "Scripting.ExecuteInlineScript",
+                                    Tags = new() { "Klassy", "Kats" },
                                     With = new()
                                     {
                                         ["script"] = "echo Kittens with Steps!"

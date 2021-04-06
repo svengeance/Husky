@@ -1,0 +1,11 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <AdditionalFilesToIncludeForProject>
+      <Value>obj\GeneratedFiles\Husky.Generator\Husky.Generator.HelloWorldGenerator\**.*</Value>
+    </AdditionalFilesToIncludeForProject>
+    <AllowCodeAnalysis>True</AllowCodeAnalysis>
+    <CustomBuildProperties>
+      <Value>IsNCrunch = True</Value>
+    </CustomBuildProperties>
+  </Settings>
+</ProjectConfiguration>
