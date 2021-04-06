@@ -9,7 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Husky.Tests.Sdk\Husky.Tests.Sdk.csproj" />
     <ProjectReference Include="..\HuskyApp.Installer\HuskyApp.Installer.csproj" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
   </ItemGroup>
 
 </Project>

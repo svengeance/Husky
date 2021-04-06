@@ -97,9 +97,6 @@ namespace Husky.Core.Workflow.Builder
             return this;
         }
 
-        public IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration
-            => AddStep<TTaskConfiguration>(name, _ => { }, stepConfiguration);
-
         public IHuskyJobBuilder AddStep<TTaskConfiguration>(string name, Action<TTaskConfiguration> taskConfiguration, HuskyStepConfiguration stepConfiguration) where TTaskConfiguration : HuskyTaskConfiguration
         {
             var configuration = Activator.CreateInstance<TTaskConfiguration>();

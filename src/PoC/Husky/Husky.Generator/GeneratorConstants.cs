@@ -5,7 +5,7 @@ namespace Husky.Generator
     public static class GeneratorConstants
     {
         public const string WorkflowConfigurationFileName = "Husky";
-        public const string GeneratedWorkflowFileName = "HuskyWorkflow.cs";
+        public const string GeneratedWorkflowFileName = "Husky.Generated.cs";
 
         public static class Workflow
         {
@@ -24,12 +24,14 @@ namespace Husky.Generator
 
                 public static class JobProperties
                 {
+                    public const string Os = "os";
                     public const string Tags = "tags";
                 }
 
                 public static class StepProperties
                 {
-                    public const string Platforms = "platforms";
+                    public const string Os = "os";
+                    public const string Tags = "tags";
                     public const string Task = "task";
                     public const string With = "with";
                 }

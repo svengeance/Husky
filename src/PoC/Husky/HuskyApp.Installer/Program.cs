@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
+ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -99,82 +98,85 @@ namespace HuskyApp.Installer
 
             logger.Debug("Finished parsing HuskyInstallerSettings: {@HuskyInstallerSettings}", installationSettings);
 
+
+            // Todo: Delete below once we are confident the YML workflow is fully functional
             //HelloWorldGenerated.HelloWorld.SayHello();
-            const string linuxScript = @"
-cls &&
-echo Welcome to Husky-App! &&
-read -n 1 -r -s -p $'Press any key to continue installation...\n'";
+//            const string linuxScript = @"
+//cls &&
+//echo Welcome to Husky-App! &&
+//read -n 1 -r -s -p $'Press any key to continue installation...\n'";
 
-            const string windowsScript = @"
-cls &&
-echo Welcome to Husky-App! &&
-pause";
+//            const string windowsScript = @"
+//cls &&
+//echo Welcome to Husky-App! &&
+//pause";
 
-            var workflow = HuskyWorkflow.Create()
-                                        .Configure<AuthorConfiguration>(a =>
-                                         {
-                                             a.Publisher = "Sven";
-                                             a.PublisherUrl = "https://sven.ai";
-                                         })
-                                        .Configure<ApplicationConfiguration>(a =>
-                                         {
-                                             a.Name = "HuskyApp";
-                                             a.Version = "1.0.0";
-                                             // Todo: GH #12 - Allow this to be resolved from a variable
-                                             a.InstallDirectory = HuskyVariables.Folders.ProgramFiles + "/HuskyApp";
-                                         })
-                                        .Configure<ClientMachineRequirementsConfiguration>(c =>
-                                         {
-                                             c.SupportedOperatingSystems = new[] { OS.Windows, OS.Linux };
-                                             c.FreeSpaceMb = 128;
-                                             c.MemoryMb = 1024;
-                                         })
-                                        .AddDependency(new DotNet(Range: ">=5.0.0", FrameworkType: FrameworkInstallationType.Runtime, Kind: DotNet.RuntimeKind.RuntimeOnly))
-                                        .WithDefaultStage(
-                                             stage => stage
-                                                           .AddJob(
-                                                                "show-splash",
-                                                                splash => splash.SetDefaultStepConfiguration(new HuskyStepConfiguration(CurrentPlatform.OS)
-                                                                                 {
-                                                                                     Tags = new[] { "Install" }
-                                                                                 })
-                                                                                .AddStep<ExecuteInlineScriptOptions>(
-                                                                                     "show-unix-splash",
-                                                                                     task => task.Script = linuxScript,
-                                                                                     LunixConfiguration)
-                                                                                .AddStep<ExecuteInlineScriptOptions>(
-                                                                                     "show-windows-splash",
-                                                                                     task => task.Script = windowsScript,
-                                                                                     WindowsConfiguration))
-                                                           .AddJob(
-                                                                "extract-husky-app",
-                                                                extract => extract.AddStep<ExtractBundledResourceOptions>(
-                                                                    "extract-files",
-                                                                    task =>
-                                                                    {
-                                                                        task.Resources = "**/*";
-                                                                        task.TargetDirectory = "{Folders.ProgramFiles}/HuskyApp";
-                                                                    }))
-                                                           .AddJob(
-                                                                "create-launch-file",
-                                                                launch => launch.AddStep<CreateScriptFileOptions>(
-                                                                                     "create-launch-script",
-                                                                                     task =>
-                                                                                     {
-                                                                                         task.Directory = "{Folders.ProgramFiles}/HuskyApp";
-                                                                                         task.FileName = "launch";
-                                                                                         task.Script = "dotnet \"{Folders.ProgramFiles}/HuskyApp/HuskyApp.dll\"";
-                                                                                     })
-                                                                                .AddStep<CreateShortcutOptions>(
-                                                                                     "create-shortcut",
-                                                                                     task =>
-                                                                                     {
-                                                                                         task.ShortcutName = "Husky App";
-                                                                                         task.ShortcutLocation = "{Folders.Desktop}";
-                                                                                         task.Target = "{create-launch-file.create-launch-script.createdFileName}";
-                                                                                     }))
-                                         ).Build();
+            //var workflow = HuskyWorkflow.Create()
+            //                            .Configure<AuthorConfiguration>(a =>
+            //                             {
+            //                                 a.Publisher = "Sven";
+            //                                 a.PublisherUrl = "https://sven.ai";
+            //                             })
+            //                            .Configure<ApplicationConfiguration>(a =>
+            //                             {
+            //                                 a.Name = "HuskyApp";
+            //                                 a.Version = "1.0.0";
+            //                                 // Todo: GH #12 - Allow this to be resolved from a variable
+            //                                 a.InstallDirectory = HuskyVariables.Folders.ProgramFiles + "/HuskyApp";
+            //                             })
+            //                            .Configure<ClientMachineRequirementsConfiguration>(c =>
+            //                             {
+            //                                 c.SupportedOperatingSystems = new[] { OS.Windows, OS.Linux };
+            //                                 c.FreeSpaceMb = 128;
+            //                                 c.MemoryMb = 1024;
+            //                             })
+            //                            .AddDependency(new DotNet(Range: ">=5.0.0", FrameworkInstallationKind: DotNet.FrameworkInstallation.Runtime, RuntimeInstallationKind: DotNet.RuntimeInstallation.RuntimeOnly))
+            //                            .WithDefaultStage(
+            //                                 stage => stage
+            //                                               .AddJob(
+            //                                                    "show-splash",
+            //                                                    splash => splash.SetDefaultStepConfiguration(new HuskyStepConfiguration(CurrentPlatform.OS)
+            //                                                                     {
+            //                                                                         Tags = new[] { "Install" }
+            //                                                                     })
+            //                                                                    .AddStep<ExecuteInlineScriptOptions>(
+            //                                                                         "show-unix-splash",
+            //                                                                         task => task.Script = linuxScript,
+            //                                                                         LunixConfiguration)
+            //                                                                    .AddStep<ExecuteInlineScriptOptions>(
+            //                                                                         "show-windows-splash",
+            //                                                                         task => task.Script = windowsScript,
+            //                                                                         WindowsConfiguration))
+            //                                               .AddJob(
+            //                                                    "extract-husky-app",
+            //                                                    extract => extract.AddStep<ExtractBundledResourceOptions>(
+            //                                                        "extract-files",
+            //                                                        task =>
+            //                                                        {
+            //                                                            task.Resources = "**/*";
+            //                                                            task.TargetDirectory = "{Folders.ProgramFiles}/HuskyApp";
+            //                                                        }))
+            //                                               .AddJob(
+            //                                                    "create-launch-file",
+            //                                                    launch => launch.AddStep<CreateScriptFileOptions>(
+            //                                                                         "create-launch-script",
+            //                                                                         task =>
+            //                                                                         {
+            //                                                                             task.Directory = "{Folders.ProgramFiles}/HuskyApp";
+            //                                                                             task.FileName = "launch";
+            //                                                                             task.Script = "dotnet \"{Folders.ProgramFiles}/HuskyApp/HuskyApp.dll\"";
+            //                                                                         })
+            //                                                                    .AddStep<CreateShortcutOptions>(
+            //                                                                         "create-shortcut",
+            //                                                                         task =>
+            //                                                                         {
+            //                                                                             task.ShortcutName = "Husky App";
+            //                                                                             task.ShortcutLocation = "{Folders.Desktop}";
+            //                                                                             task.Target = "{create-launch-file.create-launch-script.createdFileName}";
+            //                                                                         }))
+            //                             ).Build();
 
+            var workflow = Husky.Generated.Workflow.Create();
             var (numStages, numJobs, numTasks) = CountWorkflowItems(workflow);
             logger.Information("Parsed HuskyWorkflow, found {numberOfStages} stages, {numberOfJobs} jobs, and {numberOfTasks} tasks", numStages, numJobs, numTasks);
             logger.Verbose("Workflow\n{@workflow}", workflow);
