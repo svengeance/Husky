@@ -26,14 +26,14 @@ namespace Husky.Dependencies.DependencyHandlers
         };
 
         private string FormatPackageName(DotNet dependency)
-            => $"{DerivePackageProduct(dependency)}-{dependency.FrameworkType.ToString().ToLowerInvariant()}-{GetHighestMatchingVersionString(dependency.ParsedRange)}";
+            => $"{DerivePackageProduct(dependency)}-{dependency.FrameworkInstallationKind.ToString().ToLowerInvariant()}-{GetHighestMatchingVersionString(dependency.ParsedRange)}";
 
         private string DerivePackageProduct(DotNet dependency)
-            => dependency.Kind switch
+            => dependency.RuntimeInstallationKind switch
                {
-                   _ when dependency.FrameworkType == FrameworkInstallationType.Sdk => "dotnet",
-                   DotNet.RuntimeKind.AspNet => "aspnetcore",
-                   DotNet.RuntimeKind.RuntimeOnly => "dotnet",
+                   _ when dependency.FrameworkInstallationKind == DotNet.FrameworkInstallation.Sdk => "dotnet",
+                   DotNet.RuntimeInstallation.AspNet => "aspnetcore",
+                   DotNet.RuntimeInstallation.RuntimeOnly => "dotnet",
                    _ => throw new PlatformNotSupportedException($"Invalid DotNet product specified: {dependency} is invalid on Linux platforms.")
                };
 

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Husky.Core.Enums;
 using Husky.Dependencies.DependencyHandlers;
 using Husky.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+
+using FrameworkInstallation = Husky.Core.Dependencies.DotNet.FrameworkInstallation;
 
 namespace Husky.Dependencies.Tests.DotNet
 {
@@ -46,18 +47,18 @@ namespace Husky.Dependencies.Tests.DotNet
 
         }
         
-        [TestCase(FrameworkInstallationType.Runtime, "dotnet --list-runtimes")]
-        [TestCase(FrameworkInstallationType.Sdk, "dotnet --list-sdks")]
+        [TestCase(FrameworkInstallation.Runtime, "dotnet --list-runtimes")]
+        [TestCase(FrameworkInstallation.Sdk, "dotnet --list-sdks")]
         [Category("UnitTest")]
-        public void Dotnet_is_installed_check_runs_appropriate_shell_command(FrameworkInstallationType frameworkInstallationType, string expectedCommand)
+        public void Dotnet_is_installed_check_runs_appropriate_shell_command(FrameworkInstallation frameworkInstallationKind, string expectedCommand)
         {
             // Arrange
             _shellExecutionServiceMock.Setup(s => s.ExecuteShellCommand(It.IsAny<string>()))
                                       .ReturnsAsync(new ShellExecutionService.ScriptExecutionResult(0, string.Empty, string.Empty));
 
-            var dependency = new Core.Dependencies.DotNet("1.0.0", frameworkInstallationType, frameworkInstallationType == FrameworkInstallationType.Runtime
-                ? Core.Dependencies.DotNet.RuntimeKind.AspNet
-                : Core.Dependencies.DotNet.RuntimeKind.Sdk);
+            var dependency = new Core.Dependencies.DotNet("1.0.0", frameworkInstallationKind, frameworkInstallationKind == FrameworkInstallation.Runtime
+                ? Core.Dependencies.DotNet.RuntimeInstallation.AspNet
+                : Core.Dependencies.DotNet.RuntimeInstallation.Sdk);
             
             var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
             
@@ -76,7 +77,7 @@ namespace Husky.Dependencies.Tests.DotNet
         public async Task Dotnet_handler_identifies_installed_sdk(string range, bool expectedIsInstalledResult)
         {
             // Arrange
-            var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallationType.Sdk);
+            var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallation.Sdk);
             var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
 
             // Act
@@ -86,14 +87,14 @@ namespace Husky.Dependencies.Tests.DotNet
             Assert.AreEqual(expectedIsInstalledResult, isInstalled);
         }
 
-        [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeKind.AspNet, true)]
-        [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeKind.RuntimeOnly, true)]
-        [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeKind.Desktop, false)]
+        [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeInstallation.AspNet, true)]
+        [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeInstallation.RuntimeOnly, true)]
+        [TestCase("2.x.x", Core.Dependencies.DotNet.RuntimeInstallation.Desktop, false)]
         [Category("UnitTest")]
-        public async Task Dotnet_handler_identifies_installed_runtime(string range, Core.Dependencies.DotNet.RuntimeKind runtimeKind, bool expectedIsInstalledResult)
+        public async Task Dotnet_handler_identifies_installed_runtime(string range, Core.Dependencies.DotNet.RuntimeInstallation runtimeInstallation, bool expectedIsInstalledResult)
         {
             // Arrange
-            var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallationType.Runtime, runtimeKind);
+            var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallation.Runtime, runtimeInstallation);
             var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
 
             // Act
@@ -108,7 +109,7 @@ namespace Husky.Dependencies.Tests.DotNet
         public void Dotnet_handler_sastisfies_dotnet_aspnet_runtime_v5_dependency()
         {
             // Arrange
-            var dependency = new Core.Dependencies.DotNet(">=5", FrameworkInstallationType.Runtime, Core.Dependencies.DotNet.RuntimeKind.AspNet);
+            var dependency = new Core.Dependencies.DotNet(">=5", FrameworkInstallation.Runtime, Core.Dependencies.DotNet.RuntimeInstallation.AspNet);
             var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
 
             // Act
