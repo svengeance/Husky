@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.Dependencies;
-using Husky.Core.Enums;
 using Husky.Services;
 using Microsoft.Extensions.Logging;
 using Version = SemVer.Version;
@@ -31,19 +30,19 @@ namespace Husky.Dependencies.DependencyHandlers
         protected override IEnumerable<DependencyAcquisitionMethod<DotNet>> GetAvailableOsxDependencies(DotNet dependency) => Array.Empty<DependencyAcquisitionMethod<DotNet>>();
 
         public override async ValueTask<bool> IsAlreadyInstalled()
-            => IsAlreadyInstalled(Dependency, await GetDotnetInstallationOutput(Dependency.FrameworkType));
+            => IsAlreadyInstalled(Dependency, await GetDotnetInstallationOutput(Dependency.FrameworkInstallationKind));
 
         private bool IsAlreadyInstalled(DotNet dependency, string[] splitDotnetOutput)
-            => dependency.FrameworkType switch
+            => dependency.FrameworkInstallationKind switch
             {
-                FrameworkInstallationType.Sdk => GetInstalledSdks(splitDotnetOutput).Any(a => dependency.ParsedRange.IsSatisfied(a)),
-                FrameworkInstallationType.Runtime => GetInstalledRuntimes(splitDotnetOutput).Any(a => a.runtimeKind == dependency.Kind && dependency.ParsedRange.IsSatisfied(a.version)),
+                DotNet.FrameworkInstallation.Sdk => GetInstalledSdks(splitDotnetOutput).Any(a => dependency.ParsedRange.IsSatisfied(a)),
+                DotNet.FrameworkInstallation.Runtime => GetInstalledRuntimes(splitDotnetOutput).Any(a => a.runtimeKind == dependency.RuntimeInstallationKind && dependency.ParsedRange.IsSatisfied(a.version)),
                 _ => false
             };
         
-        private async ValueTask<string[]> GetDotnetInstallationOutput(FrameworkInstallationType frameworkInstallationType)
+        private async ValueTask<string[]> GetDotnetInstallationOutput(DotNet.FrameworkInstallation frameworkInstallationKind)
         {
-            var command = frameworkInstallationType == FrameworkInstallationType.Runtime
+            var command = frameworkInstallationKind == DotNet.FrameworkInstallation.Runtime
                 ? "--list-runtimes"
                 : "--list-sdks";
 
@@ -64,16 +63,16 @@ namespace Husky.Dependencies.DependencyHandlers
 
         // Microsoft.AspNetCore.App 5.0.0 [C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App]
         // Microsoft.NETCore.App 2.1.23 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
-        private (DotNet.RuntimeKind runtimeKind, Version version)[] GetInstalledRuntimes(IEnumerable<string> dotnetRuntimesList)
+        private (DotNet.RuntimeInstallation runtimeKind, Version version)[] GetInstalledRuntimes(IEnumerable<string> dotnetRuntimesList)
             => dotnetRuntimesList.Select(s => s.Split(' '))
                                  .Select(s => (DeriveRuntimeKindFromString(s[0].Split('.')[1]), Version.Parse(s[1])))
                                  .ToArray();
 
-        private DotNet.RuntimeKind DeriveRuntimeKindFromString(string dotnetRuntimeKindOutput)
+        private DotNet.RuntimeInstallation DeriveRuntimeKindFromString(string dotnetRuntimeKindOutput)
             => dotnetRuntimeKindOutput == "AspNetCore"
-                ? DotNet.RuntimeKind.AspNet
+                ? DotNet.RuntimeInstallation.AspNet
                 : dotnetRuntimeKindOutput == "WindowsDesktop"
-                    ? DotNet.RuntimeKind.Desktop
-                    : DotNet.RuntimeKind.RuntimeOnly;
+                    ? DotNet.RuntimeInstallation.Desktop
+                    : DotNet.RuntimeInstallation.RuntimeOnly;
     }
 }
