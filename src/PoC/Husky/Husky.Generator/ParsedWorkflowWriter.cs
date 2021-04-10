@@ -12,14 +12,13 @@ namespace Husky.Generator
     internal class ParsedWorkflowWriter
     {
         private readonly ParsedWorkflow _parsedWorkflow;
-        private readonly SourceBuilder _sb;
+        private readonly SourceBuilder _sb = new();
 
         public override string ToString() => _sb.ToString();
 
         private ParsedWorkflowWriter(ParsedWorkflow parsedWorkflow)
         {
             _parsedWorkflow = parsedWorkflow;
-            _sb = new();
 
             WriteHuskyWorkflow();
         }

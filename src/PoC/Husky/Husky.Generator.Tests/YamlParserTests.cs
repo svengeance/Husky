@@ -21,6 +21,7 @@ namespace Husky.Generator.Tests
   author:
     publisher: Svengeance
     publisherUrl: 'https://sven.ai'
+    isAnAlrightGuy: true
   application:
     name: Husky App
     version: 0.1
@@ -41,6 +42,7 @@ namespace Husky.Generator.Tests
                 {
                     ["publisher"] = "Svengeance",
                     ["publisherUrl"] = "https://sven.ai",
+                    ["isAnAlrightGuy"] = true
                 },
                 ["application"] = new()
                 {

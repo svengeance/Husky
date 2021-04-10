@@ -196,6 +196,7 @@ namespace Husky.Generator.WorkflowParser.YAML
             {
                 _ when int.TryParse(s, out var i)    => i,
                 _ when double.TryParse(s, out var d) => d,
+                _ when bool.TryParse(s, out var b)   => b,
                 _                                    => s?.Replace("\n", Environment.NewLine)
             };
 
