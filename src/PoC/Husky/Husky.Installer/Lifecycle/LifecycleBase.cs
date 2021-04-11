@@ -156,7 +156,7 @@ namespace Husky.Installer.Lifecycle
             /* Todo: We currently have a "related type" issue, where we don't give a damn what type <T> is here, we just *know* it's a HuskyTaskConfiguration
             *  Unfortunately, the invariance on class-generic-types causes failures when trying to upcast T here, which is a *specific* configuration, to the base HTC.
             *  This *can* cause issues if we were to try to send *ANY OTHER* type other than the related type (i.e. send in Task1Configuration to a Task2)
-            *  However, since I am only resolving and using the related type (i.e. we will *only* ever set ValueTask1Configuration on ValueTask1 here), this is somewhat safe
+            *  However, since I am only resolving and using the related type (i.e. we will *only* ever set Task1Configuration on Task1 here), this is somewhat safe
             *  In short, it may behoove us to get away from this if a different approach works better.
             */
             /*
