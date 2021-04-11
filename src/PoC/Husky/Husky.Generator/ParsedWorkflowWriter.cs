@@ -204,12 +204,13 @@ namespace Husky.Generator
                {
                    _ when TryHandleSpecialCase(property, path, out var parsed) => parsed!,
                    string s when path.EndsWith("Kind") => $"{path.Substring(0, path.Length - 4)}.{s}", // We make the bold assumption an enum property ends with Kind
-                   string s                            => "@\"" + s.Replace("\"", "\"\"") + "\"",
-                   int i                               => i.ToString(),
-                   double d                            => d.ToString(CultureInfo.InvariantCulture),
-                   string[] a                          => $"new[] {{{string.Join(",", a.Select(s => $" \"{s}\""))} }}",
-                   null                                => "null",
-                   _                                   => throw new InvalidOperationException("Unable to serialize type " + property.GetType().Name)
+                   string s   => "@\"" + s.Replace("\"", "\"\"") + "\"",
+                   int i      => i.ToString(),
+                   double d   => d.ToString(CultureInfo.InvariantCulture),
+                   string[] a => $"new[] {{{string.Join(",", a.Select(s => $" \"{s}\""))} }}",
+                   bool b     => b.ToString().ToLowerInvariant(),
+                   null       => "null",
+                   _          => throw new InvalidOperationException("Unable to serialize type " + property.GetType().Name)
                };
 
         private static bool TryHandleSpecialCase(object? property, string path, out string? parsedValue)

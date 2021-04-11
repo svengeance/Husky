@@ -123,14 +123,16 @@ namespace Husky.Generator.Tests
                 {
                     ["Cat"] = "{Kitten}/Kittens",
                     ["Dog"] = "{Puppy}/Puppies",
-                    ["NumberOfPets"] = 10
+                    ["NumberOfPets"] = 10,
+                    ["ReallyLikesPets"] = true,
                 }
             };
 
             var expectedResult = WrapWithShell(@"
             .AddGlobalVariable(""Cat"", @""{Kitten}/Kittens"")
             .AddGlobalVariable(""Dog"", @""{Puppy}/Puppies"")
-            .AddGlobalVariable(""NumberOfPets"", 10)");
+            .AddGlobalVariable(""NumberOfPets"", 10)
+            .AddGlobalVariable(""ReallyLikesPets"", true)");
 
             // Act
             var result = ParseWorkflow(workflow);
