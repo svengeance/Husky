@@ -14,7 +14,7 @@ namespace Husky.Tasks.Scripting
         protected override async ValueTask ExecuteTask()
         {
             var createdScriptFile = await _fileSystemService.CreateScriptFile(Configuration.Directory, Configuration.FileName, Configuration.Script);
-            HuskyContext.SetVariable("createdFileName", createdScriptFile);
+            HuskyContext.SetCurrentTaskVariable("createdFileName", createdScriptFile);
             HuskyContext.UninstallOperations.AddEntry(UninstallOperationsList.EntryKind.File, createdScriptFile);
         }
     }

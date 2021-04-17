@@ -4,7 +4,7 @@ using Husky.Core.Workflow;
 
 namespace Husky.Core.TaskOptions.Scripting
 {
-    public class ExecuteInlineScriptOptions : HuskyTaskConfiguration
+    public partial class ExecuteInlineScriptOptions : HuskyTaskConfiguration
     {
         public string Script { get; set; } = string.Empty;
         public bool IsWindowVisible { get; set; } = false;

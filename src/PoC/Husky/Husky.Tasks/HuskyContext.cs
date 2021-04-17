@@ -11,12 +11,11 @@ namespace Husky.Tasks
         public string CurrentJobName { get; set; } = string.Empty;
         public string CurrentStepName { get; set; } = string.Empty;
 
+        public Dictionary<string, object> Variables { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+
         public Assembly InstallationAssembly { get; }
 
         public IUninstallOperationsList UninstallOperations { get; }
-
-        public IReadOnlyDictionary<string, string> Variables => _variables;
-        private readonly Dictionary<string, string> _variables = new(StringComparer.OrdinalIgnoreCase);
 
         private readonly ILogger _logger;
 
@@ -27,11 +26,17 @@ namespace Husky.Tasks
             InstallationAssembly = installationAssembly;
         }
 
-        public void SetVariable(string key, object value)
+        public void AppendAllVariables(IEnumerable<KeyValuePair<string, object>> variables)
+        {
+            foreach (var (k, v) in variables)
+                Variables[k] = v;
+        }
+
+        public void SetCurrentTaskVariable(string key, object value)
         {
             var formattedKey = FormatVariableName(key);
             _logger.LogDebug("Setting variable {key} to value {value}", key, value);
-            _variables[formattedKey] = value.ToString() ?? throw new ArgumentNullException(nameof(value));
+            Variables[formattedKey] = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         private string FormatVariableName(string variableName) => $"{CurrentJobName}.{CurrentStepName}.{variableName}";

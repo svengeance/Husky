@@ -4,7 +4,7 @@ using Husky.Core.Workflow;
 
 namespace Husky.Core.TaskOptions.Installation
 {
-    public class VerifyMachineMeetsRequirementsOptions: HuskyTaskConfiguration
+    public partial class VerifyMachineMeetsRequirementsOptions: HuskyTaskConfiguration
     {
         public bool WarnInsteadOfHalt = false;
 

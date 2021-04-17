@@ -1,10 +1,11 @@
 ﻿using System.IO;
 using FluentValidation;
 using FluentValidation.Results;
+using Husky.Internal.Generator.Dictify;
 
 namespace Husky.Core.HuskyConfiguration
 {
-    public record ApplicationConfiguration: HuskyConfigurationBlock
+    public partial record ApplicationConfiguration: HuskyConfigurationBlock
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -37,3 +38,4 @@ namespace Husky.Core.HuskyConfiguration
         }
     }
 }
+

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using FastMember;
+using Husky.Internal.Generator;
+using Husky.Internal.Generator.Dictify;
 using Microsoft.Extensions.Logging;
 
 namespace Husky.Services
@@ -11,18 +14,24 @@ namespace Husky.Services
     public interface IVariableResolverService
     {
         /// <summary>
-        ///     Resolves all public string properties on an object, replacing any occurrences of a known variable in the string with said variable.
+        /// Resolves a runtime type <paramref name="t"/> to an object through the use of <see cref="Dictable"/>.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj">The object whose string properties will be replaced with resolved variables</param>
-        /// <param name="variableSources">All possible variable sources to resolve from</param>
-        void Resolve<T>(T obj, params IReadOnlyDictionary<string, string>[] variableSources);
+        /// <remarks>
+        /// The passed in type <b>must</b> be a <seealso cref="Dictable"/> type. This method will throw otherwise.
+        /// <br />
+        /// Execution of this method will also update all located variables in <paramref name="variableSource"/>,
+        /// replacing located variables with their proper values.
+        /// </remarks>
+        /// <param name="t">The runtime type to resolve/</param>
+        /// <param name="variableSource">The source of variables within which to resolve the properties of the type.</param>
+        /// <returns></returns>
+        object Resolve(Type t, Dictionary<string, object> variableSource);
     }
     
     public class VariableResolverService: IVariableResolverService
     {
         private readonly ILogger _logger;
-        private static readonly Regex _varMatchingRegex = new(@"(?<!{){(\w|\.|-)+}");
+        private static readonly Regex VarMatchingRegex = new(@"(?<!{){(\w|\.|-)+}");
 
         public VariableResolverService(ILogger<VariableResolverService> logger)
         {
@@ -30,65 +39,33 @@ namespace Husky.Services
         }
 
         /// <inheritdoc cref="IVariableResolverService"/>
-        public void Resolve<T>(T obj, params IReadOnlyDictionary<string, string>[] variableSources)
+        public object Resolve(Type t, Dictionary<string, object> variableSource)
         {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));   
+            Debug.Assert(t.GetInterface(nameof(IDictable)) is not null, $"Type {t.Name} must be IDictable to be resolved!");
 
-            _logger.LogDebug("Attempting to resolve variables on {object} with {sourcesCount} sources", obj.GetType().Name, variableSources.Length);
-            if (_logger.IsEnabled(LogLevel.Trace))
+            foreach (var (key, value) in variableSource)
             {
-                var variables = new StringBuilder().AppendJoin(Environment.NewLine, variableSources.SelectMany(s => s.Select(s2 => $"{s2.Key}:{s2.Value}"))).ToString();
-                _logger.LogTrace("Variable sources include {variables}", variables);
-            }
-
-            /*
-             * Todo: We're not going to be able to use FastMember and
-             *       TypeAccessor here because of the runtime IL Generation, which is incompatible
-             *       with any sort of Native AoT work we want to do.
-             */
-            var accessor = TypeAccessor.Create(obj.GetType());
-            var stringProperties = accessor.GetMembers()
-                                           .Where(w => w.Type == typeof(string))
-                                           .Select(s => s.Name);
-
-            foreach (var property in stringProperties) 
-            {
-                var value = accessor[obj, property]?.ToString();
-
-                if (value == null)
+                if (value is not string valueString)
                     continue;
 
-                var variablesToReplace = _varMatchingRegex.Matches(value)
+                var variablesToReplace = VarMatchingRegex.Matches(valueString)
                                                           .Select(s => s.Value)
                                                           .ToArray();
 
-                if (variablesToReplace.Length == 0)
+                _logger.LogDebug("Replacing {variableCount} variables on key {key}", variablesToReplace.Length, key);
+
+                foreach (var varToReplace in variablesToReplace)
                 {
-                    _logger.LogDebug("No variables to replace on property {property}", property);
-                    continue;
+                    var sanitizedVarName = SanitizeVariableName(varToReplace);
+                    if (!variableSource.TryGetValue(sanitizedVarName, out var replacement))
+                        throw new InvalidOperationException($"Unable to locate variable {varToReplace} in variables sources.");
+
+                    _logger.LogDebug("Replacing {key} with {value}", varToReplace, replacement);
+                    variableSource[key] = valueString.Replace(varToReplace, replacement.ToString());
                 }
-
-                _logger.LogDebug("Replacing variables {variables}", variablesToReplace);
-                var variableValues = variablesToReplace.Select(s => variableSources.Select(s2 => s2.TryGetValue(SanitizeVariableName(s), out var found) ? found : string.Empty)
-                                                                                   .FirstOrDefault(f => f != string.Empty))
-                                                       .ToList();
-
-                _logger.LogDebug("Loading values {values}", variableValues);
-                var sb = new StringBuilder(value);
-                for (var i = 0; i < variableValues.Count; i++)
-                {
-                    var variableValue = variableValues[i];
-
-                    if (string.IsNullOrEmpty(variableValue))
-                        throw new ArgumentException($"Unable to locate variable {variablesToReplace[i]} inside property {property} of object {typeof(T).Name}");
-
-                    sb.Replace(variablesToReplace[i], variableValue);
-                }
-
-                _logger.LogTrace("Setting {property} to {value}", property, sb.ToString());
-                accessor[obj, property] = sb.ToString();
             }
+
+            return ObjectFactory.Create(t, variableSource);
         }
 
         private static string SanitizeVariableName(string name) => name.Trim('{', '}');

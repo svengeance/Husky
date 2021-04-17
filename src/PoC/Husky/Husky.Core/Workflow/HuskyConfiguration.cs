@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Husky.Core.HuskyConfiguration;
+using Husky.Internal.Generator.Dictify;
 
 namespace Husky.Core.Workflow
 {
@@ -11,9 +12,12 @@ namespace Husky.Core.Workflow
 
         public IEnumerable<HuskyConfigurationBlock> GetConfigurationBlocks()
             => _configurations.Values
-                              .Select(s => s with { })
+                              .Select(s => (s with { }))
                               .ToList()
-                              .AsReadOnly();
+                              .AsReadOnly()!;
+
+        public IReadOnlyDictionary<string, object> ExtractConfigurationBlockVariables()
+            => new Dictionary<string, object>(_configurations.SelectMany(s => ((IDictable) s.Value).ToDictionary()));
 
         private HuskyConfiguration(Dictionary<Type, HuskyConfigurationBlock> configurations) => _configurations = configurations;
 

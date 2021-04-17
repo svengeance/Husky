@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +12,7 @@ using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
 using Husky.Dependencies;
 using Husky.Installer.Extensions;
+using Husky.Internal.Generator.Dictify;
 using Husky.Services;
 using Husky.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +33,6 @@ namespace Husky.Installer.Lifecycle
         protected readonly string UninstallOperationsFile;
         protected readonly ILoggerFactory LoggerFactory;
 
-        private readonly IServiceProvider _serviceProvider;
         private readonly IServiceScopeFactory _scopeFactory;
 
         protected LifecycleBase(HuskyWorkflow workflow, HuskyInstallerSettings huskyInstallerSettings)
@@ -39,10 +40,11 @@ namespace Husky.Installer.Lifecycle
             Workflow = workflow;
             HuskyInstallerSettings = huskyInstallerSettings;
 
-            _serviceProvider = new ServiceCollection().AddHuskyInstaller(HuskyInstallerSettings, Workflow.Configuration);
-            _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
+            var serviceProvider = new ServiceCollection().AddHuskyInstaller(HuskyInstallerSettings, Workflow.Configuration);
+            
+            _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            LoggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
+            LoggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
             Logger = LoggerFactory.CreateLogger(this.GetType().FullName);
             Logger.LogDebug("Constructed ServiceProvider");
 
@@ -54,11 +56,27 @@ namespace Husky.Installer.Lifecycle
         {
             await OnBeforeWorkflowExecute();
 
+
             var operationsList = await CreateContextUninstallOperationsList();
-            var huskyContext = ActivatorUtilities.CreateInstance<HuskyContext>(_serviceProvider, operationsList, Assembly.GetEntryAssembly()!);
+            /* Todo: Parse & load ConfigurationBlock variables from the Static variables source,
+                        dictify all of the configuration blocks, and add them to the Context.
+                      This will give the HuskyContext all possible variables, and from here on out we can rely on IT to the be "source of truth"
+                        for all future variables
+            */
+
+            var combinedVariables = HuskyVariables.AsDictionary()
+                                                  .Concat(Workflow.Configuration.ExtractConfigurationBlockVariables())
+                                                  .Concat(Workflow.Variables);
+
+            var huskyContext = new HuskyContext(LoggerFactory.CreateLogger<HuskyContext>(), operationsList, Assembly.GetEntryAssembly()!)
+            {
+                Variables = new Dictionary<string, object>(combinedVariables, StringComparer.InvariantCultureIgnoreCase)
+            };
 
             await ExecuteWorkflow(huskyContext);
             Logger.LogInformation("Husky has successfully executed {tag}", HuskyInstallerSettings.TagToExecute);
+
+            await OnAfterWorkflowExecute();
         }
 
         protected virtual bool ShouldExecuteStep<T>(HuskyStep<T> step) where T: HuskyTaskConfiguration
@@ -169,7 +187,9 @@ namespace Husky.Installer.Lifecycle
             Logger.LogDebug("Loaded task {task} for step {step}", taskType.Name, step.GetType().Name);
 
             var variableResolver = services.GetRequiredService<IVariableResolverService>();
-            variableResolver.Resolve(step.HuskyTaskConfiguration, huskyContext.Variables, Workflow.Variables, HuskyVariables.AsDictionary());
+            huskyContext.AppendAllVariables(((IDictable) step.HuskyTaskConfiguration).ToDictionary());
+            var taskOptions = variableResolver.Resolve(step.HuskyTaskConfiguration.GetType(), huskyContext.Variables);
+            step.HuskyTaskConfiguration = (T) taskOptions;
 
             task.SetExecutionContext(step.HuskyTaskConfiguration, huskyContext, step.ExecutionInformation);
 

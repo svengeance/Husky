@@ -5,7 +5,7 @@
         public string Name { get; }
 
         internal HuskyStepConfiguration HuskyStepConfiguration { get; }
-        internal TTaskConfiguration HuskyTaskConfiguration { get; }
+        internal TTaskConfiguration HuskyTaskConfiguration { get; set; }
         internal ExecutionInformation ExecutionInformation { get; } = new();
 
         public HuskyStep(string name, TTaskConfiguration huskyTaskConfiguration, HuskyStepConfiguration huskyStepConfiguration)
