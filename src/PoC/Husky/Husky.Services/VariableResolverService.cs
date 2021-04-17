@@ -26,6 +26,13 @@ namespace Husky.Services
         /// <param name="variableSource">The source of variables within which to resolve the properties of the type.</param>
         /// <returns></returns>
         object Resolve(Type t, Dictionary<string, object> variableSource);
+
+        /// <summary>
+        /// Resolves all variables within the <paramref name="variableSource"/>, updating
+        /// its variable references to the resolved values.
+        /// </summary>
+        /// <param name="variableSource">The source of variables to resolve</param>
+        void ResolveVariables(Dictionary<string, object> variableSource);
     }
     
     public class VariableResolverService: IVariableResolverService
@@ -43,14 +50,21 @@ namespace Husky.Services
         {
             Debug.Assert(t.GetInterface(nameof(IDictable)) is not null, $"Type {t.Name} must be IDictable to be resolved!");
 
+            ResolveVariables(variableSource);
+
+            return ObjectFactory.Create(t, variableSource);
+        }
+
+        public void ResolveVariables(Dictionary<string, object> variableSource)
+        {
             foreach (var (key, value) in variableSource)
             {
                 if (value is not string valueString)
                     continue;
 
                 var variablesToReplace = VarMatchingRegex.Matches(valueString)
-                                                          .Select(s => s.Value)
-                                                          .ToArray();
+                                                         .Select(s => s.Value)
+                                                         .ToArray();
 
                 _logger.LogDebug("Replacing {variableCount} variables on key {key}", variablesToReplace.Length, key);
 
@@ -61,11 +75,11 @@ namespace Husky.Services
                         throw new InvalidOperationException($"Unable to locate variable {varToReplace} in variables sources.");
 
                     _logger.LogDebug("Replacing {key} with {value}", varToReplace, replacement);
-                    variableSource[key] = valueString.Replace(varToReplace, replacement.ToString());
+
+                    valueString = valueString.Replace(varToReplace, replacement.ToString());
+                    variableSource[key] = valueString;
                 }
             }
-
-            return ObjectFactory.Create(t, variableSource);
         }
 
         private static string SanitizeVariableName(string name) => name.Trim('{', '}');
