@@ -4,7 +4,7 @@ using Husky.Core.Workflow;
 
 namespace Husky.Core.TaskOptions.Uninstallation
 {
-    public class ExecuteUninstallationOperationsOptions: HuskyTaskConfiguration
+    public partial class ExecuteUninstallationOperationsOptions: HuskyTaskConfiguration
     {
         internal override ValidationResult Validate() => new ExecuteUninstallationOperationsOptionsValidator().Validate(this);
 

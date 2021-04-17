@@ -1,10 +1,12 @@
-﻿using FluentValidation;
+﻿using System.Collections.Generic;
+using FluentValidation;
 using FluentValidation.Results;
 using Husky.Core.Workflow;
+using Husky.Internal.Generator.Dictify;
 
 namespace Husky.Installer.Tests
 {
-    public class TestHuskyTaskOptions : HuskyTaskConfiguration
+    public partial class TestHuskyTaskOptions : HuskyTaskConfiguration, IDictable
     {
         public string? Title { get; set; }
 
@@ -23,5 +25,11 @@ namespace Husky.Installer.Tests
                 RuleFor(r => r.Title).NotEmpty();
             }
         }
+
+        public Dictionary<string, object> ToDictionary() => new()
+        {
+            [nameof(Title)] = Title,
+            [nameof(HasValidated)] = HasValidated
+        };
     }
 }

@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace Husky.Installer.Tests.InstallerTests
 {
-    public class HuskyInstallerTests: BaseInstallerTest
+    internal class HuskyInstallerTests: BaseInstallerTest
     {
         [Test]
         [Category("IntegrationTest")]
@@ -52,21 +52,6 @@ namespace Husky.Installer.Tests.InstallerTests
             // Assert
             var testTaskOptions = (TestHuskyTaskOptions) Workflow.Stages.First(f => f.Name != HuskyConstants.WorkflowDefaults.PreInstallation.StageName).Jobs[0].Steps[0].HuskyTaskConfiguration;
             Assert.True(testTaskOptions.HasValidated);
-        }
-
-        [Test]
-        [Category("IntegrationTest")]
-        public async ValueTask Installer_replaces_variables_on_task_configuration()
-        {
-            // Arrange
-            var expectedTitle = "Test - 4";
-
-            // Act
-            await Installer.Execute();
-
-            // Assert
-            var testTaskOptions = (TestHuskyTaskOptions)Workflow.Stages.First(f => f.Name != HuskyConstants.WorkflowDefaults.PreInstallation.StageName).Jobs[0].Steps[0].HuskyTaskConfiguration;
-            Assert.AreEqual(expectedTitle, testTaskOptions.Title);
         }
 
         [Test]

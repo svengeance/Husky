@@ -3,7 +3,7 @@ using FluentValidation.Results;
 
 namespace Husky.Core.HuskyConfiguration
 {
-    public record InstallationConfiguration: HuskyConfigurationBlock
+    public partial record InstallationConfiguration : HuskyConfigurationBlock
     {
         public bool AddToRegistry { get; set; } = true;
         

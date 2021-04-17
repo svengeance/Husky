@@ -4,7 +4,7 @@ using Husky.Core.Workflow;
 
 namespace Husky.Core.TaskOptions.Installation
 {
-    public class PostInstallationApplicationRegistrationOptions: HuskyTaskConfiguration
+    public partial class PostInstallationApplicationRegistrationOptions: HuskyTaskConfiguration
     {
         internal override ValidationResult Validate() => new PostInstallationApplicationRegistrationConfigurationValidator().Validate(this);
 

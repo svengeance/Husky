@@ -4,7 +4,7 @@ using Husky.Core.Workflow;
 
 namespace Husky.Core.TaskOptions.Resources
 {
-    public class ExtractBundledResourceOptions : HuskyTaskConfiguration
+    public partial class ExtractBundledResourceOptions : HuskyTaskConfiguration
     {
         public string Resources { get; set; } = string.Empty;
         public string TargetDirectory { get; set; } = string.Empty;

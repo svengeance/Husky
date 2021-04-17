@@ -5,7 +5,7 @@ using Husky.Core.Workflow;
 
 namespace Husky.Core.TaskOptions.Scripting
 {
-    public class CreateScriptFileOptions : HuskyTaskConfiguration
+    public partial class CreateScriptFileOptions : HuskyTaskConfiguration
     {
         public string Directory { get; set; } = string.Empty;
         public string FileName { get; set; } = string.Empty;

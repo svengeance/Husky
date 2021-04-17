@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Husky.Installer.Tests.UninstallerTests
 {
-    public class HuskyUninstallerTests: BaseInstallerTest
+    internal class HuskyUninstallerTests: BaseInstallerTest
     {
         [Test]
         [Category("IntegrationTest")]

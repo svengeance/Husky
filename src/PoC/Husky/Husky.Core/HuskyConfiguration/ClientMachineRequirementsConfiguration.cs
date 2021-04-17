@@ -6,7 +6,7 @@ using Range = SemVer.Range;
 
 namespace Husky.Core.HuskyConfiguration
 {
-    public record ClientMachineRequirementsConfiguration: HuskyConfigurationBlock
+    public partial record ClientMachineRequirementsConfiguration : HuskyConfigurationBlock
     {
         public bool WarnInsteadOfHalt { get; set; } = false;
         public int? MemoryMb { get; set; }

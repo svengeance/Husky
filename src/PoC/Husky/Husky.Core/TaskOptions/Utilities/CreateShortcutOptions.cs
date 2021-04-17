@@ -5,7 +5,7 @@ using Husky.Core.Workflow;
 
 namespace Husky.Core.TaskOptions.Utilities
 {
-    public class CreateShortcutOptions : HuskyTaskConfiguration
+    public partial class CreateShortcutOptions : HuskyTaskConfiguration
     {
         public string ShortcutLocation { get; set; } = string.Empty;
         public string ShortcutName { get; set; } = string.Empty;

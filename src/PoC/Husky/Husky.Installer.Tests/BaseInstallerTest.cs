@@ -4,6 +4,7 @@ using Husky.Core.Workflow;
 using NUnit.Framework;
 using Husky.Core.HuskyConfiguration;
 using Husky.Installer.Lifecycle;
+using Husky.Internal.Generator.Dictify;
 
 namespace Husky.Installer.Tests
 {
@@ -14,8 +15,11 @@ namespace Husky.Installer.Tests
      *       https://github.com/svengeance/Husky/issues/4
      *
      *       She won't be quick, but damnit if I'm going to start integration testing Registry changes on my desktop.
+     *
+     * 4/15/2021: As a follow-up, though the above is done, we still want a suite of integration tests that - can - test
+     * the integration of the full workflow without necessarily spinning up the e2e container, which is expensive.
      */
-    public abstract class BaseInstallerTest
+    internal abstract class BaseInstallerTest
     {
         protected HuskyWorkflow Workflow { get; private set; } = null!;
 
@@ -32,6 +36,7 @@ namespace Husky.Installer.Tests
         [SetUp]
         public void BaseSetup()
         {
+            ObjectFactory.AddFactory(typeof(TestHuskyTaskOptions), _ => new TestHuskyTaskOptions());
             _installPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
             Workflow = HuskyWorkflow.Create()

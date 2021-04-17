@@ -3,17 +3,31 @@
   <PropertyGroup>
 	  <TargetFramework>net5.0</TargetFramework>
 	  <Nullable>Enable</Nullable>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+
+    <IsNCrunch>false</IsNCrunch>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Condition="$(IsNCrunch)" Include="obj\GeneratedFiles\**\*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.5.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="SemanticVersioning" Version="1.3.0" />
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="3.9.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Husky.Internal.Shared\Husky.Internal.Shared.csproj" />
+    <ProjectReference Include="..\Husky.Internal.Generator\Husky.Internal.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
   </ItemGroup>
 
 </Project>
