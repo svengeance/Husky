@@ -28,15 +28,38 @@ namespace Husky.Services.Tests.VariableResolverTests
         public void Resolver_updates_variable_sources_when_variables_are_found()
         {
             // Arrange
+            _fullVariableSource.Clear();
+
             AddVariableSource(("Cat", "Kitten"), ("GhostKitten", "Ghost{Cat}"), ("Dog", "Puppy"));
-            var dictable = typeof(AuthorConfiguration);
             var expectedValue = "GhostKitten";
 
             // Act
-            _ = Sut.Resolve(dictable, _fullVariableSource);
+            Sut.ResolveVariables(_fullVariableSource);
 
             // Assert
             Assert.AreEqual(expectedValue, _fullVariableSource["GhostKitten"]);
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        public void Resolver_can_resolve_variables_within_other_variables()
+        {
+            // Arrange
+            _fullVariableSource.Clear();
+            
+            AddVariableSource(("WhoAttacked", "The Fire Nation"));
+            AddVariableSource(("ZukoIs", "{WhoAttacked}"));
+            AddVariableSource(("Avatar", "Aang"));
+            AddVariableSource(("NationHuntingAvatar", "{ZukoIs}"));
+            AddVariableSource(("Sentence", "{NationHuntingAvatar} is hunting {Avatar}"));
+
+            var expectedValue = "The Fire Nation is hunting Aang";
+
+            // Act
+            Sut.ResolveVariables(_fullVariableSource);
+
+            // Assert
+            Assert.AreEqual(expectedValue, _fullVariableSource["Sentence"]);
         }
 
         [Test]
