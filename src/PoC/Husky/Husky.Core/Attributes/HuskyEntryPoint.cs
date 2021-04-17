@@ -3,5 +3,5 @@
 namespace Husky.Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class HuskyEntryPoint: Attribute { }
+    public class HuskyEntryPointAttribute: Attribute { }
 }

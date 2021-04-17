@@ -55,5 +55,5 @@
           task: Utilities.CreateShortcut
           with:
             shortcutLocation: '{Folders.Desktop}'
-            shortcutName: HuskyApp
+            shortcutName: Husky App
             target: '{create-launch-file.create-launch-script.createdFileName}'

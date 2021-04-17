@@ -69,7 +69,7 @@ namespace Husky.Tests.Sdk
             {
                 var assembly = Assembly.LoadFrom(assemblyFile);
                 if (assembly.EntryPoint is { } entryPoint &&
-                    assembly.GetExportedTypes().Any(a => a.GetMethods().Any(a2 => a2.GetCustomAttribute<HuskyEntryPoint>() is not null)))
+                    assembly.ExportedTypes.Any(a => a.GetMethods().Any(a2 => a2.GetCustomAttributes().Any(a3 => a3.GetType().Name == nameof(HuskyEntryPointAttribute)))))
                 {
                     if (huskyEntryPoint is not null)
                         throw new InvalidOperationException(
