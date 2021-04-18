@@ -8,9 +8,9 @@ namespace Husky.Installer.Tests
 {
     public partial class TestHuskyTaskOptions : HuskyTaskConfiguration, IDictable
     {
-        public string? Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
-        public bool HasValidated = false;
+        public bool HasValidated { get; set; } = false;
 
         internal override ValidationResult Validate()
         {
@@ -28,8 +28,8 @@ namespace Husky.Installer.Tests
 
         public Dictionary<string, object> ToDictionary() => new()
         {
-            [nameof(Title)] = Title,
-            [nameof(HasValidated)] = HasValidated
+            ["TestHuskyTask.Title"] = Title,
+            ["TestHuskyTask.HasValidated"] = HasValidated
         };
     }
 }

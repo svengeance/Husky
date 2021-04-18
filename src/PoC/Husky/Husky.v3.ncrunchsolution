@@ -1,6 +1,9 @@
 ﻿<SolutionConfiguration>
   <Settings>
     <AllowParallelTestExecution>True</AllowParallelTestExecution>
+    <MetricsExclusionList>
+      <Value>Husky.Tests.Adapter\src\NUnitTestAdapter\Husky.Tests.Adapter.csproj</Value>
+    </MetricsExclusionList>
     <SolutionConfigured>True</SolutionConfigured>
     <TestFilter>DoesNotHaveCategory 'e2e'</TestFilter>
   </Settings>

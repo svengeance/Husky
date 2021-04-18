@@ -72,7 +72,10 @@ namespace Husky.Services
                 {
                     var sanitizedVarName = SanitizeVariableName(varToReplace);
                     if (!variableSource.TryGetValue(sanitizedVarName, out var replacement))
-                        throw new InvalidOperationException($"Unable to locate variable {varToReplace} in variables sources.");
+                    {
+                        _logger.LogWarning($"Missing variable {varToReplace} -- skipping");
+                        continue;
+                    }
 
                     _logger.LogDebug("Replacing {key} with {value}", varToReplace, replacement);
 

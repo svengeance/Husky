@@ -16,6 +16,8 @@ namespace Husky.Core.Workflow
                               .ToList()
                               .AsReadOnly()!;
 
+        public IEnumerable<Type> GetAllConfigurationTypes() => _configurations.Keys;
+
         public IReadOnlyDictionary<string, object> ExtractConfigurationBlockVariables()
             => new Dictionary<string, object>(_configurations.SelectMany(s => ((IDictable) s.Value).ToDictionary()));
 
@@ -28,6 +30,7 @@ namespace Husky.Core.Workflow
 
         public static HuskyConfiguration Create()
         {
+            // Todo: Replace with an internal sgen to avoid reflection!
             // Instantiate an instance of each configuration and cache it by its type
             var configBlocks = typeof(ApplicationConfiguration)
                               .Assembly
