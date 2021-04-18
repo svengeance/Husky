@@ -142,12 +142,6 @@ namespace Husky.Installer.Lifecycle
                 step.HuskyTaskConfiguration = configuredStep;
             }
 
-            //var taskValidations = Workflow.Stages.SelectMany(stage => stage.Jobs.SelectMany(job => job.Steps.Select(step =>
-            //(
-            //    $"{step.Name}.{step.HuskyTaskConfiguration.GetType().Name} is not appropriately configured",
-            //    step.HuskyTaskConfiguration.Validate()
-            //))));
-
             // Todo: Remove GetType().Name here
             var configurationValidations = Workflow.Configuration.GetAllConfigurationTypes()
                                                         .Select(s => (HuskyConfigurationBlock)ObjectFactory.Create(s, variables))
