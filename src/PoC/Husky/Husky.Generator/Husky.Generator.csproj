@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.9.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
-    <PackageReference Include="YamlDotNet" Version="11.0.1" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="YamlDotNet" Version="11.1.1" PrivateAssets="all" GeneratePathProperty="true" />
 	</ItemGroup>
 
   <PropertyGroup>
