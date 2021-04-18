@@ -36,7 +36,12 @@ namespace Husky.Installer.Tests
         [SetUp]
         public void BaseSetup()
         {
-            ObjectFactory.AddFactory(typeof(TestHuskyTaskOptions), _ => new TestHuskyTaskOptions());
+            ObjectFactory.AddFactory(typeof(TestHuskyTaskOptions), dict => new TestHuskyTaskOptions
+            {
+                Title = (string) dict["TestHuskyTask.Title"],
+                HasValidated = (bool) dict["TestHuskyTask.HasValidated"]
+            });
+            
             _installPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
             Workflow = HuskyWorkflow.Create()

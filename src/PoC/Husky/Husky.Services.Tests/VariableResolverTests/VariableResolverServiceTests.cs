@@ -17,7 +17,7 @@ namespace Husky.Services.Tests.VariableResolverTests
             => _fullVariableSource = new Dictionary<string, object>(
                 Assembly.GetExecutingAssembly()
                         .GetReferencedAssemblies()
-                        .Select(s => Assembly.Load(s))
+                        .Select(Assembly.Load)
                         .SelectMany(s => s.ExportedTypes)
                         .Where(w => w.GetInterface(nameof(IDictable)) is not null ||
                                     w.BaseType?.GetInterface(nameof(IDictable)) is not null)
@@ -64,7 +64,7 @@ namespace Husky.Services.Tests.VariableResolverTests
 
         [Test]
         [Category("UnitTest")]
-        public void Resolver_throws_when_requested_variable_is_not_found()
+        public void Resolver_does_not_throw_when_requested_variable_is_not_found()
         {
             // Arrange
             AddVariableSource(($"MischievousVariable", $"{{{Guid.NewGuid()}}}"));
@@ -74,7 +74,7 @@ namespace Husky.Services.Tests.VariableResolverTests
             void Resolve() => _ = Sut.Resolve(dictable, _fullVariableSource);
 
             // Assert
-            Assert.Throws<InvalidOperationException>(Resolve);
+            Assert.DoesNotThrow(Resolve);
         }
 
         [Test]

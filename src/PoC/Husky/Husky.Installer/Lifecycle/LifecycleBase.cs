@@ -4,7 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
+using FluentValidation;
+using FluentValidation.Results;
 using Husky.Core;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
@@ -18,6 +21,7 @@ using Husky.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
+using ObjectFactory = Husky.Internal.Generator.Dictify.ObjectFactory;
 
 namespace Husky.Installer.Lifecycle
 {
@@ -56,17 +60,8 @@ namespace Husky.Installer.Lifecycle
         {
             await OnBeforeWorkflowExecute();
 
-
             var operationsList = await CreateContextUninstallOperationsList();
-            /* Todo: Parse & load ConfigurationBlock variables from the Static variables source,
-                        dictify all of the configuration blocks, and add them to the Context.
-                      This will give the HuskyContext all possible variables, and from here on out we can rely on IT to the be "source of truth"
-                        for all future variables
-            */
-
-            var combinedVariables = HuskyVariables.AsDictionary()
-                                                  .Concat(Workflow.Configuration.ExtractConfigurationBlockVariables())
-                                                  .Concat(Workflow.Variables);
+            var combinedVariables = Workflow.ExtractAllVariables();
 
             var huskyContext = new HuskyContext(LoggerFactory.CreateLogger<HuskyContext>(), operationsList, Assembly.GetEntryAssembly()!)
             {
@@ -121,10 +116,55 @@ namespace Husky.Installer.Lifecycle
             }
         }
 
+        private void Validate(Dictionary<string, object> variables)
+        {
+            using var scope = CreateServiceScope();
+            var variableResolverService = scope.ServiceProvider.GetRequiredService<IVariableResolverService>();
+            variableResolverService.ResolveVariables(variables);
+
+            static void AppendExceptions(StringBuilder sb, IEnumerable<(string title, ValidationResult validation)> items)
+                => items.Where(w => !w.validation.IsValid).Aggregate(sb, (prev, next) => prev.AppendLine(next.title).AppendLine(next.validation.ToString()));
+
+            // Todo: Tasks which contain variables that are only computable at runtime may indeed be valid.
+            var taskValidations = new List<(string, ValidationResult)>();
+            foreach (var step in Workflow.EnumerateSteps())
+            {
+                foreach (var (key, val) in ((IDictable) step.HuskyTaskConfiguration).ToDictionary())
+                    variables[key] = val;
+
+                var configuredStep = (HuskyTaskConfiguration) ObjectFactory.Create(step.HuskyTaskConfiguration.GetType(), variables);
+
+                taskValidations.Add((
+                    $"{step.Name}.{step.HuskyTaskConfiguration.GetType().Name} is not appropriately configured",
+                    configuredStep.Validate()
+                ));
+
+                step.HuskyTaskConfiguration = configuredStep;
+            }
+
+            //var taskValidations = Workflow.Stages.SelectMany(stage => stage.Jobs.SelectMany(job => job.Steps.Select(step =>
+            //(
+            //    $"{step.Name}.{step.HuskyTaskConfiguration.GetType().Name} is not appropriately configured",
+            //    step.HuskyTaskConfiguration.Validate()
+            //))));
+
+            // Todo: Remove GetType().Name here
+            var configurationValidations = Workflow.Configuration.GetAllConfigurationTypes()
+                                                        .Select(s => (HuskyConfigurationBlock)ObjectFactory.Create(s, variables))
+                                                        .Select(s => ($"{s.GetType().Name} is not appropriately configured", s.Validate()));
+
+            var exceptions = new StringBuilder();
+            AppendExceptions(exceptions, taskValidations);
+            AppendExceptions(exceptions, configurationValidations);
+
+            if (exceptions.Length > 0)
+                throw new ValidationException(exceptions.ToString());
+        }
+
         private async ValueTask ExecuteWorkflow(HuskyContext huskyContext)
         {
             // Todo: Replace variables here first before validation
-            Workflow.Validate();
+            Validate(huskyContext.Variables);
 
             if (HuskyInstallerSettings.TagToExecute == HuskyConstants.StepTags.Install)
                 await InstallDependencies();
