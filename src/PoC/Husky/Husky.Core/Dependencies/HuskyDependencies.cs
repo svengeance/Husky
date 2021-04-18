@@ -1,5 +1,4 @@
-﻿using Husky.Core.Enums;
-using Husky.Core.HuskyConfiguration;
+﻿using Husky.Core.HuskyConfiguration;
 
 // Todo: Probably should split this out. But they all look so cute together!
 

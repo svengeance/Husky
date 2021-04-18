@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using FastMember;
-using Husky.Internal.Generator;
 using Husky.Internal.Generator.Dictify;
 using Microsoft.Extensions.Logging;
 

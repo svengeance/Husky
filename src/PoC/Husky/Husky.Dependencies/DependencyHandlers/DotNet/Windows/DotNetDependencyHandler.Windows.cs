@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Husky.Core.Dependencies;
-using Husky.Core.Enums;
 using Husky.Dependencies.DependencyAcquisitionMethods;
 
 namespace Husky.Dependencies.DependencyHandlers

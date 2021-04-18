@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Husky.Core;
 using Husky.Core.Workflow;
 
 namespace Husky.Tasks

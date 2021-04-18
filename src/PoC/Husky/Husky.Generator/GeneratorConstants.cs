@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace Husky.Generator
+﻿namespace Husky.Generator
 {
     public static class GeneratorConstants
     {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Versioning;
-using System.Security.AccessControl;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 

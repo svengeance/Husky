@@ -6,7 +6,6 @@ using System.Text;
 using Husky.Generator.WorkflowParser;
 using Husky.Generator.WorkflowParser.YAML;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 
 namespace Husky.Generator
 {

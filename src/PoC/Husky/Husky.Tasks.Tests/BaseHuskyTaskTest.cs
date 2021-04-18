@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using FluentValidation;
-using Husky.Core;
 using Husky.Core.Platform;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;

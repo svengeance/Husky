@@ -1,5 +1,4 @@
 using System.IO;
-using System.Threading.Tasks;
 using Husky.Core;
 using Husky.Tests.Sdk;
 using NUnit.Framework;

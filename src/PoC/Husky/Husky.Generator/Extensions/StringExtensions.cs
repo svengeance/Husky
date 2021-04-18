@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Husky.Generator.Extensions
+﻿namespace Husky.Generator.Extensions
 {
     public static class StringExtensions
     {

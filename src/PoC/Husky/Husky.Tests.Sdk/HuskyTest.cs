@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Husky.Core.Attributes;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using NUnit.VisualStudio.TestAdapter.Internal;
 using Serilog;
 
