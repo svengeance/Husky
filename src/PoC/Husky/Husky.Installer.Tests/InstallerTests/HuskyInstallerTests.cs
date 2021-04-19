@@ -5,7 +5,7 @@ using Husky.Core;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
 using Husky.Core.Workflow;
-using Husky.Installer.Lifecycle;
+using Husky.Installer.WorkflowExecution;
 using NUnit.Framework;
 
 namespace Husky.Installer.Tests.InstallerTests

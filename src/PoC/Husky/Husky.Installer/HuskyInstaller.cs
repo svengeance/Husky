@@ -5,11 +5,12 @@ using Husky.Core.Platform;
 using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
+using Husky.Installer.WorkflowExecution;
 using Microsoft.Extensions.Logging;
 
-namespace Husky.Installer.Lifecycle
+namespace Husky.Installer
 {
-    public class HuskyInstaller: LifecycleBase
+    public class HuskyInstaller: WorkflowExecutionBase
     {
         public HuskyInstaller(HuskyWorkflow workflow, HuskyInstallerSettings installationSettings): base(workflow, installationSettings) { }
 

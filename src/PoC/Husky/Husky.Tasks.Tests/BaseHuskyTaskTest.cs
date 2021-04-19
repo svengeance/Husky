@@ -54,7 +54,7 @@ namespace Husky.Tasks.Tests
         protected abstract T CreateInstanceOfType();
 
         private async ValueTask<HuskyContext> CreateDefaultHuskyContext()
-            => await ValueTask.FromResult<HuskyContext>(new(NullLogger<HuskyContext>.Instance, await CreateUninstallOperationsList(), Assembly.GetExecutingAssembly()));
+            => await ValueTask.FromResult<HuskyContext>(new(NullLogger<HuskyContext>.Instance, await CreateUninstallOperationsList(), Assembly.GetExecutingAssembly(), "Test"));
         
         private async ValueTask<T> CreateAndConfigureTask(HuskyTaskConfiguration taskConfiguration)
         {

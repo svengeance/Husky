@@ -1,5 +1,14 @@
 <Project>
   <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RestoreSources>
+      https://api.nuget.org/v3/index.json;
+      https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json;
+      https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json;
+    </RestoreSources>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <IsWindows>true</IsWindows> 
     <IsOSX>false</IsOSX> 
     <IsLinux>false</IsLinux> 

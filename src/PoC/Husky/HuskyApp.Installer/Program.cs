@@ -10,7 +10,7 @@ using Husky.Core.Enums;
 using Husky.Core.Platform;
 using Husky.Core.Workflow;
 using Husky.Installer;
-using Husky.Installer.Lifecycle;
+using Husky.Installer.WorkflowExecution;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
@@ -178,7 +178,7 @@ namespace HuskyApp.Installer
 
             try
             {
-                LifecycleBase lifecycleOperation =
+                WorkflowExecutionBase workflowExecutionOperation =
                     installationSettings.TagToExecute switch
                     {
                         HuskyConstants.StepTags.Install => new HuskyInstaller(workflow, installationSettings),
@@ -186,7 +186,7 @@ namespace HuskyApp.Installer
                         _ => throw new InvalidOperationException($"Unable to execute Husky with step tag {installationSettings.TagToExecute}")
                     };
 
-                await lifecycleOperation.Execute();
+                await workflowExecutionOperation.Execute();
             }
             catch (Exception e)
             {

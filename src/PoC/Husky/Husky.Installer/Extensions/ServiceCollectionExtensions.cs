@@ -1,7 +1,7 @@
 ﻿using System;
 using Husky.Core.Workflow;
 using Husky.Dependencies.Extensions;
-using Husky.Installer.Lifecycle;
+using Husky.Installer.WorkflowExecution;
 using Husky.Services.Extensions;
 using Husky.Tasks;
 using Husky.Tasks.Extensions;
@@ -22,6 +22,14 @@ namespace Husky.Installer.Extensions
             serviceCollection.AddHuskyDependencies();
             serviceCollection.AddHuskyServices();
             serviceCollection.AddHuskyTasks();
+
+            serviceCollection.AddScoped<IWorkflowDependencyInstaller, WorkflowDependencyInstaller>();
+            serviceCollection.AddScoped<IWorkflowExecutor, WorkflowExecutor>();
+            serviceCollection.AddScoped<IWorkflowJobExecutor, WorkflowJobExecutor>();
+            serviceCollection.AddScoped<IWorkflowStageExecutor, WorkflowStageExecutor>();
+            serviceCollection.AddScoped<IWorkflowStepExecutor, WorkflowStepExecutor>();
+            serviceCollection.AddScoped<IWorkflowTaskExecutor, WorkflowTaskExecutor>();
+            serviceCollection.AddScoped<IWorkflowValidator, WorkflowValidator>();
 
             foreach (var configurationBlock in huskyConfiguration.GetConfigurationBlocks())
                 serviceCollection.AddSingleton(configurationBlock.GetType(), configurationBlock);

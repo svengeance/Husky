@@ -3,7 +3,7 @@ using System.Reflection;
 using Husky.Core.Workflow;
 using NUnit.Framework;
 using Husky.Core.HuskyConfiguration;
-using Husky.Installer.Lifecycle;
+using Husky.Installer.WorkflowExecution;
 using Husky.Internal.Generator.Dictify;
 
 namespace Husky.Installer.Tests

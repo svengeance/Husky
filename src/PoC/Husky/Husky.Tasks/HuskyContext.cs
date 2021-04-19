@@ -17,13 +17,16 @@ namespace Husky.Tasks
 
         public IUninstallOperationsList UninstallOperations { get; }
 
+        public string TagToExecute { get; }
+
         private readonly ILogger _logger;
 
-        public HuskyContext(ILogger<HuskyContext> logger, IUninstallOperationsList uninstallOperationsList, Assembly installationAssembly)
+        public HuskyContext(ILogger<HuskyContext> logger, IUninstallOperationsList uninstallOperationsList, Assembly installationAssembly, string tagToExecute)
         {
             _logger = logger;
             UninstallOperations = uninstallOperationsList;
             InstallationAssembly = installationAssembly;
+            TagToExecute = tagToExecute;
         }
 
         public void AppendAllVariables(IEnumerable<KeyValuePair<string, object>> variables)
