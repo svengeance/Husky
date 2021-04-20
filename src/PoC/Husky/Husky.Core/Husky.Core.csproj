@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Husky.Internal.Shared\Husky.Internal.Shared.csproj" />
-    <ProjectReference Include="..\Husky.Internal.Generator\Husky.Internal.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+    <ProjectReference Include="..\Husky.Internal.Generator\Husky.Internal.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="False" />
   </ItemGroup>
 
 </Project>

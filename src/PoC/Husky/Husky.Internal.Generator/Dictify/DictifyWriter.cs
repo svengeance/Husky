@@ -6,6 +6,45 @@ namespace Husky.Internal.Generator.Dictify
 {
     internal class DictifyWriter
     {
+        public static readonly string SupportingClasses = @"namespace Husky.Internal.Generator.Dictify
+{
+    [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
+    public class DictifyAttribute: global::System.Attribute
+    {
+        private readonly bool _applyToDerivedClasses;
+        private readonly string _portionToRemove;
+
+        public DictifyAttribute(bool applyToDerivedClasses = false, string portionToRemove = null)
+        {
+            _applyToDerivedClasses = applyToDerivedClasses;
+            _portionToRemove = portionToRemove;
+        }
+    }
+
+    public static partial class ObjectFactory
+    {
+        private static System.Collections.Generic.Dictionary<System.Type, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> _factories = new();
+        
+static ObjectFactory()
+        {
+            LoadKnownTypes();
+        }
+       
+        public static void AddFactory(System.Type t, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object> createFn)
+            => _factories[t] = createFn;
+
+        static partial void LoadKnownTypes();
+
+        public static object Create(System.Type t, System.Collections.Generic.IReadOnlyDictionary<string, object> dict)
+            => _factories[t](dict);
+    }
+
+    public interface IDictable
+    {
+        public global::System.Collections.Generic.Dictionary<string, object> ToDictionary();
+    }
+}";
+
         private readonly SourceBuilder _sb = new();
 
         private readonly List<DictableItem> _dictableItems = new();
@@ -14,12 +53,7 @@ namespace Husky.Internal.Generator.Dictify
         {
             using (_sb.Block($"namespace {namespaceName}"))
             using (_sb.Block($"partial {(isRecord ? "record" : "class")} {className}: global::Husky.Internal.Generator.Dictify.IDictable"))
-            {
                 WriteToDictionary(dictClassName, propertiesByName);
-
-                //_sb.Line();
-                //WriteFromDictionary(className, dictClassName, propertiesByName);
-            }
 
             _dictableItems.Add(new DictableItem
             {
@@ -33,54 +67,23 @@ namespace Husky.Internal.Generator.Dictify
         private void WriteCreateFunctionStaticClass()
         {
             using (_sb.Block("namespace Husky.Internal.Generator.Dictify"))
-            using (_sb.Block("public static class Dictable"))
-            using (_sb.Block("public static global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Func<global::System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> GetDictableFactories()"))
+            using (_sb.Block("public static partial class ObjectFactory"))
+            using (_sb.Block("static partial void LoadKnownTypes()"))
                 WriteCreateFunctionsForAllClasses();
         }
 
         private void WriteCreateFunctionsForAllClasses()
         {
-            using (_sb.Block("return new()", postFix: ";"))
-                foreach (var item in _dictableItems)
+            foreach (var item in _dictableItems)
+            {
+                using (_sb.Parens("AddFactory", ";"))
                 {
-                    _sb.Line($"[typeof(global::{item.NamespaceName}.{item.ClassName})] = dict => new global::{item.NamespaceName}.{item.ClassName}");
-                    using (_sb.Block(postFix: ","))
+                    _sb.Line($"typeof(global::{item.NamespaceName}.{item.ClassName}),");
+                    _sb.Line($"dict => new global::{item.NamespaceName}.{item.ClassName}");
+                    using (_sb.Block())
                         _sb.DelimitedLines(",", item.PropertiesByName.Select(s => $"{s.Key} = ({s.Value.ToDisplayString()}) dict[\"{item.DictClassName}.{s.Key}\"]"));
                 }
-        }
-
-        private void WriteObjectFactoryClass()
-        {
-            _sb.Text(@"namespace Husky.Internal.Generator.Dictify
-{
-    public static partial class ObjectFactory
-    {
-        static ObjectFactory()
-        {
-            LoadKnownTypes();
-        }
-        
-        private static System.Collections.Generic.Dictionary<System.Type, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> _factories = new();
-
-        public static void AddFactory(System.Type t, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object> createFn)
-            => _factories[t] = createFn;
-
-        static partial void LoadKnownTypes();
-
-        public static object Create(System.Type t, System.Collections.Generic.IReadOnlyDictionary<string, object> dict)
-            => _factories[t](dict);
-    }
-}
-");
-        }
-
-        private void WriteObjectFactoryInitClass()
-        {
-            using (_sb.Block("namespace Husky.Internal.Generator.Dictify"))
-            using (_sb.Block("public static partial class ObjectFactory"))
-            using (_sb.Block("static partial void LoadKnownTypes()"))
-            using (_sb.Block("foreach (var typeFactory in global::Husky.Internal.Generator.Dictify.Dictable.GetDictableFactories())"))
-                _sb.Line("AddFactory(typeFactory.Key, typeFactory.Value);");
+            }
         }
 
         private void WriteToDictionary(string dictClassName, Dictionary<string, ITypeSymbol> propertiesByName)
@@ -93,8 +96,6 @@ namespace Husky.Internal.Generator.Dictify
         public override string ToString()
         {
             WriteCreateFunctionStaticClass();
-            WriteObjectFactoryClass();
-            WriteObjectFactoryInitClass();
             return _sb.ToString();
         }
 

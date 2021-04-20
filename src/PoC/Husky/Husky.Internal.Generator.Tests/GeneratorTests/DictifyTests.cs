@@ -35,54 +35,21 @@ namespace Husky.Internal.Generator.Tests.GeneratorTests
 }
 namespace Husky.Internal.Generator.Dictify
 {
-    public static class Dictable
+    public static partial class ObjectFactory
     {
-        public static global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Func<global::System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> GetDictableFactories()
+        static partial void LoadKnownTypes()
         {
-            return new()
-            {
-                [typeof(global::Foo.KittenFactory)] = dict => new global::Foo.KittenFactory
+            AddFactory(
+                typeof(global::Foo.KittenFactory),
+                dict => new global::Foo.KittenFactory
                 {
                     NumberOfKittens = (int) dict[""KittenFactory.NumberOfKittens""],
                     ParallelizeKittenEmissions = (bool) dict[""KittenFactory.ParallelizeKittenEmissions""],
                     KittenHats = (object) dict[""KittenFactory.KittenHats""],
                     KittenNamePrefix = (string) dict[""KittenFactory.KittenNamePrefix""],
                     RandomizedAgeSeed = (decimal) dict[""KittenFactory.RandomizedAgeSeed""],
-                },
-            };
-        }
-    }
-}
-namespace Husky.Internal.Generator.Dictify
-{
-    public static partial class ObjectFactory
-    {
-        static ObjectFactory()
-        {
-            LoadKnownTypes();
-        }
-        
-        private static System.Collections.Generic.Dictionary<System.Type, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> _factories = new();
-
-        public static void AddFactory(System.Type t, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object> createFn)
-            => _factories[t] = createFn;
-
-        static partial void LoadKnownTypes();
-
-        public static object Create(System.Type t, System.Collections.Generic.IReadOnlyDictionary<string, object> dict)
-            => _factories[t](dict);
-    }
-}
-namespace Husky.Internal.Generator.Dictify
-{
-    public static partial class ObjectFactory
-    {
-        static partial void LoadKnownTypes()
-        {
-            foreach (var typeFactory in global::Husky.Internal.Generator.Dictify.Dictable.GetDictableFactories())
-            {
-                AddFactory(typeFactory.Key, typeFactory.Value);
-            }
+                }
+            );
         }
     }
 }
@@ -144,54 +111,24 @@ namespace Puppies
 }
 namespace Husky.Internal.Generator.Dictify
 {
-    public static class Dictable
-    {
-        public static global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Func<global::System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> GetDictableFactories()
-        {
-            return new()
-            {
-                [typeof(global::Kittens.KittenFactory)] = dict => new global::Kittens.KittenFactory
-                {
-                    NumberOfKittens = (int) dict[""KittenFactory.NumberOfKittens""],
-                },
-                [typeof(global::Puppies.PuppyFactory)] = dict => new global::Puppies.PuppyFactory
-                {
-                    NumberOfPuppies = (int) dict[""PuppyFactory.NumberOfPuppies""],
-                },
-            };
-        }
-    }
-}
-namespace Husky.Internal.Generator.Dictify
-{
-    public static partial class ObjectFactory
-    {
-        static ObjectFactory()
-        {
-            LoadKnownTypes();
-        }
-        
-        private static System.Collections.Generic.Dictionary<System.Type, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> _factories = new();
-
-        public static void AddFactory(System.Type t, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object> createFn)
-            => _factories[t] = createFn;
-
-        static partial void LoadKnownTypes();
-
-        public static object Create(System.Type t, System.Collections.Generic.IReadOnlyDictionary<string, object> dict)
-            => _factories[t](dict);
-    }
-}
-namespace Husky.Internal.Generator.Dictify
-{
     public static partial class ObjectFactory
     {
         static partial void LoadKnownTypes()
         {
-            foreach (var typeFactory in global::Husky.Internal.Generator.Dictify.Dictable.GetDictableFactories())
-            {
-                AddFactory(typeFactory.Key, typeFactory.Value);
-            }
+            AddFactory(
+                typeof(global::Kittens.KittenFactory),
+                dict => new global::Kittens.KittenFactory
+                {
+                    NumberOfKittens = (int) dict[""KittenFactory.NumberOfKittens""],
+                }
+            );
+            AddFactory(
+                typeof(global::Puppies.PuppyFactory),
+                dict => new global::Puppies.PuppyFactory
+                {
+                    NumberOfPuppies = (int) dict[""PuppyFactory.NumberOfPuppies""],
+                }
+            );
         }
     }
 }
@@ -229,50 +166,17 @@ namespace Husky.Internal.Generator.Dictify
 }
 namespace Husky.Internal.Generator.Dictify
 {
-    public static class Dictable
-    {
-        public static global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Func<global::System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> GetDictableFactories()
-        {
-            return new()
-            {
-                [typeof(global::Foo.KittenFactory)] = dict => new global::Foo.KittenFactory
-                {
-                    NumberOfKittens = (int) dict[""Kitten.NumberOfKittens""],
-                },
-            };
-        }
-    }
-}
-namespace Husky.Internal.Generator.Dictify
-{
-    public static partial class ObjectFactory
-    {
-        static ObjectFactory()
-        {
-            LoadKnownTypes();
-        }
-        
-        private static System.Collections.Generic.Dictionary<System.Type, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object>> _factories = new();
-
-        public static void AddFactory(System.Type t, System.Func<System.Collections.Generic.IReadOnlyDictionary<string, object>, object> createFn)
-            => _factories[t] = createFn;
-
-        static partial void LoadKnownTypes();
-
-        public static object Create(System.Type t, System.Collections.Generic.IReadOnlyDictionary<string, object> dict)
-            => _factories[t](dict);
-    }
-}
-namespace Husky.Internal.Generator.Dictify
-{
     public static partial class ObjectFactory
     {
         static partial void LoadKnownTypes()
         {
-            foreach (var typeFactory in global::Husky.Internal.Generator.Dictify.Dictable.GetDictableFactories())
-            {
-                AddFactory(typeFactory.Key, typeFactory.Value);
-            }
+            AddFactory(
+                typeof(global::Foo.KittenFactory),
+                dict => new global::Foo.KittenFactory
+                {
+                    NumberOfKittens = (int) dict[""Kitten.NumberOfKittens""],
+                }
+            );
         }
     }
 }
@@ -288,5 +192,7 @@ namespace Husky.Internal.Generator.Dictify
             Console.WriteLine(output);
             Assert.AreEqual(generated, output);
         }
+
+        private string PrependSupportingClasses(string output) => $"{DictifyWriter.SupportingClasses}{Environment.NewLine}{output}";
     }
 }
