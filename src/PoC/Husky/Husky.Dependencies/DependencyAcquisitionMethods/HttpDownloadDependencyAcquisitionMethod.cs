@@ -28,10 +28,10 @@ namespace Husky.Dependencies.DependencyAcquisitionMethods
         public string GetDownloadUrl()
             => CurrentPlatform.OSArchitecture switch
                {
-                   _ when !string.IsNullOrEmpty(DownloadedFileName) => DownloadUrl,
-                   Architecture.X64                                 => DownloadUrl_x64,
-                   Architecture.X86                                 => DownloadUrl_x86,
-                   _                                                => throw new PlatformNotSupportedException()
+                   _ when !string.IsNullOrEmpty(DownloadUrl) => DownloadUrl,
+                   Architecture.X64                          => DownloadUrl_x64,
+                   Architecture.X86                          => DownloadUrl_x86,
+                   _                                         => throw new PlatformNotSupportedException()
                };
 
         public string GetDownloadFileName()
@@ -42,24 +42,5 @@ namespace Husky.Dependencies.DependencyAcquisitionMethods
                    Architecture.X86                                 => DownloadedFileName_x86,
                    _                                                => throw new PlatformNotSupportedException()
                };
-
-        public override async ValueTask AcquireDependency(IServiceProvider serviceProvider)
-        {
-            var logger = serviceProvider.GetRequiredService<ILogger<HttpDownloadDependencyAcquisitionMethod<T>>>();
-            logger.LogInformation("Attempting to download dependency {dependency}", Dependency.GetType().Name);
-
-            var httpService = serviceProvider.GetRequiredService<IHttpService>();
-            var fileService = serviceProvider.GetRequiredService<IFileSystemService>();
-            var shellExecutionService = serviceProvider.GetRequiredService<IShellExecutionService>();
-
-            var downloadFileDirectory = fileService.CreateTempDirectory();
-            var downloadFileFullPath = Path.Combine(downloadFileDirectory.FullName, GetDownloadFileName());
-            var downloadedFile = await httpService.DownloadFile(GetDownloadUrl(), downloadFileFullPath);
-
-            // Todo: Log execution result
-            var executionResult = await shellExecutionService.ExecuteFile(downloadedFile.FullName, InstallationArguments);
-
-            Console.WriteLine($"Executed HTTP Acquisition for {Dependency.GetType().Name}");
-        }
     }
 }

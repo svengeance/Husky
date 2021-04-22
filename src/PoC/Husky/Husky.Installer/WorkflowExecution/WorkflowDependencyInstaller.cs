@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Husky.Core.HuskyConfiguration;
 using Husky.Dependencies;
+using Husky.Dependencies.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Husky.Installer.WorkflowExecution
@@ -16,13 +17,13 @@ namespace Husky.Installer.WorkflowExecution
     {
         private readonly ILogger<WorkflowDependencyInstaller> _logger;
         private readonly IDependencyHandlerResolver _dependencyHandlerResolver;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IDependencyAcquisitionService _dependencyAcquisitionService;
 
-        public WorkflowDependencyInstaller(ILogger<WorkflowDependencyInstaller> logger, IDependencyHandlerResolver dependencyHandlerResolver, IServiceProvider serviceProvider)
+        public WorkflowDependencyInstaller(ILogger<WorkflowDependencyInstaller> logger, IDependencyHandlerResolver dependencyHandlerResolver, IDependencyAcquisitionService dependencyAcquisitionService)
         {
             _logger = logger;
             _dependencyHandlerResolver = dependencyHandlerResolver;
-            _serviceProvider = serviceProvider;
+            _dependencyAcquisitionService = dependencyAcquisitionService;
         }
 
         public async Task InstallDependencies(IEnumerable<HuskyDependency> dependencies)
@@ -39,7 +40,7 @@ namespace Husky.Installer.WorkflowExecution
                     if (dependencyHandler.TrySatisfyDependency(out var acquisitionMethod))
                     {
                         _logger.LogInformation("Successfully located a handler for {dependency}, attempting to install", dependency.GetType().Name);
-                        await acquisitionMethod.AcquireDependency(_serviceProvider);
+                        await _dependencyAcquisitionService.AcquireDependency(acquisitionMethod);
                         _logger.LogDebug("Successfully installed dependency {dependency}", dependency.GetType().Name);
 
                         // Todo: Verify installed (maybe call IsAlreadyInstalled again? :D)

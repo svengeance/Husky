@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
-using Husky.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Version = SemVer.Version;
 
 namespace Husky.Dependencies.DependencyAcquisitionMethods
@@ -17,18 +14,7 @@ namespace Husky.Dependencies.DependencyAcquisitionMethods
         
         public PackageManagerDependencyAcquisitionMethod(T dependency): base(dependency) { }
 
-        public override async ValueTask AcquireDependency(IServiceProvider serviceProvider)
-        {
-            var shellExecutionService = serviceProvider.GetRequiredService<IShellExecutionService>();
-
-            foreach (var command in PreInstallationCommands)
-                await shellExecutionService.ExecuteShellCommand(command);
-
-            var installationCommand = GetPlatformPackageManager().CreateInstallCommand(PackageName);
-            await shellExecutionService.ExecuteShellCommand(installationCommand);
-        }
-
-        private PackageManager GetPlatformPackageManager()
+        public PackageManager GetPlatformPackageManager()
             => CurrentPlatform.OS switch
                {
                    OS.Linux when CurrentPlatform.LinuxDistribution is null => ThrowUnsupportedPackageManager(),
@@ -70,7 +56,7 @@ namespace Husky.Dependencies.DependencyAcquisitionMethods
             public static PackageManager Pkg = new("pgk", "install", "delete", "-y");
         }
 
-        protected record PackageManager(string Command, string InstallVerb, string RemoveVerb, string SilentArg)
+        public record PackageManager(string Command, string InstallVerb, string RemoveVerb, string SilentArg)
         {
             public string CreateInstallCommand(string packageName) => $"{Command} {InstallVerb} {packageName} {SilentArg}";
             public string CreateUninstallCommand(string packageName) => $"{Command} {RemoveVerb} {packageName} {SilentArg}";

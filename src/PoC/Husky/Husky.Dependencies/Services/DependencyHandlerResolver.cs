@@ -4,7 +4,7 @@ using Husky.Core.HuskyConfiguration;
 using Husky.Dependencies.DependencyHandlers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Husky.Dependencies
+namespace Husky.Dependencies.Services
 {
     public interface IDependencyHandlerResolver
     {
