@@ -1,13 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Husky.Core.Infrastructure;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
 using Husky.Installer;
-using Husky.Installer.Extensions;
+using Husky.Services.Infrastructure;
+using Husky.Tasks.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
+using StrongInject;
 
 namespace Husky.Tasks.Tests
 {
@@ -24,10 +28,9 @@ namespace Husky.Tasks.Tests
         [OneTimeSetUp]
         protected void BaseSetup()
         {
-            var installerConfiguration = new HuskyInstallerSettings();
             var huskyConfiguration = HuskyConfiguration.Create();
             ConfigureHusky(huskyConfiguration);
-            RootServiceProvider = new ServiceCollection().AddHuskyInstaller(installerConfiguration, huskyConfiguration);
+            RootServiceProvider = CreateServiceProvider();
         }
 
         protected override T CreateInstanceOfType() => ScopedServiceProvider.GetRequiredService<T>();
@@ -42,6 +45,19 @@ namespace Husky.Tasks.Tests
             var scopeFactory = RootServiceProvider.GetRequiredService<IServiceScopeFactory>();
             CurrentTestScope = scopeFactory.CreateScope();
             ScopedServiceProvider = CurrentTestScope.ServiceProvider;
+        }
+
+        private IServiceProvider CreateServiceProvider()
+        {
+            var serviceCollection = new ServiceCollection();
+
+            var modules = new[] { typeof(HuskyServicesModule), typeof(HuskyTasksModule), typeof(HuskyCoreModule) };
+
+            foreach (var module in modules)
+                foreach (var registration in module.GetCustomAttributes<RegisterAttribute>())
+                    serviceCollection.AddScoped(registration.RegisterAs.Length == 0 ? registration.Type : registration.RegisterAs.Single(), registration.Type);
+
+            return serviceCollection.BuildServiceProvider();
         }
 
         [TearDown]
