@@ -60,7 +60,8 @@ namespace Husky.Dependencies.Tests.DotNet
                 ? Core.Dependencies.DotNet.RuntimeInstallation.AspNet
                 : Core.Dependencies.DotNet.RuntimeInstallation.Sdk);
             
-            var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
+            var sut = new DotNetDependencyHandler(_shellExecutionServiceMock.Object);
+            sut.LoadDependency(dependency);
             
             // Act
             _ = sut.IsAlreadyInstalled();
@@ -78,7 +79,8 @@ namespace Husky.Dependencies.Tests.DotNet
         {
             // Arrange
             var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallation.Sdk);
-            var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
+            var sut = new DotNetDependencyHandler(_shellExecutionServiceMock.Object);
+            sut.LoadDependency(dependency);
 
             // Act
             var isInstalled = await sut.IsAlreadyInstalled();
@@ -95,7 +97,8 @@ namespace Husky.Dependencies.Tests.DotNet
         {
             // Arrange
             var dependency = new Core.Dependencies.DotNet(range, FrameworkInstallation.Runtime, runtimeInstallation);
-            var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
+            var sut = new DotNetDependencyHandler(_shellExecutionServiceMock.Object);
+            sut.LoadDependency(dependency);
 
             // Act
             var isInstalled = await sut.IsAlreadyInstalled();
@@ -110,7 +113,8 @@ namespace Husky.Dependencies.Tests.DotNet
         {
             // Arrange
             var dependency = new Core.Dependencies.DotNet(">=5", FrameworkInstallation.Runtime, Core.Dependencies.DotNet.RuntimeInstallation.AspNet);
-            var sut = new DotNetDependencyHandler(dependency, NullLogger<DotNetDependencyHandler>.Instance, _shellExecutionServiceMock.Object);
+            var sut = new DotNetDependencyHandler(_shellExecutionServiceMock.Object);
+            sut.LoadDependency(dependency);
 
             // Act
             var satisfiesDependency = sut.TrySatisfyDependency(out var acquisitionMethod);

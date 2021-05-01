@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using Husky.Core.Dependencies;
 using Husky.Core.HuskyConfiguration;
 
 namespace Husky.Dependencies

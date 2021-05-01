@@ -4,7 +4,8 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Core.Workflow.Uninstallation
 {
@@ -26,39 +27,38 @@ namespace Husky.Core.Workflow.Uninstallation
         public string FilePath { get; }
 
         private readonly OperationsListVersion _version;
-        private readonly ILogger _logger;
+        private static readonly ILogger Logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(UninstallOperationsList));
 
         private const byte Newline = 0xA;
 
-        private UninstallOperationsList(string filePath, OperationsListVersion version, ILogger logger)
+        private UninstallOperationsList(string filePath, OperationsListVersion version)
         {
             FilePath = filePath;
             _version = version;
-            _logger = logger;
         }
 
-        public static async ValueTask<IUninstallOperationsList> CreateOrRead(string filePath, ILogger logger)
+        public static async ValueTask<IUninstallOperationsList> CreateOrRead(string filePath)
         {
-            logger.LogInformation("Initializing instance of Uninstall Operations List at directory {uninstallOperationsFile}", filePath);
+            Logger.Information("Initializing instance of Uninstall Operations List at directory {uninstallOperationsFile}", filePath);
             if (File.Exists(filePath))
-                return await ReadFromJson(filePath, logger);
+                return await ReadFromJson(filePath, Logger);
 
-            logger.LogDebug("Unable to locate existing Uninstall Operations List, creating new copy");
-            var newUninstallOpsList = new UninstallOperationsList(filePath, OperationsListVersion.V1, logger);
+            Logger.Debug("Unable to locate existing Uninstall Operations List, creating new copy");
+            var newUninstallOpsList = new UninstallOperationsList(filePath, OperationsListVersion.V1);
             var parentDirectory = new FileInfo(filePath).DirectoryName ?? throw new ArgumentException($"Unable to locate directory for uninstall file at {filePath}");
 
             Directory.CreateDirectory(parentDirectory);
             File.Create(filePath).Close();
             await newUninstallOpsList.Flush();
             
-            logger.LogInformation("Successfully created new instance of Uninstall Operations List at directory {uninstallOperationsFile}", filePath);
+            Logger.Information("Successfully created new instance of Uninstall Operations List at directory {uninstallOperationsFile}", filePath);
 
             return newUninstallOpsList;
         }
 
         public void AddEntry(EntryKind kind, string entry)
         {
-            _logger.LogTrace("Adding {entryKind} entry to Uninstall Operations List with value {entry}", kind, entry);
+            Logger.Verbose("Adding {entryKind} entry to Uninstall Operations List with value {entry}", kind, entry);
             GetListFromKind(kind).Add(entry);
         }
 
@@ -66,19 +66,19 @@ namespace Husky.Core.Workflow.Uninstallation
 
         public async Task Flush()
         {
-            _logger.LogDebug("Writing {numFiles} files, {numDirectories} directories, {numRegValues} registry values, and {numRegKeys} keys to Uninstall OperationsList",
+            Logger.Debug("Writing {numFiles} files, {numDirectories} directories, {numRegValues} registry values, and {numRegKeys} keys to Uninstall OperationsList",
                 FilesToRemove.Count, DirectoriesToRemove.Count, RegistryValuesToRemove.Count, RegistryKeysToRemove.Count);
 
             var uninstallOperationsFileExists = File.Exists(FilePath);
             if (!uninstallOperationsFileExists)
-                _logger.LogWarning("Uninstall Operations List was deleted at {uninstallOperationsListFilePath} -- recreating", FilePath);
+                Logger.Warning("Uninstall Operations List was deleted at {uninstallOperationsListFilePath} -- recreating", FilePath);
 
             await using var fs = File.Open(FilePath, FileMode.Create);
 
             fs.WriteByte((byte)_version);
             fs.WriteByte(Newline);
             await JsonSerializer.SerializeAsync(fs, this);
-            _logger.LogDebug("Successfully flushed Uninstall Operations List");
+            Logger.Debug("Successfully flushed Uninstall Operations List");
         }
 
         private HashSet<string> GetListFromKind(EntryKind kind)
@@ -93,22 +93,22 @@ namespace Husky.Core.Workflow.Uninstallation
 
         private static async Task<UninstallOperationsList> ReadFromJson(string filePath, ILogger logger)
         {
-            logger.LogDebug("Reading existing Uninstall Operations file at {filePath}", filePath);
+            logger.Debug("Reading existing Uninstall Operations file at {filePath}", filePath);
             await using var fs = File.OpenRead(filePath);
             var version = (OperationsListVersion) (byte) fs.ReadByte();
-            logger.LogTrace("Reading file as version {uninstallOperationsFileVersion}", version.ToString());
+            logger.Verbose("Reading file as version {uninstallOperationsFileVersion}", version.ToString());
             _ = fs.ReadByte(); // Discard newline
             
             using var json = await JsonDocument.ParseAsync(fs);
             return version switch
                    {
-                       OperationsListVersion.V1 => ReadListV1(json, filePath, logger),
+                       OperationsListVersion.V1 => ReadListV1(json, filePath),
                        _ => throw new InvalidOperationException($"Attempted to read Uninstall file at {filePath} which had version {version}")
                    };
         }
 
-        private static UninstallOperationsList ReadListV1(JsonDocument json, string filePath, ILogger logger)
-            => new(filePath, OperationsListVersion.V1, logger)
+        private static UninstallOperationsList ReadListV1(JsonDocument json, string filePath)
+            => new(filePath, OperationsListVersion.V1)
             {
                 FilesToRemove = ReadAsStringArray(json.RootElement.GetProperty(nameof(FilesToRemove))),
                 DirectoriesToRemove = ReadAsStringArray(json.RootElement.GetProperty(nameof(DirectoriesToRemove))),

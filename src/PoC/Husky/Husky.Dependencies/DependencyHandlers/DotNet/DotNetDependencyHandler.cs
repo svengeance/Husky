@@ -4,14 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.Dependencies;
 using Husky.Services;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 using Version = SemVer.Version;
 
 namespace Husky.Dependencies.DependencyHandlers
 {
     public partial class DotNetDependencyHandler: DependencyHandler<DotNet>
     {
-        private readonly ILogger _logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(DotNetDependencyHandler));
         private readonly IShellExecutionService _shellExecutionService;
 
         /*
@@ -21,9 +22,8 @@ namespace Husky.Dependencies.DependencyHandlers
          *
          *       *sigh*. What did we sign up for. (:
          */
-        public DotNetDependencyHandler(DotNet dependency, ILogger<DotNetDependencyHandler> logger, IShellExecutionService shellExecutionService): base(dependency)
+        public DotNetDependencyHandler(IShellExecutionService shellExecutionService)
         {
-            _logger = logger;
             _shellExecutionService = shellExecutionService;
         }
 
@@ -48,7 +48,7 @@ namespace Husky.Dependencies.DependencyHandlers
 
             var (exitCode, stdOutput, _) = await _shellExecutionService.ExecuteShellCommand($"dotnet {command}");
 
-            _logger.LogDebug("Retrieved dotnet installation output using {command}\n{dotnetOutput}", command, stdOutput);
+            _logger.Debug("Retrieved dotnet installation output using {command}\n{dotnetOutput}", command, stdOutput);
 
             return exitCode != 0
                 ? Array.Empty<string>()

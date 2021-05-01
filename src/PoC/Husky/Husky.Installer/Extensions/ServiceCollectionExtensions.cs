@@ -1,10 +1,7 @@
 ﻿using System;
 using Husky.Core.Workflow;
-using Husky.Dependencies.Extensions;
 using Husky.Installer.WorkflowExecution;
-using Husky.Services.Extensions;
-using Husky.Tasks;
-using Husky.Tasks.Extensions;
+using Husky.Tasks.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -15,13 +12,7 @@ namespace Husky.Installer.Extensions
     {
         public static IServiceProvider AddHuskyInstaller(this IServiceCollection serviceCollection, HuskyInstallerSettings huskyInstallerSettings, HuskyConfiguration huskyConfiguration)
         {
-            foreach (var externalAssembly in huskyInstallerSettings.ResolveModulesFromAssemblies)
-                HuskyTaskResolver.AddAssemblyForScanning(externalAssembly);
-
             serviceCollection.AddLogging(logging => logging.AddSerilog());
-            serviceCollection.AddHuskyDependencies();
-            serviceCollection.AddHuskyServices();
-            serviceCollection.AddHuskyTasks();
 
             serviceCollection.AddScoped<IWorkflowDependencyInstaller, WorkflowDependencyInstaller>();
             serviceCollection.AddScoped<IWorkflowExecutor, WorkflowExecutor>();

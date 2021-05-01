@@ -8,6 +8,7 @@ using FluentValidation;
 using Husky.Core.Platform;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
+using Husky.Tasks.Infrastructure;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -22,8 +23,6 @@ namespace Husky.Tasks.Tests
         protected Mock<IPlatformInformation> PlatformInformationMock { get; } = new();
 
         private HuskyTaskConfiguration DefaultTaskConfiguration { get; set; } = null!;
-        
-        private HashSet<Type> HuskyTaskTypes { get; } = HuskyTaskResolver.GetAvailableTasks().ToHashSet();
         
         [SetUp]
         public async ValueTask SetupBaseHuskyTaskTest()
@@ -54,12 +53,10 @@ namespace Husky.Tasks.Tests
         protected abstract T CreateInstanceOfType();
 
         private async ValueTask<HuskyContext> CreateDefaultHuskyContext()
-            => await ValueTask.FromResult<HuskyContext>(new(NullLogger<HuskyContext>.Instance, await CreateUninstallOperationsList(), Assembly.GetExecutingAssembly(), "Test"));
+            => await ValueTask.FromResult<HuskyContext>(new(await CreateUninstallOperationsList(), Assembly.GetExecutingAssembly(), "Test"));
         
         private async ValueTask<T> CreateAndConfigureTask(HuskyTaskConfiguration taskConfiguration)
         {
-            if (!HuskyTaskTypes.Contains(typeof(T)))
-                Assert.Fail($"Unable to locate Type {typeof(T)} for testing");
 
             BeforeSetup(); // Allows our unit tests to properly setup Mocks 
             var huskyTask = CreateInstanceOfType();

@@ -6,8 +6,9 @@ using Husky.Core;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
 using Husky.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Serilog.Context;
+using Serilog.Core;
 
 namespace Husky.Installer.WorkflowExecution
 {
@@ -18,26 +19,23 @@ namespace Husky.Installer.WorkflowExecution
 
     public class WorkflowExecutor: IWorkflowExecutor
     {
-        private readonly ILogger<WorkflowExecutor> _logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(WorkflowExecutor));
         private readonly IWorkflowStageExecutor _stageExecutor;
         private readonly IWorkflowValidator _workflowValidator;
         private readonly IWorkflowDependencyInstaller _dependencyInstaller;
-        private readonly ILoggerFactory _loggerFactory;
 
-        public WorkflowExecutor(ILogger<WorkflowExecutor> logger, IWorkflowStageExecutor stageExecutor, IWorkflowValidator workflowValidator, IWorkflowDependencyInstaller dependencyInstaller, ILoggerFactory loggerFactory)
+        public WorkflowExecutor(IWorkflowStageExecutor stageExecutor, IWorkflowValidator workflowValidator, IWorkflowDependencyInstaller dependencyInstaller)
         {
-            _logger = logger;
             _stageExecutor = stageExecutor;
             _workflowValidator = workflowValidator;
             _dependencyInstaller = dependencyInstaller;
-            _loggerFactory = loggerFactory;
         }
 
         public async ValueTask Execute(HuskyWorkflow huskyWorkflow, HuskyInstallerSettings installerSettings, IUninstallOperationsList uninstallOperationsList)
         {
             var combinedVariables = _workflowValidator.ValidateWorkflow(huskyWorkflow);
 
-            var huskyContext = new HuskyContext(_loggerFactory.CreateLogger<HuskyContext>(), uninstallOperationsList, Assembly.GetEntryAssembly()!, installerSettings.TagToExecute)
+            var huskyContext = new HuskyContext(uninstallOperationsList, Assembly.GetEntryAssembly()!, installerSettings.TagToExecute)
             {
                 Variables = new Dictionary<string, object>(combinedVariables, StringComparer.InvariantCultureIgnoreCase)
             };
@@ -48,11 +46,11 @@ namespace Husky.Installer.WorkflowExecution
             foreach (var stageToExecute in huskyWorkflow.Stages)
             {
                 using var stageScope = LogContext.PushProperty("Stage", stageToExecute.Name + ".");
-                _logger.LogInformation("Executing stage {stage}", stageToExecute.Name);
+                _logger.Information("Executing stage {stage}", stageToExecute.Name);
                 await _stageExecutor.ExecuteStage(stageToExecute, huskyContext);
             }
 
-            _logger.LogInformation("Husky has successfully executed {tag}", installerSettings.TagToExecute);
+            _logger.Information("Husky has successfully executed {tag}", installerSettings.TagToExecute);
         }
     }
 }

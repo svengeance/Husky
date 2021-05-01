@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Husky.Core.Workflow;
 using Husky.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Serilog.Context;
+using Serilog.Core;
 
 namespace Husky.Installer.WorkflowExecution
 {
@@ -13,20 +14,16 @@ namespace Husky.Installer.WorkflowExecution
 
     public class WorkflowStageExecutor: IWorkflowStageExecutor
     {
-        private readonly ILogger<WorkflowStageExecutor> _logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(WorkflowStageExecutor));
         private readonly IWorkflowJobExecutor _jobExecutor;
 
-        public WorkflowStageExecutor(ILogger<WorkflowStageExecutor> logger, IWorkflowJobExecutor jobExecutor)
-        {
-            _logger = logger;
-            _jobExecutor = jobExecutor;
-        }
+        public WorkflowStageExecutor(IWorkflowJobExecutor jobExecutor) => _jobExecutor = jobExecutor;
 
         public async ValueTask ExecuteStage(HuskyStage stage, HuskyContext huskyContext)
         {
             foreach (var job in stage.Jobs)
             {
-                _logger.LogInformation("Executing job {job}", job.Name);
+                _logger.Information("Executing job {job}", job.Name);
                 using var jobScope = LogContext.PushProperty("Job", job.Name + ".");
                 huskyContext.CurrentJobName = job.Name;
 

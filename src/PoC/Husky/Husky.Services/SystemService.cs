@@ -6,7 +6,8 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Services
 {
@@ -17,19 +18,18 @@ namespace Husky.Services
 
     public class SystemService: ISystemService
     {
-        private readonly ILogger<SystemService> _logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(SystemService));
         private readonly IShellExecutionService _shellExecutionService;
 
-        public SystemService(ILogger<SystemService> logger, IShellExecutionService shellExecutionService)
+        public SystemService(IShellExecutionService shellExecutionService)
         {
-            _logger = logger;
             _shellExecutionService = shellExecutionService;
         }
 
         public async ValueTask<SystemInformation> GetSystemInformation()
         {
-            _logger.LogInformation("Retrieving information about the current system");
-            _logger.LogTrace("Retrieving total memory");
+            _logger.Information("Retrieving information about the current system");
+            _logger.Verbose("Retrieving total memory");
             var totalMemory = CurrentPlatform.OS switch
                               {
                                   OS.Windows => GetTotalAvailableMemoryMegabytesWindows(),
@@ -37,7 +37,7 @@ namespace Husky.Services
                                   _ => throw new PlatformNotSupportedException($"Unable to get system information for Platform: {CurrentPlatform.LongDescription}")
                               };
 
-            _logger.LogTrace("Retrieving drive information");
+            _logger.Verbose("Retrieving drive information");
             var driveInformation = DriveInfo.GetDrives()
                                             .Select(s => new SystemDriveInformation(s.RootDirectory)
                                              {
@@ -50,13 +50,13 @@ namespace Husky.Services
                 DriveInformation = driveInformation.ToArray()
             };
 
-            _logger.LogDebug("Retrieved system information {@systemInformation}", systemInformation);
+            _logger.Debug("Retrieved system information {@systemInformation}", systemInformation);
             return systemInformation;
         }
 
         private int GetTotalAvailableMemoryMegabytesWindows()
         {
-            _logger.LogTrace("P/Invoking GlobalMemoryStatusEx");
+            _logger.Verbose("P/Invoking GlobalMemoryStatusEx");
             MemoryStatusEx memoryStatus = new();
             memoryStatus.dwMemoryLoad = (uint) Marshal.SizeOf<MemoryStatusEx>();
             if (GlobalMemoryStatusEx(ref memoryStatus))
@@ -67,7 +67,7 @@ namespace Husky.Services
 
         private async Task<int> GetTotalAvailableMemoryMegabytesLinux()
         {
-            _logger.LogTrace("Reading /proc/meminfo");
+            _logger.Verbose("Reading /proc/meminfo");
             var memInfoQuery = await _shellExecutionService.ExecuteShellCommand("head -n 1 /proc/meminfo");
             if (!memInfoQuery.WasSuccessful) // Todo: Generic "command failed to execute" exception w/ attempted command
                 throw new ApplicationException($"Unable to inspect system total memory - {CurrentPlatform.LongDescription}");

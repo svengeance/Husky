@@ -1,4 +1,5 @@
 ﻿using System;
+using Husky.Core.Dependencies;
 using Husky.Core.HuskyConfiguration;
 
 namespace Husky.Core.Workflow.Builder

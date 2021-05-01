@@ -35,7 +35,7 @@ namespace Husky.Tasks.Tests
         protected override async ValueTask<IUninstallOperationsList> CreateUninstallOperationsList()
             => UninstallOperationsList =
                 await new ValueTask<IUninstallOperationsList>(
-                    await Core.Workflow.Uninstallation.UninstallOperationsList.CreateOrRead(_uninstallOperationsListFile, NullLogger.Instance));
+                    await Core.Workflow.Uninstallation.UninstallOperationsList.CreateOrRead(_uninstallOperationsListFile));
 
         protected override void BeforeSetup()
         {

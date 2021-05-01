@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Services
 {
@@ -19,18 +20,13 @@ namespace Husky.Services
 
     public class EmbeddedResourceService : IEmbeddedResourceService
     {
-        private readonly ILogger _logger;
-
-        public EmbeddedResourceService(ILogger<EmbeddedResourceService> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(RegistryService));
 
         public string[] ListResources(Assembly assembly) => assembly.GetManifestResourceNames();
         
         public IEnumerable<string> ListResources(Assembly assembly, string include)
         {
-            _logger.LogDebug("Locating resources in {assembly} that match pattern {includePattern}", assembly.FullName, include);
+            _logger.Debug("Locating resources in {assembly} that match pattern {includePattern}", assembly.FullName, include);
             var availableResources = ListResources(assembly);
 
             var matcher = new Matcher(StringComparison.InvariantCultureIgnoreCase);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Husky.Core.Dependencies;
 using Husky.Core.HuskyConfiguration;
 using Range = SemVer.Range;
 

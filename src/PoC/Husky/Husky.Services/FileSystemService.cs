@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Services
 {
@@ -36,23 +37,18 @@ namespace Husky.Services
 
     public class FileSystemService: IFileSystemService
     {
-        private readonly ILogger _logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(RegistryService));
         protected virtual string WindowsScriptFileExtension => ".cmd";
         protected virtual string LinuxScriptFileExtension => ".sh";
         protected virtual string OsxScriptFileExtension => ".sh";
 
-        public FileSystemService(ILogger<FileSystemService> logger)
-        {
-            _logger = logger;
-        }
-
         public DirectoryInfo CreateTempDirectory()
         {
-            _logger.LogDebug("Creating a temp directory");
+            _logger.Debug("Creating a temp directory");
             var directoryName = Path.GetRandomFileName();
             var directoryInfo = new DirectoryInfo(Path.Combine(Path.GetTempPath(), directoryName));
             directoryInfo.Create();
-            _logger.LogInformation("Temp directory created at {tempDirectoryPath}", directoryInfo.FullName);
+            _logger.Information("Temp directory created at {tempDirectoryPath}", directoryInfo.FullName);
 
             return directoryInfo;
         }
@@ -62,14 +58,14 @@ namespace Husky.Services
         {
             totalLength ??= 0L;
             filePath ??= Path.GetTempFileName();
-            _logger.LogInformation("Writing {totalLength} bytes to {filePath}", totalLength, filePath);
+            _logger.Information("Writing {totalLength} bytes to {filePath}", totalLength, filePath);
 
             var totalBytesRead = 0L;
             int bytesRead;
             var buffer = new byte[4 * 1024];
 
             await using var fs = File.OpenWrite(filePath);
-            _logger.LogDebug($"Opened file {filePath} for writing", filePath);
+            _logger.Debug($"Opened file {filePath} for writing", filePath);
 
             while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) != 0)
             {
@@ -78,7 +74,7 @@ namespace Husky.Services
                 bytesWrittenProgress?.Report(new IFileSystemService.FileWriteProgress((long) totalLength, totalBytesRead));
             }
 
-            _logger.LogInformation("Wrote {totalBytesRead}/{totalLength} bytes to file {filePath}", totalBytesRead, totalLength, filePath);
+            _logger.Information("Wrote {totalBytesRead}/{totalLength} bytes to file {filePath}", totalBytesRead, totalLength, filePath);
 
             return new FileInfo(filePath);
         }
@@ -88,25 +84,25 @@ namespace Husky.Services
          */
         public async ValueTask<string> CreateScriptFile(string destinationDirectory, string fileName, string script)
         {
-            _logger.LogInformation("Creating a script file at {destinationDirectory} with file name {fileName} writing script:\n{script}", destinationDirectory, fileName, script);
+            _logger.Information("Creating a script file at {destinationDirectory} with file name {fileName} writing script:\n{script}", destinationDirectory, fileName, script);
             var destFileInfo = new FileInfo(Path.Combine(destinationDirectory, fileName + GetScriptFileExtension()));
             var destDirInfo = new DirectoryInfo(destinationDirectory);
             
             if (destDirInfo.Parent is not null && !destDirInfo.Exists) // If we're not a root directory.. 
             {
-                _logger.LogDebug("Directory {destinationDirectory} did not exist, creating");
+                _logger.Debug("Directory {destinationDirectory} did not exist, creating");
                 destDirInfo.Create();
             }
 
-            _logger.LogTrace("Creating script file for writing");
+            _logger.Verbose("Creating script file for writing");
             await using var fileWriter = new StreamWriter(destFileInfo.Create());
 
-            _logger.LogTrace("Writing script to file");
+            _logger.Verbose("Writing script to file");
             await fileWriter.WriteAsync(script);
 
             destFileInfo.Refresh();
 
-            _logger.LogInformation("Created script file {scriptFile} of size {scriptFileSizeBytes}", destFileInfo.FullName, destFileInfo.Length);
+            _logger.Information("Created script file {scriptFile} of size {scriptFileSizeBytes}", destFileInfo.FullName, destFileInfo.Length);
             return destFileInfo.FullName;
         }
 
@@ -114,11 +110,11 @@ namespace Husky.Services
         {
             if (Directory.Exists(directoryPath))
             {
-                _logger.LogDebug("Attempted to create directory at {directoryPath}, but the directory already exists", directoryPath);
+                _logger.Debug("Attempted to create directory at {directoryPath}, but the directory already exists", directoryPath);
                 return ValueTask.FromResult(new DirectoryInfo(directoryPath));
             }
 
-            _logger.LogDebug("Creating directory {directory}", directoryPath);
+            _logger.Debug("Creating directory {directory}", directoryPath);
             return ValueTask.FromResult(Directory.CreateDirectory(directoryPath));
         }
 
@@ -126,11 +122,11 @@ namespace Husky.Services
         {
             if (!File.Exists(filePath))
             {
-                _logger.LogWarning("Attempted to delete file at {filePath}, but the file did not exist", filePath);
+                _logger.Warning("Attempted to delete file at {filePath}, but the file did not exist", filePath);
                 return ValueTask.CompletedTask;
             }
 
-            _logger.LogDebug("Removing file {filePath}", filePath);
+            _logger.Debug("Removing file {filePath}", filePath);
             File.Delete(filePath);
 
             return ValueTask.CompletedTask;
@@ -140,11 +136,11 @@ namespace Husky.Services
         {
             if (!Directory.Exists(directoryPath))
             {
-                _logger.LogWarning("Attempted to delete directory at {directoryPath}, but the directory did not exist", directoryPath);
+                _logger.Warning("Attempted to delete directory at {directoryPath}, but the directory did not exist", directoryPath);
                 return ValueTask.CompletedTask;
             }
 
-            _logger.LogDebug("Recursively removing directory {directoryPath}", directoryPath);
+            _logger.Debug("Recursively removing directory {directoryPath}", directoryPath);
             Directory.Delete(directoryPath, true);
             return ValueTask.CompletedTask;
         }
@@ -153,17 +149,17 @@ namespace Husky.Services
         {
             if (!Directory.Exists(directoryPath))
             {
-                _logger.LogWarning("Attempted to delete directory at {directoryPath}, but the directory did not exist", directoryPath);
+                _logger.Warning("Attempted to delete directory at {directoryPath}, but the directory did not exist", directoryPath);
                 return ValueTask.CompletedTask;
             }
 
             if (skipIfNotEmpty && Directory.EnumerateFileSystemEntries(directoryPath).Any())
             {
-                _logger.LogDebug("Attempted to delete directory at {directoryPath}, but the directory was not empty -- skipping", directoryPath);
+                _logger.Debug("Attempted to delete directory at {directoryPath}, but the directory was not empty -- skipping", directoryPath);
                 return ValueTask.CompletedTask;
             }
 
-            _logger.LogDebug("Removing directory {directoryPath}", directoryPath);
+            _logger.Debug("Removing directory {directoryPath}", directoryPath);
             Directory.Delete(directoryPath);
             return ValueTask.CompletedTask;
         }

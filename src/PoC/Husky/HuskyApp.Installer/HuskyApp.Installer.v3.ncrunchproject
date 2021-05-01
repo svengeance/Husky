@@ -7,8 +7,6 @@
     <CustomBuildProperties>
       <Value>IsNCrunch = True</Value>
     </CustomBuildProperties>
-    <HiddenComponentWarnings>
-      <Value>MicrosoftNetCompilersNotSupported</Value>
-    </HiddenComponentWarnings>
+    <HiddenComponentWarnings />
   </Settings>
 </ProjectConfiguration>

@@ -4,19 +4,19 @@ using System.Threading.Tasks;
 using Husky.Core.TaskOptions.Resources;
 using Husky.Core.Workflow.Uninstallation;
 using Husky.Services;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Tasks.Resources
 {
     public class ExtractBundledResource : HuskyTask<ExtractBundledResourceOptions>
     {
-        private readonly ILogger _logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(ExtractBundledResource));
         private readonly IEmbeddedResourceService _embeddedResourceService;
         private readonly IFileSystemService _fileSystemService;
 
-        public ExtractBundledResource(ILogger<ExtractBundledResource> logger, IEmbeddedResourceService embeddedResourceService, IFileSystemService fileSystemService)
+        public ExtractBundledResource(IEmbeddedResourceService embeddedResourceService, IFileSystemService fileSystemService)
         {
-            _logger = logger;
             _embeddedResourceService = embeddedResourceService;
             _fileSystemService = fileSystemService;
         }
@@ -24,21 +24,21 @@ namespace Husky.Tasks.Resources
         protected override async ValueTask ExecuteTask()
         {
             var availableFiles = _embeddedResourceService.ListResources(HuskyContext.InstallationAssembly, Configuration.Resources).ToArray();
-            _logger.LogDebug("Located {numberOfFilteredEmbeddedFiles} files for copying", availableFiles.Length);
+            _logger.Debug("Located {numberOfFilteredEmbeddedFiles} files for copying", availableFiles.Length);
 
             if (Directory.Exists(Configuration.TargetDirectory))
             {
-                _logger.LogDebug("Directory {targetDirectory} exists already - cleaning as necessary", Configuration.TargetDirectory);
+                _logger.Debug("Directory {targetDirectory} exists already - cleaning as necessary", Configuration.TargetDirectory);
                 if (Configuration.CleanFiles)
                 {
-                    _logger.LogTrace("Preparing to clean files");
+                    _logger.Verbose("Preparing to clean files");
                     foreach (var file in Directory.EnumerateFiles(Configuration.TargetDirectory))
                         await _fileSystemService.DeleteFile(file);
                 }
 
                 if (Configuration.CleanDirectories)
                 {
-                    _logger.LogTrace("Preparing to clean directories");
+                    _logger.Verbose("Preparing to clean directories");
                     foreach (var dir in Directory.EnumerateDirectories(Configuration.TargetDirectory))
                         await _fileSystemService.DeleteDirectoryRecursive(dir);
                 }
@@ -51,7 +51,7 @@ namespace Husky.Tasks.Resources
 
             foreach (var file in availableFiles)
             {
-                _logger.LogDebug("Preparing to copy {file} from embedded resource", file);
+                _logger.Debug("Preparing to copy {file} from embedded resource", file);
                 var destPath = Path.Combine(Configuration.TargetDirectory, file);
                 var destDir = Path.GetDirectoryName(destPath);
 

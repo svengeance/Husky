@@ -1,6 +1,6 @@
 ﻿using SemVer;
 
-namespace Husky.Core.HuskyConfiguration
+namespace Husky.Core.Dependencies
 {
     public abstract record HuskyDependency
     {
