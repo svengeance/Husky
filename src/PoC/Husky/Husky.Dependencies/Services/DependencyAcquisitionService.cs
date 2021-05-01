@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Husky.Core.HuskyConfiguration;
+using Husky.Core.Dependencies;
 using Husky.Dependencies.DependencyAcquisitionMethods;
 using Husky.Services;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Dependencies.Services
 {
@@ -15,14 +16,13 @@ namespace Husky.Dependencies.Services
 
     public class DependencyAcquisitionService: IDependencyAcquisitionService
     {
-        private readonly ILogger<DependencyAcquisitionService> _logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(DependencyAcquisitionService));
         private readonly IShellExecutionService _shellExecutionService;
         private readonly IHttpService _httpService;
         private readonly IFileSystemService _fileSystemService;
 
-        public DependencyAcquisitionService(ILogger<DependencyAcquisitionService> logger, IShellExecutionService shellExecutionService, IHttpService httpService, IFileSystemService fileSystemService)
+        public DependencyAcquisitionService(IShellExecutionService shellExecutionService, IHttpService httpService, IFileSystemService fileSystemService)
         {
-            _logger = logger;
             _shellExecutionService = shellExecutionService;
             _httpService = httpService;
             _fileSystemService = fileSystemService;
@@ -38,7 +38,7 @@ namespace Husky.Dependencies.Services
 
         private async ValueTask AcquireHttpDependency<T>(HttpDownloadDependencyAcquisitionMethod<T> httpDownload) where T : HuskyDependency
         {
-            _logger.LogInformation("Attempting to download dependency {dependency}", httpDownload.Dependency.GetType().Name);
+            _logger.Information("Attempting to download dependency {dependency}", httpDownload.Dependency.GetType().Name);
 
             var downloadFileDirectory = _fileSystemService.CreateTempDirectory();
             var downloadFileFullPath = Path.Combine(downloadFileDirectory.FullName, httpDownload.GetDownloadFileName());
@@ -53,7 +53,7 @@ namespace Husky.Dependencies.Services
 
         public async ValueTask AcquirePackageDependency<T>(PackageManagerDependencyAcquisitionMethod<T> package) where T : HuskyDependency
         {
-            _logger.LogInformation("Attempting to download dependency {dependency}", package.Dependency.GetType().Name);
+            _logger.Information("Attempting to download dependency {dependency}", package.Dependency.GetType().Name);
             foreach (var command in package.PreInstallationCommands)
                 await _shellExecutionService.ExecuteShellCommand(command);
 

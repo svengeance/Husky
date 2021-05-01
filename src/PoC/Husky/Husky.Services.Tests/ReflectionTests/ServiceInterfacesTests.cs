@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Husky.Services.Extensions;
+using Husky.Services.Infrastructure;
 using NUnit.Framework;
 
 namespace Husky.Services.Tests.ReflectionTests
@@ -10,15 +10,15 @@ namespace Husky.Services.Tests.ReflectionTests
     [TestFixture]
     public class ServiceInterfacesTests
     {
-        private Type[] _services;
+        private Type[] _services = Array.Empty<Type>();
 
         [OneTimeSetUp]
         public void GetServicesInformation()
         {
-            _services = typeof(ServiceCollectionExtensions).Assembly
-                                                           .GetExportedTypes()
-                                                           .Where(w => w.IsPublic && w.Name.EndsWith("Service"))
-                                                           .ToArray();
+            _services = typeof(HuskyServicesModule).Assembly
+                                                   .GetExportedTypes()
+                                                   .Where(w => w.IsPublic && w.Name.EndsWith("Service"))
+                                                   .ToArray();
         }
 
         [Test]

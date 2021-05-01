@@ -4,7 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Husky.Internal.Generator.Dictify;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Services
 {
@@ -34,13 +35,9 @@ namespace Husky.Services
     
     public class VariableResolverService: IVariableResolverService
     {
-        private readonly ILogger _logger;
-        private static readonly Regex VarMatchingRegex = new(@"(?<!{){(\w|\.|-)+}");
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(VariableResolverService));
 
-        public VariableResolverService(ILogger<VariableResolverService> logger)
-        {
-            _logger = logger;
-        }
+        private static readonly Regex VarMatchingRegex = new(@"(?<!{){(\w|\.|-)+}");
 
         /// <inheritdoc cref="IVariableResolverService"/>
         public object Resolve(Type t, Dictionary<string, object> variableSource)
@@ -63,18 +60,18 @@ namespace Husky.Services
                                                          .Select(s => s.Value)
                                                          .ToArray();
 
-                _logger.LogDebug("Replacing {variableCount} variables on key {key}", variablesToReplace.Length, key);
+                _logger.Debug("Replacing {variableCount} variables on key {key}", variablesToReplace.Length, key);
 
                 foreach (var varToReplace in variablesToReplace)
                 {
                     var sanitizedVarName = SanitizeVariableName(varToReplace);
                     if (!variableSource.TryGetValue(sanitizedVarName, out var replacement))
                     {
-                        _logger.LogWarning($"Missing variable {varToReplace} -- skipping");
+                        _logger.Warning($"Missing variable {varToReplace} -- skipping");
                         continue;
                     }
 
-                    _logger.LogDebug("Replacing {key} with {value}", varToReplace, replacement);
+                    _logger.Debug("Replacing {key} with {value}", varToReplace, replacement);
 
                     valueString = valueString.Replace(varToReplace, replacement.ToString());
                     variableSource[key] = valueString;

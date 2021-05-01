@@ -6,7 +6,6 @@ using Husky.Core.TaskOptions.Installation;
 using Husky.Core.Workflow;
 using Husky.Core.Workflow.Uninstallation;
 using Husky.Installer.WorkflowExecution;
-using Microsoft.Extensions.Logging;
 
 namespace Husky.Installer
 {
@@ -23,7 +22,7 @@ namespace Husky.Installer
 
         protected override async Task<IUninstallOperationsList> CreateContextUninstallOperationsList()
         {
-            var uninstallOperationsList = await UninstallOperationsList.CreateOrRead(UninstallOperationsFile, LoggerFactory.CreateLogger<UninstallOperationsList>());
+            var uninstallOperationsList = await UninstallOperationsList.CreateOrRead(UninstallOperationsFile);
             uninstallOperationsList.AddEntry(UninstallOperationsList.EntryKind.File, UninstallOperationsFile);
             uninstallOperationsList.AddEntry(UninstallOperationsList.EntryKind.Directory, Path.GetDirectoryName(UninstallOperationsFile)!);
             await uninstallOperationsList.Flush();

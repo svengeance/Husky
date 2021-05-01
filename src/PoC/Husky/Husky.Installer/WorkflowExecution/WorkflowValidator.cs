@@ -19,10 +19,7 @@ namespace Husky.Installer.WorkflowExecution
     {
         private readonly IVariableResolverService _variableResolverService;
 
-        public WorkflowValidator(IVariableResolverService variableResolverService)
-        {
-            _variableResolverService = variableResolverService;
-        }
+        public WorkflowValidator(IVariableResolverService variableResolverService) => _variableResolverService = variableResolverService;
 
         public Dictionary<string, object> ValidateWorkflow(HuskyWorkflow workflow)
         {

@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Husky.Core.Workflow;
 using Husky.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Installer.WorkflowExecution
 {
@@ -12,13 +13,11 @@ namespace Husky.Installer.WorkflowExecution
 
     public class WorkflowTaskExecutor: IWorkflowTaskExecutor
     {
-        private readonly ILogger _logger;
-
-        public WorkflowTaskExecutor(ILogger<WorkflowTaskExecutor> logger) => _logger = logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(WorkflowTaskExecutor));
 
         public ValueTask ExecuteTask<T>(HuskyTask<T> task) where T : HuskyTaskConfiguration
         {
-            _logger.LogDebug("Beginning execution of {task}", task.GetType().Name);
+            _logger.Debug("Beginning execution of {task}", task.GetType().Name);
             return task.Execute();
         }
     }

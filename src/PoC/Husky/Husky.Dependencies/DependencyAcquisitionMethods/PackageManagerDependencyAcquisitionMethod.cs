@@ -1,4 +1,5 @@
 ﻿using System;
+using Husky.Core.Dependencies;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;

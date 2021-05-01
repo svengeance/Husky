@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Husky.Core.Dependencies;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
 using Husky.Services;

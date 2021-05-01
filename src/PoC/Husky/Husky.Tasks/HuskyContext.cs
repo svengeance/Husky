@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Husky.Core.Workflow.Uninstallation;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Tasks
 {
@@ -19,11 +20,10 @@ namespace Husky.Tasks
 
         public string TagToExecute { get; }
 
-        private readonly ILogger _logger;
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(HuskyContext));
 
-        public HuskyContext(ILogger<HuskyContext> logger, IUninstallOperationsList uninstallOperationsList, Assembly installationAssembly, string tagToExecute)
+        public HuskyContext(IUninstallOperationsList uninstallOperationsList, Assembly installationAssembly, string tagToExecute)
         {
-            _logger = logger;
             UninstallOperations = uninstallOperationsList;
             InstallationAssembly = installationAssembly;
             TagToExecute = tagToExecute;
@@ -38,7 +38,7 @@ namespace Husky.Tasks
         public void SetCurrentTaskVariable(string key, object value)
         {
             var formattedKey = FormatVariableName(key);
-            _logger.LogDebug("Setting variable {key} to value {value}", key, value);
+            _logger.Debug("Setting variable {key} to value {value}", key, value);
             Variables[formattedKey] = value ?? throw new ArgumentNullException(nameof(value));
         }
 

@@ -3,7 +3,8 @@ using CliWrap;
 using CliWrap.Buffered;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace Husky.Services
 {
@@ -27,17 +28,12 @@ namespace Husky.Services
         private const string WindowsShellFileName = "cmd.exe";
         private const string LinuxShellFileName = "/bin/sh";
         private const string OsxShellFileName = "/bin/sh";
-        
-        private readonly ILogger _logger;
 
-        public ShellExecutionService(ILogger<ShellExecutionService> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(ShellExecutionService));
 
         public async ValueTask<ScriptExecutionResult> ExecuteShellCommand(string command)
         {
-            _logger.LogInformation("Executing shell command {command}", command);
+            _logger.Information("Executing shell command {command}", command);
             var commandResult = await Cli.Wrap(GetShellFileName())
                                          .WithArguments($"{GetShellExecuteAndTerminateArg()} {command}")
                                          .ExecuteBufferedAsync();
@@ -51,7 +47,7 @@ namespace Husky.Services
         public async ValueTask<ScriptExecutionResult> ExecuteFile(string filePath, string args)
         {
             // Todo: Going to need a non buffered version so we're not storing all of stdout in memory
-            _logger.LogInformation("Executing file {filePath} with args command {command}", filePath, args);
+            _logger.Information("Executing file {filePath} with args command {command}", filePath, args);
             var commandResult = await Cli.Wrap(filePath)
                                          .WithArguments(args)
                                          .ExecuteBufferedAsync();
@@ -83,9 +79,9 @@ namespace Husky.Services
 
             public void LogResult(ILogger logger)
             {
-                logger.LogInformation("Executed shell command with exit code {exitCode}", ExitCode);
-                logger.LogDebug("Shell execution resulted in the following StdOutput:\n{standardOutput}", StdOutput);
-                logger.LogDebug("Shell execution resulted in the following StdError:\n{standardError}", StdError);
+                logger.Information("Executed shell command with exit code {exitCode}", ExitCode);
+                logger.Debug("Shell execution resulted in the following StdOutput:\n{standardOutput}", StdOutput);
+                logger.Debug("Shell execution resulted in the following StdError:\n{standardError}", StdError);
             }
         }
     }

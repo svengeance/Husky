@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Husky.Core.Dependencies;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Workflow.Builder;
 
