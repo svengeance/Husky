@@ -20,7 +20,7 @@ namespace Husky.Core.Tests.UninstallationOperationsTests
         [SetUp]
         public async ValueTask Setup()
         {
-            _sut = (UninstallOperationsList) await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath, NullLogger.Instance);
+            _sut = (UninstallOperationsList) await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath);
         }
 
         [TearDown]
@@ -60,7 +60,7 @@ namespace Husky.Core.Tests.UninstallationOperationsTests
 
             await _sut.Flush();
 
-            var parsedOperations = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath, NullLogger.Instance);
+            var parsedOperations = await UninstallOperationsList.CreateOrRead(_uninstallOperationsFilePath);
 
             // Assert
             foreach (var entryKind in Enum.GetValues<UninstallOperationsList.EntryKind>())
