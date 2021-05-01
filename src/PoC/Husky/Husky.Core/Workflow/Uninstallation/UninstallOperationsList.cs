@@ -41,7 +41,7 @@ namespace Husky.Core.Workflow.Uninstallation
         {
             Logger.Information("Initializing instance of Uninstall Operations List at directory {uninstallOperationsFile}", filePath);
             if (File.Exists(filePath))
-                return await ReadFromJson(filePath, Logger);
+                return await ReadFromJson(filePath);
 
             Logger.Debug("Unable to locate existing Uninstall Operations List, creating new copy");
             var newUninstallOpsList = new UninstallOperationsList(filePath, OperationsListVersion.V1);
@@ -91,12 +91,12 @@ namespace Husky.Core.Workflow.Uninstallation
                    _                       => throw new ArgumentOutOfRangeException(nameof(kind), kind.ToString())
                };
 
-        private static async Task<UninstallOperationsList> ReadFromJson(string filePath, ILogger logger)
+        private static async Task<UninstallOperationsList> ReadFromJson(string filePath)
         {
-            logger.Debug("Reading existing Uninstall Operations file at {filePath}", filePath);
+            Logger.Debug("Reading existing Uninstall Operations file at {filePath}", filePath);
             await using var fs = File.OpenRead(filePath);
             var version = (OperationsListVersion) (byte) fs.ReadByte();
-            logger.Verbose("Reading file as version {uninstallOperationsFileVersion}", version.ToString());
+            Logger.Verbose("Reading file as version {uninstallOperationsFileVersion}", version.ToString());
             _ = fs.ReadByte(); // Discard newline
             
             using var json = await JsonDocument.ParseAsync(fs);
