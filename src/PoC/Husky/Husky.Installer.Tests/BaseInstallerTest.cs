@@ -5,6 +5,8 @@ using NUnit.Framework;
 using Husky.Core.HuskyConfiguration;
 using Husky.Installer.WorkflowExecution;
 using Husky.Internal.Generator.Dictify;
+using Husky.Tasks.Infrastructure;
+using StrongInject;
 
 namespace Husky.Installer.Tests
 {
@@ -40,6 +42,12 @@ namespace Husky.Installer.Tests
             {
                 Title = (string) dict["TestHuskyTask.Title"],
                 HasValidated = (bool) dict["TestHuskyTask.HasValidated"]
+            });
+
+            HuskyTasksContainer.RegisterCustomTask(typeof(TestHuskyTaskOptions), () =>
+            {
+                using var container = new TestTaskContainer();
+                return container.Resolve<TestHuskyTask>();
             });
             
             _installPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
