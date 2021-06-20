@@ -20,7 +20,7 @@ namespace Husky.Services
 
     public class EmbeddedResourceService : IEmbeddedResourceService
     {
-        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(RegistryService));
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(EmbeddedResourceService));
 
         public string[] ListResources(Assembly assembly) => assembly.GetManifestResourceNames();
         
