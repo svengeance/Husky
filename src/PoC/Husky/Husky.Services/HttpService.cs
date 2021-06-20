@@ -19,7 +19,7 @@ namespace Husky.Services
     {
         private static readonly HttpClient HttpClient = new();
 
-        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(RegistryService));
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(HttpService));
         private readonly IFileSystemService _fileSystemService;
 
         public HttpService(IFileSystemService fileSystemService)

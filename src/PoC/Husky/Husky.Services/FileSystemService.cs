@@ -37,7 +37,7 @@ namespace Husky.Services
 
     public class FileSystemService: IFileSystemService
     {
-        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(RegistryService));
+        private readonly ILogger _logger = Log.ForContext(Constants.SourceContextPropertyName, nameof(FileSystemService));
         protected virtual string WindowsScriptFileExtension => ".cmd";
         protected virtual string LinuxScriptFileExtension => ".sh";
         protected virtual string OsxScriptFileExtension => ".sh";
