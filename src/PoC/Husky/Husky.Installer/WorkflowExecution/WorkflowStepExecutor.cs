@@ -33,7 +33,7 @@ namespace Husky.Installer.WorkflowExecution
         {
             //var taskType = HuskyTaskResolver.GetTaskForConfiguration(step.HuskyTaskConfiguration);
             //var task = Unsafe.As<HuskyTask<T>>(_serviceProvider.GetRequiredService(taskType));
-            using var ownedTask = _taskResolver.ResolveTaskForConfiguration(typeof(T));
+            using var ownedTask = _taskResolver.ResolveTaskForConfiguration(huskyContext, step.HuskyTaskConfiguration.GetType());
             var task = ownedTask.Value;
             _logger.Debug("Loaded task {task} for step {step}", typeof(T).Name, step.GetType().Name);
 

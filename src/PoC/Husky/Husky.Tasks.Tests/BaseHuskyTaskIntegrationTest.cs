@@ -51,7 +51,7 @@ namespace Husky.Tasks.Tests
         {
             var serviceCollection = new ServiceCollection();
 
-            var modules = new[] { typeof(HuskyServicesModule), typeof(HuskyTasksModule), typeof(HuskyCoreModule) };
+            var modules = new[] { typeof(HuskyServicesModule), typeof(HuskyTasksContainer), typeof(HuskyCoreModule) };
 
             foreach (var module in modules)
                 foreach (var registration in module.GetCustomAttributes<RegisterAttribute>())
