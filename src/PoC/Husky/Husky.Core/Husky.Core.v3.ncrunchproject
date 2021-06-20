@@ -1,5 +1,7 @@
 ﻿<ProjectConfiguration>
   <Settings>
-    <HiddenComponentWarnings />
+    <HiddenComponentWarnings>
+      <Value>MicrosoftNetCompilersNotSupported</Value>
+    </HiddenComponentWarnings>
   </Settings>
 </ProjectConfiguration>
