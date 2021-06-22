@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis;
 namespace Husky.Generator
 {
     [Generator]
-    internal class HelloWorldGenerator : ISourceGenerator
+    internal class WorkflowGenerator : ISourceGenerator
     {
         public void Execute(GeneratorExecutionContext context)
         {
@@ -59,10 +59,7 @@ namespace Husky.Generator
             }
         }
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            Console.WriteLine("Hi");
-        }
+        public void Initialize(GeneratorInitializationContext context) { }
 
         // This isn't sexy, but consider that there aren't many parsers, it won't change much over time, and that this is running frequently as the user edits their files.
         // Is assembly scanning the right call?
