@@ -81,8 +81,8 @@ namespace HuskyApp.Installer
              *       One possible solution is to find a way to give the user access to the ServiceProvider and possible allow some sort of Middleware
              *       that executes per-step, per-job, per-stage, etc..
              */
-            var installationSettings = new HuskyInstallerSettings { LoggerConfiguration = loggerConfiguration };
-            var argParsingResult = await installationSettings.LoadFromStartArgs(args);
+            var installationSettings = new HuskyInstallerSettings();
+            var argParsingResult = installationSettings.LoadFromStartArgs(args);
 
             logger.Information("Parsed installations settings with result {parseResult}", argParsingResult);
             if (argParsingResult != 0)

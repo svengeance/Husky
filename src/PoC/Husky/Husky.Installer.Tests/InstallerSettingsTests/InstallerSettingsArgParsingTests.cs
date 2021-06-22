@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Husky.Core;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -19,13 +20,13 @@ namespace Husky.Installer.Tests.InstallerSettingsTests
         [TestCase(HuskyConstants.StepTags.Uninstall, HuskyConstants.StepTags.Uninstall)]
         [TestCase(HuskyConstants.StepTags.Modify, HuskyConstants.StepTags.Modify)]
         [TestCase(HuskyConstants.StepTags.Repair, HuskyConstants.StepTags.Repair)]
-        [TestCase("validate", "")]
+        [TestCase("", HuskyConstants.StepTags.Install)]
         [Category("UnitTest")]
-        public async ValueTask Parsing_args_determines_steps_to_use(string verb, string expectedTag)
+        public void Parsing_args_determines_steps_to_use(string verb, string expectedTag)
         {
             // Arrange
             // Act
-            var parseResult = await Sut.LoadFromStartArgs(new[] { verb });
+            var parseResult = Sut.LoadFromStartArgs(new[] { verb });
 
             // Assert
             Assert.Zero(parseResult);
@@ -34,13 +35,13 @@ namespace Husky.Installer.Tests.InstallerSettingsTests
 
         [Test]
         [Category("UnitTest")]
-        public async ValueTask Parsing_unknown_verb_returns_non_zero_code()
+        public void Parsing_unknown_verb_returns_non_zero_code()
         {
             // Arrange
             var args = "Unknown Command";
 
             // Act
-            var parseResult = await Sut.LoadFromStartArgs(new[] { args });
+            var parseResult = Sut.LoadFromStartArgs(new[] { args });
 
             // Assert
             Assert.NotZero(parseResult);
@@ -48,16 +49,16 @@ namespace Husky.Installer.Tests.InstallerSettingsTests
 
         [TestCase("--dry-run", nameof(HuskyInstallerSettings.IsDryRun), true)]
         [TestCase("--verbosity=Trace", nameof(HuskyInstallerSettings.LogLevel), LogLevel.Trace)]
-        [TestCase("-v Error", nameof(HuskyInstallerSettings.LogLevel), LogLevel.Error)]
+        [TestCase("--verbosity=Error", nameof(HuskyInstallerSettings.LogLevel), LogLevel.Error)]
         [Category("UnitTest")]
-        public async ValueTask Parsing_global_options_from_args_configures_install_settings(string arg, string expectedProperty, object expectedValue)
+        public void Parsing_global_options_from_args_configures_install_settings(string arg, string expectedProperty, object expectedValue)
         {
             // Arrange
             object? GetPropertyValue(HuskyInstallerSettings obj, string name)
                 => obj.GetType().GetProperty(expectedProperty)?.GetValue(obj);
 
             // Act
-            var parseResult = await Sut.LoadFromStartArgs(new[] { "validate", arg });
+            var parseResult = Sut.LoadFromStartArgs(new[] { "install", arg });
 
             // Assert
             Assert.Zero(parseResult);

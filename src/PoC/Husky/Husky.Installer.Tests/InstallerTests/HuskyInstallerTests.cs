@@ -43,7 +43,7 @@ namespace Husky.Installer.Tests.InstallerTests
         public async ValueTask Installer_validates_workflow()
         {
             // Arrange
-            var settings = new HuskyInstallerSettings { ResolveModulesFromAssemblies = new[] { Assembly.GetExecutingAssembly() } };
+            var settings = new HuskyInstallerSettings();
             var installer = new HuskyInstaller(Workflow, settings);
 
             // Act

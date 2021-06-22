@@ -10,22 +10,22 @@
 
     <IsNCrunch>false</IsNCrunch>
 
-    <!--<TrimMode>link</TrimMode>
-    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>-->
+    <TrimMode>link</TrimMode>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     
-    <!--<DebuggerSupport>false</DebuggerSupport>
+    <DebuggerSupport>false</DebuggerSupport>
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
     <EventSourceSupport>false</EventSourceSupport>
     <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
-    <UseSystemResourceKeys>true</UseSystemResourceKeys>-->
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
 
-    <!--<IlcDisableUnhandledExceptionExperience>true</IlcDisableUnhandledExceptionExperience>
+    <IlcDisableUnhandledExceptionExperience>true</IlcDisableUnhandledExceptionExperience>
     <IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
     <IlcInvariantGlobalization>true</IlcInvariantGlobalization>
-    <IlcOptimizationPreference>Size</IlcOptimizationPreference>-->
+    <IlcOptimizationPreference>Size</IlcOptimizationPreference>
 
-    <!--<IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>-->
+    <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />-->
+    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
     <ProjectReference Include="..\Husky.Core\Husky.Core.csproj" />
     <ProjectReference Include="..\Husky.Installer\Husky.Installer.csproj" />
     <ProjectReference Include="..\Husky.Generator\Husky.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
