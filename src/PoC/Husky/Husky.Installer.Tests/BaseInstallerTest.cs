@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Reflection;
+using Husky.Core;
 using Husky.Core.Workflow;
 using NUnit.Framework;
 using Husky.Core.HuskyConfiguration;
@@ -64,7 +65,6 @@ namespace Husky.Installer.Tests
                                          job.AddStep<TestHuskyTaskOptions>("TestStep", ConfigureTestTaskOptions))
                                     .Build();
 
-            InstallerSettings = new HuskyInstallerSettings { ResolveModulesFromAssemblies = new[] { Assembly.GetExecutingAssembly() } };
             InstallerSettings.LoadFromStartArgs(new[] { "install" });
 
             Installer = new HuskyInstaller(Workflow, InstallerSettings);
