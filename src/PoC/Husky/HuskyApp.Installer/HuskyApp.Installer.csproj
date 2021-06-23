@@ -12,8 +12,8 @@
 
     <TrimMode>link</TrimMode>
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-    
-    <DebuggerSupport>false</DebuggerSupport>
+
+    <!--<DebuggerSupport>false</DebuggerSupport>
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
     <EventSourceSupport>false</EventSourceSupport>
@@ -26,6 +26,13 @@
     <IlcOptimizationPreference>Size</IlcOptimizationPreference>
 
     <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
+
+    <IlcDisableReflection>true</IlcDisableReflection>
+
+    <IlcGenerateMapFile>true</IlcGenerateMapFile>
+    <IlcGenerateMetadataLog>true</IlcGenerateMetadataLog>
+    <IlcGenerateDgmlFile>true</IlcGenerateDgmlFile>-->
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
+    <!--<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />-->
     <ProjectReference Include="..\Husky.Core\Husky.Core.csproj" />
     <ProjectReference Include="..\Husky.Installer\Husky.Installer.csproj" />
     <ProjectReference Include="..\Husky.Generator\Husky.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
