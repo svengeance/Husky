@@ -30,7 +30,7 @@ namespace Husky.Installer.Tests
 
         protected HuskyUninstaller Uninstaller { get; private set; } = null!;
 
-        protected HuskyInstallerSettings InstallerSettings { get; private set; } = null!;
+        protected HuskyInstallerSettings InstallerSettings { get; private set; } = new()!;
 
         protected abstract void ConfigureTestTaskOptions(TestHuskyTaskOptions options);
 
