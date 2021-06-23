@@ -1,6 +1,6 @@
 ﻿using System;
 using Husky.Core.CLI;
-using Microsoft.Extensions.Logging;
+using Serilog.Events;
 
 namespace Husky.Core
 {
@@ -10,7 +10,7 @@ namespace Husky.Core
 
         // Todo: GH #18 - Make DryRun actually do something
         public bool IsDryRun { get; private set; }
-        public LogLevel LogLevel { get; private set; } = LogLevel.Information;
+        public LogEventLevel LogLevel { get; private set; } = LogEventLevel.Information;
 
         public int LoadFromStartArgs(string[] args)
         {
@@ -22,7 +22,7 @@ namespace Husky.Core
             TagToExecute = parseResult.Command;
             IsDryRun = parseResult.TryGetOption("dry-run", out var dryRun) && dryRun.GetAsBool();
             if (parseResult.TryGetOption("verbosity", out var logLevel))
-                LogLevel = Enum.Parse<LogLevel>(logLevel.GetAsString());
+                LogLevel = Enum.Parse<LogEventLevel>(logLevel.GetAsString());
 
             return 0;
         }

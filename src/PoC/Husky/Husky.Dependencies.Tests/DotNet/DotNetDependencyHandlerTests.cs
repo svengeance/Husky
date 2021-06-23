@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Husky.Dependencies.DependencyHandlers;
 using Husky.Services;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 

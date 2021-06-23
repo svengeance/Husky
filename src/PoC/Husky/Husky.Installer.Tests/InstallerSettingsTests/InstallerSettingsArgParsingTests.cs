@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Husky.Core;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Serilog.Events;
 
 namespace Husky.Installer.Tests.InstallerSettingsTests
 {
@@ -48,8 +49,8 @@ namespace Husky.Installer.Tests.InstallerSettingsTests
         }
 
         [TestCase("--dry-run", nameof(HuskyInstallerSettings.IsDryRun), true)]
-        [TestCase("--verbosity=Trace", nameof(HuskyInstallerSettings.LogLevel), LogLevel.Trace)]
-        [TestCase("--verbosity=Error", nameof(HuskyInstallerSettings.LogLevel), LogLevel.Error)]
+        [TestCase("--verbosity=Verbose", nameof(HuskyInstallerSettings.LogLevel), LogEventLevel.Verbose)]
+        [TestCase("--verbosity=Error", nameof(HuskyInstallerSettings.LogLevel), LogEventLevel.Error)]
         [Category("UnitTest")]
         public void Parsing_global_options_from_args_configures_install_settings(string arg, string expectedProperty, object expectedValue)
         {

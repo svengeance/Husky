@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Husky.Core.Workflow.Uninstallation;
-using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
 namespace Husky.Core.Tests.UninstallationOperationsTests

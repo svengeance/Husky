@@ -1,13 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Husky.Core.Dependencies;
-using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
-using Husky.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 // ReSharper disable InconsistentNaming
 namespace Husky.Dependencies.DependencyAcquisitionMethods
