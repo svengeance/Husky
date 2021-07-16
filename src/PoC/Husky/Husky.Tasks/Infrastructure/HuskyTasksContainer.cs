@@ -41,7 +41,7 @@ namespace Husky.Tasks.Infrastructure
         IContainer<VerifyMachineMeetsRequirements>
     {
         [Factory]
-        private ApplicationConfiguration CreateaAppConfiguration() => (ApplicationConfiguration)ObjectFactory.Create(typeof(ApplicationConfiguration), _context.Variables);
+        private ApplicationConfiguration CreateAppConfiguration() => (ApplicationConfiguration)ObjectFactory.Create(typeof(ApplicationConfiguration), _context.Variables);
 
         [Factory]
         private InstallationConfiguration CreateInstallationConfiguration() => (InstallationConfiguration)ObjectFactory.Create(typeof(InstallationConfiguration), _context.Variables);
