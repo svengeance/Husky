@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-preview.2.22152.2" />
+    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-*" />
     <ProjectReference Include="..\Husky.Core\Husky.Core.csproj" />
     <ProjectReference Include="..\Husky.Installer\Husky.Installer.csproj" />
     <ProjectReference Include="..\Husky.Generator\Husky.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
