@@ -6,7 +6,7 @@
 
 using System;
 using System.Text.RegularExpressions;
-using Version = SemVer.Version;
+using Version = SemanticVersioning.Version;
 using System.Linq;
 
 namespace Husky.Internal.Shared

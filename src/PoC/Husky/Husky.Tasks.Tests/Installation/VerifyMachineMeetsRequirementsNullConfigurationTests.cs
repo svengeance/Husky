@@ -11,7 +11,7 @@ using Husky.Services;
 using Husky.Tasks.Installation;
 using Moq;
 using NUnit.Framework;
-using Version = SemVer.Version;
+using Version = SemanticVersioning.Version;
 
 namespace Husky.Tasks.Tests.Installation
 {

@@ -7,7 +7,7 @@ using System.Runtime.Versioning;
 using Husky.Core.Enums;
 using Husky.Internal.Shared;
 using Microsoft.Win32;
-using Version = SemVer.Version;
+using Version = SemanticVersioning.Version;
 
 // ReSharper disable InconsistentNaming
 namespace Husky.Core.Platform

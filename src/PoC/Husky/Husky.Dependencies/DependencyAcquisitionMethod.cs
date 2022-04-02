@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Husky.Core.Dependencies;
 using Husky.Core.HuskyConfiguration;
-using Range = SemVer.Range;
+using Range = SemanticVersioning.Range;
 
 namespace Husky.Dependencies
 {

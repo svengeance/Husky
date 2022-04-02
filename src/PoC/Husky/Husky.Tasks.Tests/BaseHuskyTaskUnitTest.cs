@@ -18,7 +18,7 @@ namespace Husky.Tasks.Tests
         protected override void BeforeSetup()
         {
             Fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
-            Fixture.Inject(new SemVer.Version("0.1.2"));
+            Fixture.Inject(new SemanticVersioning.Version("0.1.2"));
             Fixture.Inject(UninstallOperationsMock);
 
             var sutConstructorTypes = typeof(T).GetConstructors(BindingFlags.Public | BindingFlags.Instance)

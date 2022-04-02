@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Husky.Core.Enums;
-using Version = SemVer.Version;
+using Version = SemanticVersioning.Version;
 
 namespace Husky.Core.Platform
 {

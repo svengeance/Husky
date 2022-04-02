@@ -4,7 +4,7 @@ using System.Linq;
 using Husky.Core.Dependencies;
 using Husky.Core.Platform;
 using Husky.Dependencies.DependencyAcquisitionMethods;
-using Version = SemVer.Version;
+using Version = SemanticVersioning.Version;
 
 namespace Husky.Dependencies.DependencyHandlers
 {

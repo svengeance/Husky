@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>Enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StrongInject" Version="1.2.0" />
+    <PackageReference Include="StrongInject" Version="1.4.3" />
   </ItemGroup>
 
   <ItemGroup>

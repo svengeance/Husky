@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Husky.Core.Dependencies;
 using Husky.Core.Enums;
 using Husky.Core.Platform;
-using Range = SemVer.Range;
-using Version = SemVer.Version;
+using Range = SemanticVersioning.Range;
+using Version = SemanticVersioning.Version;
 
 namespace Husky.Dependencies.DependencyHandlers
 {

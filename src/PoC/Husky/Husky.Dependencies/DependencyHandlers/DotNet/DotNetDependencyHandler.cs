@@ -6,7 +6,7 @@ using Husky.Core.Dependencies;
 using Husky.Services;
 using Serilog;
 using Serilog.Core;
-using Version = SemVer.Version;
+using Version = SemanticVersioning.Version;
 
 namespace Husky.Dependencies.DependencyHandlers
 {

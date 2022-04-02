@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Husky.Core.Enums;
-using SemVer;
+using SemanticVersioning;
 
 namespace Husky.Core.Platform
 {

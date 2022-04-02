@@ -2,7 +2,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Husky.Core.Enums;
-using Range = SemVer.Range;
+using Range = SemanticVersioning.Range;
 
 namespace Husky.Core.HuskyConfiguration
 {

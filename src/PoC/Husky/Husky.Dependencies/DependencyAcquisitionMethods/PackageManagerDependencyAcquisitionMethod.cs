@@ -3,7 +3,7 @@ using Husky.Core.Dependencies;
 using Husky.Core.Enums;
 using Husky.Core.HuskyConfiguration;
 using Husky.Core.Platform;
-using Version = SemVer.Version;
+using Version = SemanticVersioning.Version;
 
 namespace Husky.Dependencies.DependencyAcquisitionMethods
 {

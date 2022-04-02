@@ -1,4 +1,4 @@
-﻿using SemVer;
+﻿using SemanticVersioning;
 
 namespace Husky.Core.Dependencies
 {
